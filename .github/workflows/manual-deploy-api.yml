@@ -42,5 +42,5 @@ jobs:
               registry-username: ${{ secrets.REGISTRY_USERNAME }}
               registry-password: ${{ secrets.REGISTRY_PASSWORD }}
               name: aci-homeworkmanagerapi
-              environment-variables: PRODUCTION_DB_CONNECTION_STRING="${{ secrets.PRODUCTION_DB_CONNECTION_STRING }}"
+              secure-environment-variables: PRODUCTION_DB_CONNECTION_STRING="${{ secrets.PRODUCTION_DB_CONNECTION_STRING }}"
               location: 'west europe'
