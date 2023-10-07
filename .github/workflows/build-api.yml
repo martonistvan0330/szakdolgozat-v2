@@ -10,7 +10,7 @@ jobs:
   build-dotnet:
     defaults:
       run:
-        working-directory: TestProject
+        working-directory: HomeworkManager
 
     runs-on: ubuntu-latest
 
