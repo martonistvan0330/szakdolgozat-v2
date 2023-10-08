@@ -10,7 +10,7 @@ jobs:
   build:
     defaults:
       run:
-        working-directory: AngularClientApp
+        working-directory: HomeworkManager.Angular/ClientApp
     
     runs-on: ubuntu-latest
 
@@ -25,7 +25,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        cache-dependency-path: AngularClientApp/package-lock.json
+        cache-dependency-path: HomeworkManager.Angular/ClientApp/package-lock.json
     - run: npm ci
     - run: npm run build --if-present
     # - run: npm test

@@ -50,7 +50,7 @@ jobs:
 
         defaults:
             run:
-                working-directory: AngularClientApp
+                working-directory: HomeworkManager.Angular/ClientApp
 
         steps:
         - name: 'Checkout GitHub Action'
