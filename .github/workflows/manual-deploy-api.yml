@@ -36,11 +36,11 @@ jobs:
           uses: 'azure/aci-deploy@v1'
           with:
               resource-group: ${{ secrets.RESOURCE_GROUP }}
-              dns-name-label: homework-manager-api
+              dns-name-label: homework-manager-test-api
               image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/homeworkmanagerapi:v0.${{ github.run_number }}
               registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
               registry-username: ${{ secrets.REGISTRY_USERNAME }}
               registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-              name: aci-homeworkmanagerapi
+              name: aci-homeworkmanager-testapi
               secure-environment-variables: PRODUCTION_DB_CONNECTION_STRING="${{ secrets.PRODUCTION_DB_CONNECTION_STRING }}"
               location: 'west europe'
