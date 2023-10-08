@@ -6,11 +6,11 @@ import { Component, isDevMode, OnInit } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  title = 'AngularClientApp';
+  title = 'ClientApp';
 
   ngOnInit() {
     if (!isDevMode()) {
-      this.title = "AngularClientAppProd"
+      this.title = "ClientAppProd"
     }
   }
 }
