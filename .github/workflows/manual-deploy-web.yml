@@ -36,7 +36,7 @@ jobs:
           uses: 'azure/aci-deploy@v1'
           with:
               resource-group: ${{ secrets.RESOURCE_GROUP }}
-              dns-name-label: homework-manager-test-api
+              dns-name-label: homework-manager-api
               image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/homeworkmanagerapi:v${{ github.run_number }}
               registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
               registry-username: ${{ secrets.REGISTRY_USERNAME }}
