@@ -1,15 +1,15 @@
-name: Manual Deploy Web
+name: Manual Deploy Angular app
 
 on:
     workflow_dispatch
 
 jobs:
-    build-and-deploy-api:
+    build-and-deploy-angular:
         runs-on: ubuntu-latest
 
         defaults:
             run:
-                working-directory: TestProject
+                working-directory: AngularClientApp
 
         steps:
         - name: 'Checkout GitHub Action'
@@ -29,17 +29,17 @@ jobs:
               username: ${{ secrets.REGISTRY_USERNAME }}
               password: ${{ secrets.REGISTRY_PASSWORD }}
         - run: |
-            docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/testapi:v${{ github.run_number }} -f TestProject.API/Dockerfile
-            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/testapi:v${{ github.run_number }}
+            docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/homeworkmanagerangulartest:v${{ github.run_number }}
+            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/homeworkmanagerangulartest:v${{ github.run_number }}
 
         - name: 'Deploy to Azure Container Instances'
           uses: 'azure/aci-deploy@v1'
           with:
               resource-group: ${{ secrets.RESOURCE_GROUP }}
-              dns-name-label: ${{ secrets.RESOURCE_GROUP }}-api
-              image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/testapi:v${{ github.run_number }}
+              dns-name-label: homework-manager-test
+              image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/homeworkmanagerangulartest:v${{ github.run_number }}
               registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
               registry-username: ${{ secrets.REGISTRY_USERNAME }}
               registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-              name: aci-testapi
+              name: aci-homeworkmanager-testangular
               location: 'west europe'
