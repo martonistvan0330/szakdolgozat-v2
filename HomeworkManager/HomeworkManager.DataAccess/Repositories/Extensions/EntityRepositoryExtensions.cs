@@ -1,5 +1,5 @@
 ﻿using HomeworkManager.Model.CustomEntities.Enitity;
-using HomeworkManager.Model.Enitities;
+using HomeworkManager.Model.Entities;
 
 namespace HomeworkManager.DataAccess.Repositories.Extensions
 {

@@ -1,18 +1,23 @@
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.Model.CustomEntities.Enitity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeworkManager.API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class EntityController : ControllerBase
     {
         private readonly IEntityManager _entityManager;
 
         private readonly ILogger<EntityController> _logger;
 
-        public EntityController(ILogger<EntityController> logger, IEntityManager entityManager)
+        public EntityController(
+            ILogger<EntityController> logger,
+            IEntityManager entityManager,
+            IConfiguration configuration
+        )
         {
             _logger = logger;
             _entityManager = entityManager;
@@ -23,10 +28,7 @@ namespace HomeworkManager.API.Controllers
         {
             var entity = await _entityManager.GetOrNullAsync(entityId);
 
-            if (entity is null)
-            {
-                return NotFound();
-            }
+            if (entity is null) return NotFound();
 
             return Ok(entity);
         }
@@ -43,6 +45,7 @@ namespace HomeworkManager.API.Controllers
             return await _entityManager.CreateAsync(entityModel);
         }
 
+        [Authorize]
         [HttpDelete("{entityId}")]
         public async Task<ActionResult> Delete(int entityId)
         {
