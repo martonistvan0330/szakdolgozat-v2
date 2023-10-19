@@ -21,7 +21,8 @@ namespace HomeworkManager.API.Hosting
                         ValidateIssuerSigningKey = true,
                         ValidAudience = jwtConfiguration["Audience"],
                         ValidIssuer = jwtConfiguration["Issuer"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfiguration["Key"]!))
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfiguration["Key"]!)),
+                        ClockSkew = TimeSpan.Zero
                     };
                 });
         }

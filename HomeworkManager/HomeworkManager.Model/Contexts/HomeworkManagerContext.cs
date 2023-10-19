@@ -6,6 +6,7 @@ namespace HomeworkManager.Model.Contexts
 {
     public class HomeworkManagerContext : IdentityDbContext<User, Role, Guid>
     {
+        public DbSet<AccessToken> AccessTokens => Set<AccessToken>();
         public DbSet<Entity> Entities => Set<Entity>();
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 

@@ -3,7 +3,7 @@ using HomeworkManager.Model.CustomEntities.Authentication;
 using HomeworkManager.Model.Entities;
 using HomeworkManager.Model.ErrorEntities;
 
-namespace HomeworkManager.BusinessLogic.Services.Interfaces
+namespace HomeworkManager.BusinessLogic.Services.Authentication.Interfaces
 {
     public interface IJwtService
     {

@@ -4,6 +4,9 @@ namespace HomeworkManager.Model.Entities
     {
         public int RefreshTokenId { get; set; }
         public required string Token { get; set; }
-        public Guid UserId { get; set; }
+        public bool IsActive { get; set; } = true;
+        
+        public int AccessTokenId { get; set; }
+        public AccessToken AccessToken { get; set; } = null!;
     }
 }

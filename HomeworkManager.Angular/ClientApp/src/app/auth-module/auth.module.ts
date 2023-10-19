@@ -10,12 +10,14 @@ import { MatCardModule } from "@angular/material/card";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { FormsModule } from "@angular/forms";
+import { AuthLayoutComponent } from './auth-layout/auth-layout.component';
 
 
 @NgModule({
   declarations: [
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    AuthLayoutComponent
   ],
   imports: [
     CommonModule,

@@ -4,6 +4,7 @@ using HomeworkManager.Model.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeworkManager.Model.Migrations
 {
     [DbContext(typeof(HomeworkManagerContext))]
-    partial class HomeworkManagerContextModelSnapshot : ModelSnapshot
+    [Migration("20231019221011_RevokableTokens")]
+    partial class RevokableTokens
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,7 +47,7 @@ namespace HomeworkManager.Model.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AccessTokens", (string)null);
+                    b.ToTable("AccessTokens");
                 });
 
             modelBuilder.Entity("HomeworkManager.Model.Entities.Entity", b =>
@@ -61,7 +64,7 @@ namespace HomeworkManager.Model.Migrations
 
                     b.HasKey("EntityId");
 
-                    b.ToTable("Entities", (string)null);
+                    b.ToTable("Entities");
                 });
 
             modelBuilder.Entity("HomeworkManager.Model.Entities.RefreshToken", b =>
@@ -87,7 +90,7 @@ namespace HomeworkManager.Model.Migrations
                     b.HasIndex("AccessTokenId")
                         .IsUnique();
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("HomeworkManager.Model.Entities.Role", b =>

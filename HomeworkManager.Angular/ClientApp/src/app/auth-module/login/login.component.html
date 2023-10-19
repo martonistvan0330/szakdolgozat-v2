@@ -1,38 +1,36 @@
-<mat-sidenav-container class="sidenav-container">
-    <mat-sidenav-content class="content">
-        <mat-card class="login-card">
-            <mat-card-header class="login-header">
-                <mat-card-title>Sign In</mat-card-title>
-            </mat-card-header>
-            <form>
-                <mat-card-content class="login-content">
-                    <mat-form-field>
-                        <mat-label>Username</mat-label>
-                        <input #username="ngModel" [(ngModel)]="authRequest.username" id="username" matInput
-                               name="username"
-                               required>
-                        <mat-error *ngIf="username.invalid && (username.dirty || username.touched)">
-                            Username required
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field>
-                        <mat-label>Password</mat-label>
-                        <input #password="ngModel" [(ngModel)]="authRequest.password" id="password" matInput
-                               name="password" required
-                               type="password">
-                        <mat-error *ngIf="password.invalid && (password.dirty || password.touched)">
-                            Password required
-                        </mat-error>
-                    </mat-form-field>
-                </mat-card-content>
-                <mat-card-actions class="login-actions">
-                    <button (click)="login()" color="primary" mat-raised-button>Log In</button>
-                </mat-card-actions>
-            </form>
-            <mat-card-footer class="login-footer">
-                <mat-divider></mat-divider>
-                <a color="accent" mat-button routerLink="/register">Sign Up</a>
-            </mat-card-footer>
-        </mat-card>
-    </mat-sidenav-content>
-</mat-sidenav-container>
+<hwm-auth-layout>
+    <mat-card class="login-card">
+        <mat-card-header class="login-header">
+            <mat-card-title>Sign In</mat-card-title>
+        </mat-card-header>
+        <form>
+            <mat-card-content class="login-content">
+                <mat-form-field>
+                    <mat-label>Username</mat-label>
+                    <input #username="ngModel" [(ngModel)]="authRequest.username" id="username" matInput
+                           name="username"
+                           required>
+                    <mat-error *ngIf="username.invalid && (username.dirty || username.touched)">
+                        Username required
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Password</mat-label>
+                    <input #password="ngModel" [(ngModel)]="authRequest.password" id="password" matInput
+                           name="password" required
+                           type="password">
+                    <mat-error *ngIf="password.invalid && (password.dirty || password.touched)">
+                        Password required
+                    </mat-error>
+                </mat-form-field>
+            </mat-card-content>
+            <mat-card-actions class="login-actions">
+                <button (click)="login()" color="primary" mat-raised-button>Log In</button>
+            </mat-card-actions>
+        </form>
+        <mat-card-footer class="login-footer">
+            <mat-divider></mat-divider>
+            <a color="accent" mat-button routerLink="/register">Sign Up</a>
+        </mat-card-footer>
+    </mat-card>
+</hwm-auth-layout>

@@ -4,6 +4,7 @@ namespace HomeworkManager.DataAccess.Repositories.Interfaces
 {
     public interface IRefreshTokenRepository
     {
-        Task<bool> UserHasTokenAsync(User user, string refreshToken);
+        Task<RefreshToken?> GetAsync(AccessToken accessToken, string refreshToken);
+        Task RevokeAsync(AccessToken accessToken, string refreshToken);
     }
 }

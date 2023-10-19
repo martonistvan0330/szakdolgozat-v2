@@ -1,6 +1,7 @@
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.Model.CustomEntities.Authentication;
 using HomeworkManager.Model.CustomEntities.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeworkManager.API.Controllers;
@@ -19,21 +20,21 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("Register")]
-    public async Task<ActionResult<UserModel>> RegisterAsync(UserModel newUser)
+    public async Task<ActionResult<AuthenticationResponse>> RegisterAsync(UserModel newUser)
     {
         var registerUserResult = await _authenticationManager.RegisterAsync(newUser);
 
-        return registerUserResult.Match<ActionResult<UserModel>>(
+        return registerUserResult.Match<ActionResult<AuthenticationResponse>>(
             result => Ok(result),
             error => BadRequest(error.Message)
         );
     }
 
-    [HttpPost("CreateToken")]
+    [HttpPost("Login")]
     public async Task<ActionResult<AuthenticationResponse>> CreateBearerTokenAsync(AuthenticationRequest authenticationRequest)
     {
         var authenticationResponseResult =
-            await _authenticationManager.CreateBearerTokenAsync(authenticationRequest.Username, authenticationRequest.Password);
+            await _authenticationManager.LoginAsync(authenticationRequest);
 
         return authenticationResponseResult.Match<ActionResult<AuthenticationResponse>>(
             result => Ok(result),
@@ -45,7 +46,20 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<AuthenticationResponse>> RefreshTokenAsync(RefreshRequest tokens)
     {
         var authenticationResult = await _authenticationManager.CreateRefreshTokenAsync(tokens.AccessToken, tokens.RefreshToken);
+        
         return authenticationResult.Match<ActionResult<AuthenticationResponse>>(
+            result => Ok(result),
+            error => Unauthorized(error.Message)
+        );
+    }
+
+    [Authorize]
+    [HttpPost("Logout")]
+    public async Task<ActionResult<bool>> LogoutAsync(RevokeRequest tokens)
+    {
+        var logoutResult = await _authenticationManager.Logout(User.Identity?.Name, tokens);
+
+        return logoutResult.Match<ActionResult<bool>>(
             result => Ok(result),
             error => Unauthorized(error.Message)
         );

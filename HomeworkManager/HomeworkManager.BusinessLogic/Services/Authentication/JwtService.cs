@@ -3,7 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using HomeworkManager.BusinessLogic.Services.Interfaces;
+using HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
 using HomeworkManager.DataAccess.Repositories.Interfaces;
 using HomeworkManager.Model.Configurations;
 using HomeworkManager.Model.CustomEntities;
@@ -15,20 +15,27 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace HomeworkManager.BusinessLogic.Services
+namespace HomeworkManager.BusinessLogic.Services.Authentication
 {
     public class JwtService : IJwtService
     {
         private const int EXPIRATION_MINUTES = 1;
 
         private readonly JwtConfiguration _jwtConfiguration;
-        private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly UserManager<User> _userManager;
+        private readonly IAccessTokenRepository _accessTokenRepository;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
 
-        public JwtService(IOptions<JwtConfiguration> jwtConfiguration, UserManager<User> userManager, IRefreshTokenRepository refreshTokenRepository)
+        public JwtService(
+            IOptions<JwtConfiguration> jwtConfiguration,
+            UserManager<User> userManager,
+            IAccessTokenRepository accessTokenRepository,
+            IRefreshTokenRepository refreshTokenRepository
+        )
         {
             _jwtConfiguration = jwtConfiguration.Value;
             _userManager = userManager;
+            _accessTokenRepository = accessTokenRepository;
             _refreshTokenRepository = refreshTokenRepository;
         }
 
@@ -37,21 +44,23 @@ namespace HomeworkManager.BusinessLogic.Services
         {
             var expiration = DateTime.UtcNow.AddMinutes(EXPIRATION_MINUTES);
 
-            var accessToken = CreateJwtAccessToken(
+            var accessJwt = CreateJwtAccessToken(
                 await CreateClaimsAsync(user),
                 CreateSigningCredentials(),
                 expiration
             );
 
             var refreshToken = GenerateRefreshToken();
-
-            await UpdateUserAsync(user, refreshToken);
-
+            
             var tokenHandler = new JwtSecurityTokenHandler();
+
+            string accessToken = tokenHandler.WriteToken(accessJwt);
+            
+            await AddTokensToUserAsync(user, accessToken, refreshToken);
 
             return new AuthenticationResponse
             {
-                AccessToken = tokenHandler.WriteToken(accessToken),
+                AccessToken = accessToken,
                 RefreshToken = refreshToken,
                 Expiration = expiration
             };
@@ -81,11 +90,27 @@ namespace HomeworkManager.BusinessLogic.Services
 
             var user = await _userManager.FindByNameAsync(principal.Identity.Name);
 
-            if (user is null || !await _refreshTokenRepository.UserHasTokenAsync(user, refreshToken))
+            if (user is null)
             {
                 return new BusinessError(AuthenticationErrorMessages.INVALID_REFRESH_TOKEN);
             }
 
+            var dbAccessToken = await _accessTokenRepository.GetAsync(user, accessToken);
+
+            if (dbAccessToken is null || !dbAccessToken.IsActive)
+            {
+                return new BusinessError(AuthenticationErrorMessages.INVALID_ACCESS_TOKEN);
+            }
+            
+            var dbRefreshToken = await _refreshTokenRepository.GetAsync(dbAccessToken, refreshToken);
+
+            if (dbRefreshToken is null || !dbRefreshToken.IsActive)
+            {
+                return new BusinessError(AuthenticationErrorMessages.INVALID_REFRESH_TOKEN);
+            }
+
+            await RevokeTokensAsync(user, accessToken, refreshToken);
+            
             return await CreateTokensAsync(user);
         }
 
@@ -136,11 +161,32 @@ namespace HomeworkManager.BusinessLogic.Services
             return Convert.ToBase64String(randomNumber);
         }
 
-        private async Task UpdateUserAsync(User user, string refreshToken)
+        private async Task AddTokensToUserAsync(User user, string accessToken, string refreshToken)
         {
-            user.RefreshTokens.Add(new RefreshToken { Token = refreshToken, UserId = user.Id });
+            AccessToken dbAccessToken = new()
+            {
+                Token = accessToken,
+                UserId = user.Id
+            };
 
+            dbAccessToken.RefreshToken = new()
+            {
+                Token = refreshToken,
+                AccessToken = dbAccessToken
+            };
+            
+            user.AccessTokens.Add(dbAccessToken);
+        
             await _userManager.UpdateAsync(user);
+        }
+
+        private async Task RevokeTokensAsync(User user, string accessToken, string refreshToken)
+        {
+            var dbAccessToken = await _accessTokenRepository.RevokeAsync(user, accessToken);
+            if (dbAccessToken is not null)
+            {
+                await _refreshTokenRepository.RevokeAsync(dbAccessToken, refreshToken);
+            }
         }
     }
 }

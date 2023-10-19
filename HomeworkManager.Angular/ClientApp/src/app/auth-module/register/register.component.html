@@ -1,1 +1,46 @@
-<p>register works!</p>
+<hwm-auth-layout>
+  <mat-card class="register-card">
+    <mat-card-header class="register-header">
+      <mat-card-title>Sign Up</mat-card-title>
+    </mat-card-header>
+    <form>
+      <mat-card-content class="register-content">
+        <mat-form-field>
+          <mat-label>Email</mat-label>
+          <input #email="ngModel" [(ngModel)]="user.email" id="email" matInput
+                 name="email"
+                 required type="email">
+          <mat-error *ngIf="email.invalid && (email.dirty || email.touched)">
+            Email required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Username</mat-label>
+          <input #username="ngModel" [(ngModel)]="user.username" id="username" matInput
+                 name="username"
+                 required>
+          <mat-error *ngIf="username.invalid && (username.dirty || username.touched)">
+            Username required
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Password</mat-label>
+          <input #password="ngModel" [(ngModel)]="user.password" id="password" matInput
+                 name="password" required
+                 type="password">
+          <mat-error *ngIf="password.invalid && (password.dirty || password.touched)">
+            Password required
+          </mat-error>
+        </mat-form-field>
+      </mat-card-content>
+      <mat-card-actions class="register-actions">
+        <button (click)="register()" color="primary" mat-raised-button>Register</button>
+      </mat-card-actions>
+    </form>
+    <mat-card-footer class="register-footer">
+      <mat-divider></mat-divider>
+      <a color="accent" mat-button routerLink="/login">Sign In</a>
+    </mat-card-footer>
+  </mat-card>
+</hwm-auth-layout>

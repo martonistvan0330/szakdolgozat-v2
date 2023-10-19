@@ -4,6 +4,6 @@ namespace HomeworkManager.Model.Entities
 {
     public class User : IdentityUser<Guid>
     {
-        public ICollection<RefreshToken> RefreshTokens { get; set; } = new HashSet<RefreshToken>();
+        public ICollection<AccessToken> AccessTokens { get; set; } = new HashSet<AccessToken>();
     }
 }

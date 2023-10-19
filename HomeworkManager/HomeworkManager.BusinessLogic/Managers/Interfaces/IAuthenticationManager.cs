@@ -7,8 +7,9 @@ namespace HomeworkManager.BusinessLogic.Managers.Interfaces
 {
     public interface IAuthenticationManager
     {
-        Task<Result<UserModel, BusinessError>> RegisterAsync(UserModel newUser);
-        Task<Result<AuthenticationResponse, BusinessError>> CreateBearerTokenAsync(string userName, string password);
+        Task<Result<AuthenticationResponse, BusinessError>> RegisterAsync(UserModel newUser);
+        Task<Result<AuthenticationResponse, BusinessError>> LoginAsync(AuthenticationRequest authenticationRequest);
         Task<Result<AuthenticationResponse, BusinessError>> CreateRefreshTokenAsync(string accessToken, string refreshToken);
+        Task<Result<bool, BusinessError>> Logout(string? userName, RevokeRequest tokens);
     }
 }

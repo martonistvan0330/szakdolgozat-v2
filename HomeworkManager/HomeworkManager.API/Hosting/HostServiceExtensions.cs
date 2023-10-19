@@ -1,7 +1,7 @@
 ﻿using HomeworkManager.BusinessLogic.Managers;
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
-using HomeworkManager.BusinessLogic.Services;
-using HomeworkManager.BusinessLogic.Services.Interfaces;
+using HomeworkManager.BusinessLogic.Services.Authentication;
+using HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
 using HomeworkManager.BusinessLogic.Services.Seed;
 using HomeworkManager.BusinessLogic.Services.Seed.Interfaces;
 using HomeworkManager.DataAccess.Repositories;
@@ -13,6 +13,7 @@ namespace HomeworkManager.API.Hosting
     {
         public static IServiceCollection AddRepositories(this IServiceCollection services)
         {
+            services.AddScoped<IAccessTokenRepository, AccessTokenRepository>();
             services.AddScoped<IEntityRepository, EntityRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             return services;

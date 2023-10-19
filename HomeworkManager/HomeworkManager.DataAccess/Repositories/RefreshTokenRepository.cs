@@ -14,12 +14,24 @@ namespace HomeworkManager.DataAccess.Repositories
             _context = context;
         }
 
-        public async Task<bool> UserHasTokenAsync(User user, string refreshToken)
+        public async Task<RefreshToken?> GetAsync(AccessToken accessToken, string refreshToken)
         {
             return await _context.RefreshTokens
-                .Where(rt => rt.UserId == user.Id)
-                .Select(rt => rt.Token)
-                .ContainsAsync(refreshToken);
+                .Where(rt => rt.Token == refreshToken
+                             && rt.AccessTokenId == accessToken.AccessTokenId)
+                .SingleOrDefaultAsync();
+        }
+
+        public async Task RevokeAsync(AccessToken accessToken, string refreshToken)
+        {
+            var dbRefreshToken = await GetAsync(accessToken, refreshToken);
+
+            if (dbRefreshToken is not null)
+            {
+                dbRefreshToken.IsActive = false;
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }
