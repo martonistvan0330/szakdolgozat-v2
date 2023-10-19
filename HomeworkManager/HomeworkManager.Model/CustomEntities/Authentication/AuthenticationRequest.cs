@@ -1,8 +1,7 @@
-﻿namespace HomeworkManager.Model.CustomEntities.Authentication
+﻿namespace HomeworkManager.Model.CustomEntities.Authentication;
+
+public class AuthenticationRequest
 {
-    public class AuthenticationRequest
-    {
-        public required string Username { get; set; }
-        public required string Password { get; set; }
-    }
+    public required string Username { get; set; }
+    public required string Password { get; set; }
 }

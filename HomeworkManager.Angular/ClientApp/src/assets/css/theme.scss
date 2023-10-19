@@ -1,0 +1,28 @@
+@use '@angular/material' as mat;
+@use '../../app/auth-module/login/login.component.scss' as login;
+
+$dark-theme: mat.define-dark-theme((
+        color: (
+                primary: mat.define-palette(mat.$pink-palette, 700, 500, 900),
+                accent: mat.define-palette(mat.$blue-grey-palette, A200, A100, A400),
+        ),
+        typography: mat.define-typography-config(),
+        density: 0,
+));
+
+@include mat.all-component-themes($dark-theme);
+//@include login.theme($dark-theme);
+
+$light-theme: mat.define-light-theme((
+        color: (
+                primary: mat.define-palette(mat.$indigo-palette),
+                accent: mat.define-palette(mat.$pink-palette, A200, A100, A400),
+        ),
+        typography: mat.define-typography-config(),
+        density: 0,
+));
+
+@media (prefers-color-scheme: light) {
+  @include mat.all-component-colors($light-theme);
+  //@include login.theme($light-theme)
+}

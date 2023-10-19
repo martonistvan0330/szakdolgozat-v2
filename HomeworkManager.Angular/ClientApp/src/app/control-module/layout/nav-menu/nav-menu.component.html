@@ -1,0 +1,45 @@
+<!--<mat-sidenav-container class="sidenav-container">-->
+<!--    <mat-sidenav #drawer [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"-->
+<!--                 [mode]="(isHandset$ | async) ? 'over' : 'side'"-->
+<!--                 [opened]="(isHandset$ | async) === false"-->
+<!--                 class="sidenav"-->
+<!--                 fixedInViewport-->
+<!--                 fixedTopGap="64">-->
+<!--        <mat-nav-list>-->
+<!--            <a href="#" mat-list-item>Link 1</a>-->
+<!--            <a href="#" mat-list-item>Link 2</a>-->
+<!--            <a href="#" mat-list-item>Link 3</a>-->
+<!--        </mat-nav-list>-->
+<!--    </mat-sidenav>-->
+<!--    <mat-sidenav-content>-->
+<!--        <mat-toolbar color="primary">-->
+<!--            <button-->
+<!--                    (click)="drawer.toggle()"-->
+<!--                    *ngIf="isHandset$ | async"-->
+<!--                    aria-label="Toggle sidenav"-->
+<!--                    mat-icon-button-->
+<!--                    type="button">-->
+<!--                <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>-->
+<!--            </button>-->
+<!--            <span>ClientApp</span>-->
+<!--        </mat-toolbar>-->
+<!--        <ng-content/>-->
+<!--    </mat-sidenav-content>-->
+<!--</mat-sidenav-container>-->
+<mat-sidenav-container class="sidenav-container">
+    <mat-sidenav #sidenav
+                 [fixedTopGap]="isMobile? 56 : 64"
+                 [mode]="isMobile ? 'over' : 'side'"
+                 [opened]="isMobile === false"
+                 class="sidenav"
+                 fixedInViewport>
+        <mat-nav-list>
+            <a [routerLink]="['/', 'home']" mat-list-item>Home</a>
+            <a [routerLink]="['/', 'dashboard']" mat-list-item>Dashboard</a>
+        </mat-nav-list>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+        <ng-content/>
+    </mat-sidenav-content>
+</mat-sidenav-container>
