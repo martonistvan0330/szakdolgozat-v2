@@ -1,6 +1,6 @@
 ﻿using HomeworkManager.Model.CustomEntities.Enitity;
 
-namespace HomeworkManager.Model.Enitities
+namespace HomeworkManager.Model.Entities
 {
     public class Entity
     {
@@ -11,7 +11,7 @@ namespace HomeworkManager.Model.Enitities
         {
             return new EntityModel
             {
-                Name = Name,
+                Name = Name
             };
         }
     }

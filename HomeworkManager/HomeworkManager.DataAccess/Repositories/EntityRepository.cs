@@ -2,7 +2,7 @@
 using HomeworkManager.DataAccess.Repositories.Interfaces;
 using HomeworkManager.Model.Contexts;
 using HomeworkManager.Model.CustomEntities.Enitity;
-using HomeworkManager.Model.Enitities;
+using HomeworkManager.Model.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace HomeworkManager.DataAccess.Repositories

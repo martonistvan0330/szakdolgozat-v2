@@ -1,14 +1,18 @@
-﻿using HomeworkManager.Model.Enitities;
+﻿using HomeworkManager.Model.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace HomeworkManager.Model.Contexts
 {
-    public class HomeworkManagerContext : DbContext
+    public class HomeworkManagerContext : IdentityDbContext<User, Role, Guid>
     {
-        public HomeworkManagerContext(DbContextOptions<HomeworkManagerContext> dbContextOptions) : base(dbContextOptions)
+        public DbSet<AccessToken> AccessTokens => Set<AccessToken>();
+        public DbSet<Entity> Entities => Set<Entity>();
+        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+
+        public HomeworkManagerContext(DbContextOptions<HomeworkManagerContext> dbContextOptions)
+            : base(dbContextOptions)
         {
         }
-
-        public DbSet<Entity> Entities { get; set; }
     }
 }

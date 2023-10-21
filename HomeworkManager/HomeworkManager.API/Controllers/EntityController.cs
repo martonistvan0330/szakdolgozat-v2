@@ -2,52 +2,54 @@ using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.Model.CustomEntities.Enitity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HomeworkManager.API.Controllers
+namespace HomeworkManager.API.Controllers;
+
+[ApiController]
+[Route("api/Entity")]
+public class EntityController : ControllerBase
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class EntityController : ControllerBase
+    private readonly IEntityManager _entityManager;
+
+    private readonly ILogger<EntityController> _logger;
+
+    public EntityController(
+        ILogger<EntityController> logger,
+        IEntityManager entityManager
+    )
     {
-        private readonly IEntityManager _entityManager;
+        _logger = logger;
+        _entityManager = entityManager;
+    }
 
-        private readonly ILogger<EntityController> _logger;
+    [HttpGet("{entityId}")]
+    public async Task<ActionResult<EntityModel>> GetAll(int entityId)
+    {
+        var entity = await _entityManager.GetOrNullAsync(entityId);
 
-        public EntityController(ILogger<EntityController> logger, IEntityManager entityManager)
+        if (entity is null)
         {
-            _logger = logger;
-            _entityManager = entityManager;
+            return NotFound();
         }
 
-        [HttpGet("{entityId}")]
-        public async Task<ActionResult<EntityModel>> GetAll(int entityId)
-        {
-            var entity = await _entityManager.GetOrNullAsync(entityId);
+        return Ok(entity);
+    }
 
-            if (entity is null)
-            {
-                return NotFound();
-            }
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<EntityModel>>> GetAll()
+    {
+        return Ok(await _entityManager.GetAllAsync());
+    }
 
-            return Ok(entity);
-        }
+    [HttpPost]
+    public async Task<ActionResult<int>> Create(EntityModel entityModel)
+    {
+        return await _entityManager.CreateAsync(entityModel);
+    }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<EntityModel>>> GetAll()
-        {
-            return Ok(await _entityManager.GetAllAsync());
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<int>> Create(EntityModel entityModel)
-        {
-            return await _entityManager.CreateAsync(entityModel);
-        }
-
-        [HttpDelete("{entityId}")]
-        public async Task<ActionResult> Delete(int entityId)
-        {
-            await _entityManager.DeleteAsync(entityId);
-            return Ok();
-        }
+    [HttpDelete("{entityId}")]
+    public async Task<ActionResult> Delete(int entityId)
+    {
+        await _entityManager.DeleteAsync(entityId);
+        return Ok();
     }
 }

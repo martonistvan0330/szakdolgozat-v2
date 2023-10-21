@@ -1,0 +1,16 @@
+<mat-toolbar color="primary">
+    <button (click)="onClick()" *ngIf="isMobile" mat-icon-button>
+        <mat-icon>menu</mat-icon>
+    </button>
+    <h1>Homework Manager</h1>
+    <span class="spacer"></span>
+    <ng-container *ngIf="(authService.currentUser$ | async) as user">
+        <h6>{{ user.username }}</h6>
+        <button [matMenuTriggerFor]="accountMenu" mat-icon-button>
+            <mat-icon>account_circle</mat-icon>
+        </button>
+        <mat-menu #accountMenu="matMenu">
+            <button mat-menu-item (click)="logout()">Logout</button>
+        </mat-menu>
+    </ng-container>
+</mat-toolbar>

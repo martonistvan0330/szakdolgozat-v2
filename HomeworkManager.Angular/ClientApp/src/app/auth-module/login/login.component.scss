@@ -1,0 +1,35 @@
+//@use 'sass:map';
+//@use '@angular/material' as mat;
+//
+//@mixin theme($theme) {
+//  $color-config: mat.get-color-config($theme);
+//  $background-palette: map.get($color-config, 'background');
+//
+//  div {
+//    background-color: mat.get-color-from-palette($background-palette, background);
+//  }
+//}
+
+.login-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.login-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.login-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
