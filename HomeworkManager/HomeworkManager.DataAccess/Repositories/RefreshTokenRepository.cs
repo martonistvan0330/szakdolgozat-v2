@@ -3,35 +3,34 @@ using HomeworkManager.Model.Contexts;
 using HomeworkManager.Model.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace HomeworkManager.DataAccess.Repositories
+namespace HomeworkManager.DataAccess.Repositories;
+
+public class RefreshTokenRepository : IRefreshTokenRepository
 {
-    public class RefreshTokenRepository : IRefreshTokenRepository
+    private readonly HomeworkManagerContext _context;
+
+    public RefreshTokenRepository(HomeworkManagerContext context)
     {
-        private readonly HomeworkManagerContext _context;
+        _context = context;
+    }
 
-        public RefreshTokenRepository(HomeworkManagerContext context)
+    public async Task<RefreshToken?> GetAsync(string refreshToken, AccessToken accessToken)
+    {
+        return await _context.RefreshTokens
+            .Where(rt => rt.Token == refreshToken
+                         && rt.AccessTokenId == accessToken.AccessTokenId)
+            .SingleOrDefaultAsync();
+    }
+
+    public async Task RevokeAsync(string refreshToken, AccessToken accessToken)
+    {
+        var dbRefreshToken = await GetAsync(refreshToken, accessToken);
+
+        if (dbRefreshToken is not null)
         {
-            _context = context;
+            dbRefreshToken.IsActive = false;
         }
 
-        public async Task<RefreshToken?> GetAsync(AccessToken accessToken, string refreshToken)
-        {
-            return await _context.RefreshTokens
-                .Where(rt => rt.Token == refreshToken
-                             && rt.AccessTokenId == accessToken.AccessTokenId)
-                .SingleOrDefaultAsync();
-        }
-
-        public async Task RevokeAsync(AccessToken accessToken, string refreshToken)
-        {
-            var dbRefreshToken = await GetAsync(accessToken, refreshToken);
-
-            if (dbRefreshToken is not null)
-            {
-                dbRefreshToken.IsActive = false;
-            }
-
-            await _context.SaveChangesAsync();
-        }
+        await _context.SaveChangesAsync();
     }
 }

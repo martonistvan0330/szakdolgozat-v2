@@ -11,12 +11,13 @@ using HomeworkManager.Model.ErrorEntities.Authentication;
 using Microsoft.AspNetCore.Identity;
 
 namespace HomeworkManager.BusinessLogic.Managers;
+
 public class AuthenticationManager : IAuthenticationManager
 {
-    private readonly IJwtService _jwtService;
-    private readonly UserManager<User> _userManager;
     private readonly IAccessTokenRepository _accessTokenRepository;
+    private readonly IJwtService _jwtService;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
+    private readonly UserManager<User> _userManager;
 
     public AuthenticationManager(UserManager<User> userManager,
         IJwtService jwtService,
@@ -50,7 +51,7 @@ public class AuthenticationManager : IAuthenticationManager
         {
             return new BusinessError(createResult.Errors.Select(e => e.Description).ToArray());
         }
-        
+
         return await _jwtService.CreateTokensAsync(user);
     }
 
@@ -69,14 +70,15 @@ public class AuthenticationManager : IAuthenticationManager
         {
             return new BusinessError(AuthenticationErrorMessages.INVALID_PASSWORD);
         }
-        
+
         return await _jwtService.CreateTokensAsync(user);
     }
 
     public async Task<Result<AuthenticationResponse, BusinessError>> CreateRefreshTokenAsync(
         string accessToken,
         string refreshToken
-    ) {
+    )
+    {
         return await _jwtService.RefreshTokensAsync(accessToken, refreshToken);
     }
 
@@ -88,19 +90,19 @@ public class AuthenticationManager : IAuthenticationManager
         }
 
         var user = await _userManager.FindByNameAsync(username);
-        
+
         if (user is null)
         {
             return new BusinessError(AuthenticationErrorMessages.INVALID_USERNAME);
         }
 
-        var dbAccessToken = await _accessTokenRepository.RevokeAsync(user, tokens.AccessToken);
+        var dbAccessToken = await _accessTokenRepository.RevokeAsync(tokens.AccessToken, user);
 
         if (dbAccessToken is not null)
         {
-            await _refreshTokenRepository.RevokeAsync(dbAccessToken, tokens.RefreshToken);
+            await _refreshTokenRepository.RevokeAsync(tokens.RefreshToken, dbAccessToken);
         }
-        
+
         return true;
     }
 }

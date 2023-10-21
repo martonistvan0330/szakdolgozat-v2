@@ -1,9 +1,8 @@
 import { Inject, inject, Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
-import { catchError, Observable } from "rxjs";
+import { catchError, Observable, switchMap } from "rxjs";
 import { AuthenticationResponse, RefreshRequest } from "../../../../shared-module";
-import { map } from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
@@ -33,22 +32,20 @@ export class AuthorizedApiClientService {
           const refreshToken = localStorage.getItem('refresh-token');
 
           if (accessToken !== null && refreshToken !== null) {
-            this.http.post<AuthenticationResponse>(
+            return this.http.post<AuthenticationResponse>(
               this.apiUrl + 'Auth/RefreshToken',
               new RefreshRequest(accessToken, refreshToken)
             ).pipe(
-              catchError(error => {
-                throw error;
-              }),
-              map(authResponse => {
+              switchMap(authResponse => {
                 localStorage.setItem('access-token', authResponse.accessToken);
                 localStorage.setItem('refresh-token', authResponse.refreshToken);
 
                 return caught;
+              }),
+              catchError(error => {
+                throw error;
               })
             );
-          } else {
-            throw error;
           }
         }
         throw error;

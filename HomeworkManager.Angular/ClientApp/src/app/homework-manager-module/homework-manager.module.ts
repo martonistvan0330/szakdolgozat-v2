@@ -9,17 +9,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { ControlModule } from "../control-module/control.module";
 import { RouterOutlet } from "@angular/router";
-import { AsdComponent } from './asd/asd.component';
-import { QweComponent } from './qwe/qwe.component';
-
 
 
 @NgModule({
   declarations: [
     HomeComponent,
     DashboardComponent,
-    AsdComponent,
-    QweComponent
   ],
   imports: [
     CommonModule,
@@ -33,8 +28,8 @@ import { QweComponent } from './qwe/qwe.component';
   ],
   exports: [
     HomeComponent,
-    AsdComponent,
-    QweComponent
+    DashboardComponent
   ]
 })
-export class HomeworkManagerModule { }
+export class HomeworkManagerModule {
+}

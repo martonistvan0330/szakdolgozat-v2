@@ -1,10 +1,9 @@
 using HomeworkManager.Model.Entities;
 
-namespace HomeworkManager.DataAccess.Repositories.Interfaces
+namespace HomeworkManager.DataAccess.Repositories.Interfaces;
+
+public interface IRefreshTokenRepository
 {
-    public interface IRefreshTokenRepository
-    {
-        Task<RefreshToken?> GetAsync(AccessToken accessToken, string refreshToken);
-        Task RevokeAsync(AccessToken accessToken, string refreshToken);
-    }
+    Task<RefreshToken?> GetAsync(string refreshToken, AccessToken accessToken);
+    Task RevokeAsync(string refreshToken, AccessToken accessToken);
 }

@@ -14,7 +14,7 @@ public class AccessTokenRepository : IAccessTokenRepository
         _context = context;
     }
 
-    public async Task<AccessToken?> GetAsync(User user, string accessToken)
+    public async Task<AccessToken?> GetAsync(string accessToken, User user)
     {
         return await _context.AccessTokens
             .Where(rt => rt.Token == accessToken
@@ -22,9 +22,9 @@ public class AccessTokenRepository : IAccessTokenRepository
             .SingleOrDefaultAsync();
     }
 
-    public async Task<AccessToken?> RevokeAsync(User user, string accessToken)
+    public async Task<AccessToken?> RevokeAsync(string accessToken, User user)
     {
-        var dbAccessToken = await GetAsync(user, accessToken);
+        var dbAccessToken = await GetAsync(accessToken, user);
 
         if (dbAccessToken is not null)
         {

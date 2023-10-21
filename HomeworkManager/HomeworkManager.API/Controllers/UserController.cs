@@ -1,12 +1,12 @@
-﻿using HomeworkManager.Model.CustomEntities.User;
+﻿using HomeworkManager.API.Attributes;
+using HomeworkManager.Model.CustomEntities.User;
 using HomeworkManager.Model.Entities;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeworkManager.API.Controllers;
 
-[Authorize]
+[HomeworkManagerAuthorize]
 [ApiController]
 [Route("api/User")]
 public class UserController : ControllerBase

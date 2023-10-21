@@ -1,7 +1,7 @@
+using HomeworkManager.API.Attributes;
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.Model.CustomEntities.Authentication;
 using HomeworkManager.Model.CustomEntities.User;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeworkManager.API.Controllers;
@@ -46,14 +46,14 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<AuthenticationResponse>> RefreshTokenAsync(RefreshRequest tokens)
     {
         var authenticationResult = await _authenticationManager.CreateRefreshTokenAsync(tokens.AccessToken, tokens.RefreshToken);
-        
+
         return authenticationResult.Match<ActionResult<AuthenticationResponse>>(
             result => Ok(result),
             error => Unauthorized(error.Message)
         );
     }
 
-    [Authorize]
+    [HomeworkManagerAuthorize]
     [HttpPost("Logout")]
     public async Task<ActionResult<bool>> LogoutAsync(RevokeRequest tokens)
     {

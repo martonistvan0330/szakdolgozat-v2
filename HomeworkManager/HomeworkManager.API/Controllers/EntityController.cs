@@ -1,6 +1,5 @@
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.Model.CustomEntities.Enitity;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeworkManager.API.Controllers;
@@ -47,7 +46,6 @@ public class EntityController : ControllerBase
         return await _entityManager.CreateAsync(entityModel);
     }
 
-    [Authorize]
     [HttpDelete("{entityId}")]
     public async Task<ActionResult> Delete(int entityId)
     {

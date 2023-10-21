@@ -12,9 +12,9 @@ const routes: Routes = [
 
   {
     path: '', component: control.LayoutComponent, canActivate: [authGuard], children: [
-      { path: 'home', component: homework_manager.HomeComponent },
+      { path: 'home', component: homework_manager.DashboardComponent },
       { path: 'dashboard', component: homework_manager.DashboardComponent },
-      { path: '**', redirectTo: '/dashboard' }
+      { path: '**', redirectTo: '/home' }
     ]
   }
 
