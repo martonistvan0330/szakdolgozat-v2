@@ -29,7 +29,7 @@ public class UserController : ControllerBase
             {
                 return Ok(new UserModel
                 {
-                    UserName = user.UserName!,
+                    Username = user.UserName!,
                     Password = "*****",
                     Email = user.Email!
                 });
