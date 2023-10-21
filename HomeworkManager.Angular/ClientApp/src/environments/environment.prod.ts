@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'homework-manager-api.westeurope.azurecontainer.io/api/'
+  apiUrl: 'http://homework-manager-api.westeurope.azurecontainer.io/api/'
 };
