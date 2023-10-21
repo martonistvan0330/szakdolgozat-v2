@@ -1,6 +1,7 @@
 ﻿using HomeworkManager.DataAccess.Repositories.Interfaces;
 using HomeworkManager.Model.Contexts;
 using HomeworkManager.Model.Entities;
+using HomeworkManager.Shared.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace HomeworkManager.DataAccess.Repositories;
@@ -8,31 +9,38 @@ namespace HomeworkManager.DataAccess.Repositories;
 public class AccessTokenRepository : IAccessTokenRepository
 {
     private readonly HomeworkManagerContext _context;
+    private readonly IHashingService _hashingService;
 
-    public AccessTokenRepository(HomeworkManagerContext context)
+    public AccessTokenRepository(HomeworkManagerContext context, IHashingService hashingService)
     {
         _context = context;
+        _hashingService = hashingService;
     }
 
     public async Task<AccessToken?> GetAsync(string accessToken, Guid userId)
     {
+        var accessTokenHash = await _hashingService.GetHashString(accessToken);
+
         return await _context.AccessTokens
-            .Where(rt => rt.Token == accessToken
+            .Where(rt => rt.TokenHash == accessTokenHash
                          && rt.UserId == userId)
             .SingleOrDefaultAsync();
     }
 
     public async Task CreateAsync(string accessToken, string refreshToken, Guid userId)
     {
+        var accessTokenHash = await _hashingService.GetHashString(accessToken);
+        var refreshTokenHash = await _hashingService.GetHashString(refreshToken);
+
         AccessToken dbAccessToken = new()
         {
-            Token = accessToken,
+            TokenHash = accessTokenHash,
             UserId = userId
         };
 
         dbAccessToken.RefreshToken = new RefreshToken
         {
-            Token = refreshToken,
+            TokenHash = refreshTokenHash,
             AccessToken = dbAccessToken
         };
 

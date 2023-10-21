@@ -6,6 +6,8 @@ using HomeworkManager.BusinessLogic.Services.Seed;
 using HomeworkManager.BusinessLogic.Services.Seed.Interfaces;
 using HomeworkManager.DataAccess.Repositories;
 using HomeworkManager.DataAccess.Repositories.Interfaces;
+using HomeworkManager.Shared.Services;
+using HomeworkManager.Shared.Services.Interfaces;
 
 namespace HomeworkManager.API.Hosting;
 
@@ -28,6 +30,7 @@ public static class HostServiceExtensions
 
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
+        services.AddTransient<IHashingService, HashingService>();
         services.AddTransient<IJwtService, JwtService>();
         services.AddTransient<IRoleSeedService, RoleSeedService>();
         services.AddTransient<ITokenService, TokenService>();

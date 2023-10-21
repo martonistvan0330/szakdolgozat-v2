@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeworkManager.Model", "Ho
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeworkManager.BusinessLogic", "HomeworkManager.BusinessLogic\HomeworkManager.BusinessLogic.csproj", "{301B6813-8D89-4CD2-9740-EC61B657BF36}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeworkManager.Shared", "HomeworkManager.Shared\HomeworkManager.Shared.csproj", "{CD8D8C92-2906-4DF1-AFDD-8463E9C62801}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{301B6813-8D89-4CD2-9740-EC61B657BF36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{301B6813-8D89-4CD2-9740-EC61B657BF36}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{301B6813-8D89-4CD2-9740-EC61B657BF36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD8D8C92-2906-4DF1-AFDD-8463E9C62801}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD8D8C92-2906-4DF1-AFDD-8463E9C62801}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD8D8C92-2906-4DF1-AFDD-8463E9C62801}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD8D8C92-2906-4DF1-AFDD-8463E9C62801}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

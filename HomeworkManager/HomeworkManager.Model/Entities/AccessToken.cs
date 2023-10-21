@@ -3,9 +3,9 @@
 public class AccessToken
 {
     public int AccessTokenId { get; set; }
-    public required string Token { get; set; }
+    public required string TokenHash { get; set; }
     public bool IsActive { get; set; } = true;
-        
+
     public Guid UserId { get; set; }
     public User User { get; set; } = null!;
 

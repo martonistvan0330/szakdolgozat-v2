@@ -1,14 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\HomeworkManager.DataAccess\HomeworkManager.DataAccess.csproj" />
-    <ProjectReference Include="..\HomeworkManager.Model\HomeworkManager.Model.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\HomeworkManager.DataAccess\HomeworkManager.DataAccess.csproj"/>
+        <ProjectReference Include="..\HomeworkManager.Model\HomeworkManager.Model.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Services\Common\"/>
+    </ItemGroup>
 
 </Project>

@@ -18,8 +18,6 @@ namespace HomeworkManager.BusinessLogic.Services.Authentication;
 
 public class JwtService : IJwtService
 {
-    private const int EXPIRATION_MINUTES = 1;
-
     private readonly JwtConfiguration _jwtConfiguration;
     private readonly ITokenService _tokenService;
     private readonly UserManager<User> _userManager;
@@ -38,7 +36,7 @@ public class JwtService : IJwtService
 
     public async Task<AuthenticationResponse> CreateTokensAsync(User user)
     {
-        var expiration = DateTime.UtcNow.AddMinutes(EXPIRATION_MINUTES);
+        var expiration = DateTime.UtcNow.AddMinutes(_jwtConfiguration.ExpirationMinutes);
 
         var accessJwt = CreateJwtAccessToken(
             await CreateClaimsAsync(user),
