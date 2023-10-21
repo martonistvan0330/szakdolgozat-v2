@@ -1,6 +1,5 @@
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
-using HomeworkManager.DataAccess.Repositories.Interfaces;
 using HomeworkManager.Model.Constants;
 using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.Authentication;
@@ -14,21 +13,19 @@ namespace HomeworkManager.BusinessLogic.Managers;
 
 public class AuthenticationManager : IAuthenticationManager
 {
-    private readonly IAccessTokenRepository _accessTokenRepository;
     private readonly IJwtService _jwtService;
-    private readonly IRefreshTokenRepository _refreshTokenRepository;
+    private readonly ITokenService _tokenService;
     private readonly UserManager<User> _userManager;
 
-    public AuthenticationManager(UserManager<User> userManager,
+    public AuthenticationManager(
         IJwtService jwtService,
-        IAccessTokenRepository accessTokenRepository,
-        IRefreshTokenRepository refreshTokenRepository
+        ITokenService tokenService,
+        UserManager<User> userManager
     )
     {
-        _userManager = userManager;
         _jwtService = jwtService;
-        _accessTokenRepository = accessTokenRepository;
-        _refreshTokenRepository = refreshTokenRepository;
+        _tokenService = tokenService;
+        _userManager = userManager;
     }
 
     public async Task<Result<AuthenticationResponse, BusinessError>> RegisterAsync(UserModel newUser)
@@ -96,12 +93,7 @@ public class AuthenticationManager : IAuthenticationManager
             return new BusinessError(AuthenticationErrorMessages.INVALID_USERNAME);
         }
 
-        var dbAccessToken = await _accessTokenRepository.RevokeAsync(tokens.AccessToken, user);
-
-        if (dbAccessToken is not null)
-        {
-            await _refreshTokenRepository.RevokeAsync(tokens.RefreshToken, dbAccessToken);
-        }
+        await _tokenService.RevokeTokensAsync(tokens.AccessToken, tokens.RefreshToken, user.Id);
 
         return true;
     }

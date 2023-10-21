@@ -4,7 +4,6 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
-using HomeworkManager.DataAccess.Repositories.Interfaces;
 using HomeworkManager.Model.Configurations;
 using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.Authentication;
@@ -20,23 +19,20 @@ namespace HomeworkManager.BusinessLogic.Services.Authentication;
 public class JwtService : IJwtService
 {
     private const int EXPIRATION_MINUTES = 1;
-    private readonly IAccessTokenRepository _accessTokenRepository;
 
     private readonly JwtConfiguration _jwtConfiguration;
-    private readonly IRefreshTokenRepository _refreshTokenRepository;
+    private readonly ITokenService _tokenService;
     private readonly UserManager<User> _userManager;
 
     public JwtService(
         IOptions<JwtConfiguration> jwtConfiguration,
-        UserManager<User> userManager,
-        IAccessTokenRepository accessTokenRepository,
-        IRefreshTokenRepository refreshTokenRepository
+        ITokenService tokenService,
+        UserManager<User> userManager
     )
     {
         _jwtConfiguration = jwtConfiguration.Value;
+        _tokenService = tokenService;
         _userManager = userManager;
-        _accessTokenRepository = accessTokenRepository;
-        _refreshTokenRepository = refreshTokenRepository;
     }
 
 
@@ -56,7 +52,7 @@ public class JwtService : IJwtService
 
         var accessToken = tokenHandler.WriteToken(accessJwt);
 
-        await AddTokensToUserAsync(user, accessToken, refreshToken);
+        await _tokenService.AddTokensToUserAsync(accessToken, refreshToken, user.Id);
 
         return new AuthenticationResponse
         {
@@ -95,21 +91,14 @@ public class JwtService : IJwtService
             return new BusinessError(AuthenticationErrorMessages.INVALID_REFRESH_TOKEN);
         }
 
-        var dbAccessToken = await _accessTokenRepository.GetAsync(accessToken, user);
+        var checkTokensResult = await _tokenService.CheckTokensAsync(accessToken, refreshToken, user.Id);
 
-        if (dbAccessToken is null || !dbAccessToken.IsActive)
+        if (!checkTokensResult.Success)
         {
-            return new BusinessError(AuthenticationErrorMessages.INVALID_ACCESS_TOKEN);
+            return checkTokensResult.Error!;
         }
 
-        var dbRefreshToken = await _refreshTokenRepository.GetAsync(refreshToken, dbAccessToken);
-
-        if (dbRefreshToken is null || !dbRefreshToken.IsActive)
-        {
-            return new BusinessError(AuthenticationErrorMessages.INVALID_REFRESH_TOKEN);
-        }
-
-        await RevokeTokensAsync(user, accessToken, refreshToken);
+        await _tokenService.RevokeTokensAsync(accessToken, refreshToken, user.Id);
 
         return await CreateTokensAsync(user);
     }
@@ -159,33 +148,5 @@ public class JwtService : IJwtService
         using var randomNumberGenerator = RandomNumberGenerator.Create();
         randomNumberGenerator.GetBytes(randomNumber);
         return Convert.ToBase64String(randomNumber);
-    }
-
-    private async Task AddTokensToUserAsync(User user, string accessToken, string refreshToken)
-    {
-        AccessToken dbAccessToken = new()
-        {
-            Token = accessToken,
-            UserId = user.Id
-        };
-
-        dbAccessToken.RefreshToken = new RefreshToken
-        {
-            Token = refreshToken,
-            AccessToken = dbAccessToken
-        };
-
-        user.AccessTokens.Add(dbAccessToken);
-
-        await _userManager.UpdateAsync(user);
-    }
-
-    private async Task RevokeTokensAsync(User user, string accessToken, string refreshToken)
-    {
-        var dbAccessToken = await _accessTokenRepository.RevokeAsync(accessToken, user);
-        if (dbAccessToken is not null)
-        {
-            await _refreshTokenRepository.RevokeAsync(refreshToken, dbAccessToken);
-        }
     }
 }

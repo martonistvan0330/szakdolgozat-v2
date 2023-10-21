@@ -21,31 +21,22 @@ public class HomeworkManagerAuthorizeAttribute : AuthorizeAttribute, IAsyncAutho
         var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<User>>();
         var accessTokenRepository = context.HttpContext.RequestServices.GetRequiredService<IAccessTokenRepository>();
 
-        var bearerToken = context.HttpContext.Request.Headers["Authorization"].FirstOrDefault();
+        var bearerToken = context.HttpContext.Request.Headers["Authorization"].First()!;
+        var accessToken = bearerToken.Split(" ")[1];
 
-        if (bearerToken is not null)
+        var username = context.HttpContext.User.Identity?.Name;
+
+        if (username is not null)
         {
-            var tokenParts = bearerToken.Split(" ");
+            var user = await userManager.FindByNameAsync(username);
 
-            if (tokenParts is ["Bearer", _, ..])
+            if (user is not null)
             {
-                var accessToken = tokenParts[1];
+                var dbAccessToken = await accessTokenRepository.GetAsync(accessToken, user.Id);
 
-                var username = context.HttpContext.User.Identity?.Name;
-
-                if (username is not null)
+                if (dbAccessToken is not null && dbAccessToken.IsActive)
                 {
-                    var user = await userManager.FindByNameAsync(username);
-
-                    if (user is not null)
-                    {
-                        var dbAccessToken = await accessTokenRepository.GetAsync(accessToken, user);
-
-                        if (dbAccessToken is not null && dbAccessToken.IsActive)
-                        {
-                            return;
-                        }
-                    }
+                    return;
                 }
             }
         }
