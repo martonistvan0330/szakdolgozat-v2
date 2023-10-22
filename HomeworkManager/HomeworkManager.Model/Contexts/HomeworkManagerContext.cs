@@ -2,17 +2,25 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace HomeworkManager.Model.Contexts
-{
-    public class HomeworkManagerContext : IdentityDbContext<User, Role, Guid>
-    {
-        public DbSet<AccessToken> AccessTokens => Set<AccessToken>();
-        public DbSet<Entity> Entities => Set<Entity>();
-        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+namespace HomeworkManager.Model.Contexts;
 
-        public HomeworkManagerContext(DbContextOptions<HomeworkManagerContext> dbContextOptions)
-            : base(dbContextOptions)
-        {
-        }
+public class HomeworkManagerContext : IdentityDbContext<User, Role, Guid>
+{
+    public DbSet<AccessToken> AccessTokens => Set<AccessToken>();
+    public DbSet<Entity> Entities => Set<Entity>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+
+    public HomeworkManagerContext(DbContextOptions<HomeworkManagerContext> dbContextOptions)
+        : base(dbContextOptions)
+    {
+    }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+
+        builder.Entity<AccessToken>(entity => { entity.Property(e => e.IsActive).HasDefaultValue(true); });
+
+        builder.Entity<RefreshToken>(entity => { entity.Property(e => e.IsActive).HasDefaultValue(true); });
     }
 }

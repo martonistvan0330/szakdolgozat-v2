@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeworkManager.Model.Migrations
 {
     [DbContext(typeof(HomeworkManagerContext))]
-    [Migration("20231021213132_HashedTokens")]
-    partial class HashedTokens
+    [Migration("20231022000448_Recreate_Token_Tables_With_Hash")]
+    partial class Recreate_Token_Tables_With_Hash
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,7 +34,9 @@ namespace HomeworkManager.Model.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AccessTokenId"));
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("TokenHash")
                         .IsRequired()
@@ -79,7 +81,9 @@ namespace HomeworkManager.Model.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("TokenHash")
                         .IsRequired()
