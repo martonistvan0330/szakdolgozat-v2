@@ -24,7 +24,6 @@
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-        //"JWT__Key": "super-secret-jwt-key"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7020;http://localhost:5020"

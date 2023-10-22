@@ -6,9 +6,4 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\HomeworkManager.Model\HomeworkManager.Model.csproj"/>
-        <ProjectReference Include="..\HomeworkManager.Shared\HomeworkManager.Shared.csproj"/>
-    </ItemGroup>
-
 </Project>

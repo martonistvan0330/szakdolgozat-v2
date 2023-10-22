@@ -11,9 +11,9 @@ const routes: Routes = [
   { path: 'register', component: auth.RegisterComponent },
 
   {
-    path: '', component: control.LayoutComponent, canActivate: [authGuard], children: [
-      { path: 'home', component: homework_manager.DashboardComponent },
-      { path: 'dashboard', component: homework_manager.DashboardComponent },
+    path: '', component: control.LayoutComponent, children: [
+      { path: 'home', component: homework_manager.DashboardComponent, canActivate: [authGuard] },
+      { path: 'dashboard', component: homework_manager.DashboardComponent, canActivate: [authGuard] },
       { path: '**', redirectTo: '/home' }
     ]
   }
