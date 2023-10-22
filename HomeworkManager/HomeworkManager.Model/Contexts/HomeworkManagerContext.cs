@@ -18,9 +18,5 @@ public class HomeworkManagerContext : IdentityDbContext<User, Role, Guid>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-
-        builder.Entity<AccessToken>(entity => { entity.Property(e => e.IsActive).HasDefaultValue(true); });
-
-        builder.Entity<RefreshToken>(entity => { entity.Property(e => e.IsActive).HasDefaultValue(true); });
     }
 }
