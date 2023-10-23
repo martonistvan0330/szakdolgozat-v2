@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using HomeworkManager.BusinessLogic.Managers;
 using HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
 using HomeworkManager.Model.Configurations;
 using HomeworkManager.Model.CustomEntities;
@@ -10,7 +11,6 @@ using HomeworkManager.Model.CustomEntities.Authentication;
 using HomeworkManager.Model.Entities;
 using HomeworkManager.Model.ErrorEntities;
 using HomeworkManager.Model.ErrorEntities.Authentication;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -20,12 +20,12 @@ public class JwtService : IJwtService
 {
     private readonly JwtConfiguration _jwtConfiguration;
     private readonly ITokenService _tokenService;
-    private readonly UserManager<User> _userManager;
+    private readonly UserManager _userManager;
 
     public JwtService(
         IOptions<JwtConfiguration> jwtConfiguration,
         ITokenService tokenService,
-        UserManager<User> userManager
+        UserManager userManager
     )
     {
         _jwtConfiguration = jwtConfiguration.Value;

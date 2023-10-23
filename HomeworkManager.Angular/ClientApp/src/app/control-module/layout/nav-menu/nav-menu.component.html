@@ -30,12 +30,14 @@
     <mat-sidenav #sidenav
                  [fixedTopGap]="isMobile? 56 : 64"
                  [mode]="isMobile ? 'over' : 'side'"
+                 [ngClass]="isMobile ? 'asd' : 'qwe'"
                  [opened]="isMobile === false"
                  class="sidenav"
                  fixedInViewport>
         <mat-nav-list>
             <a [routerLink]="['/', 'home']" mat-list-item>Home</a>
             <a [routerLink]="['/', 'dashboard']" mat-list-item>Dashboard</a>
+            <a [routerLink]="['/', 'admin', 'users']" mat-list-item>Users</a>
         </mat-nav-list>
     </mat-sidenav>
 

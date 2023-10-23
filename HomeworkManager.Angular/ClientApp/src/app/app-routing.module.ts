@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import * as auth from './auth-module';
 import * as control from './control-module';
 import * as homework_manager from './homework-manager-module';
+import * as admin from './admin-module';
 import { authGuard } from "./core-module";
 
 const routes: Routes = [
@@ -14,6 +15,11 @@ const routes: Routes = [
     path: '', component: control.LayoutComponent, children: [
       { path: 'home', component: homework_manager.DashboardComponent, canActivate: [authGuard] },
       { path: 'dashboard', component: homework_manager.DashboardComponent, canActivate: [authGuard] },
+      {
+        path: 'admin', children: [
+          { path: 'users', component: admin.UserListComponent }
+        ]
+      },
       { path: '**', redirectTo: '/home' }
     ]
   }

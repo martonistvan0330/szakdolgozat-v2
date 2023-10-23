@@ -1,4 +1,4 @@
-<div class="app-container">
+<div [ngClass]="(isHandset$ | async) ? 'mobile' : ''" class="app-container">
     <hwm-toolbar (toggleNavbar)="toggleNavbar()" [isMobile]="isHandset$ | async" class="app-toolbar"/>
     <hwm-nav-menu #nav_menu [isMobile]="isHandset$ | async" class="nav-menu">
         <router-outlet/>

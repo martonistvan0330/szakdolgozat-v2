@@ -1,7 +1,6 @@
-﻿namespace HomeworkManager.BusinessLogic.Services.Seed.Interfaces
+﻿namespace HomeworkManager.BusinessLogic.Services.Seed.Interfaces;
+
+public interface IRoleSeedService
 {
-    public interface IRoleSeedService
-    {
-        Task SeedRoleAsync();
-    }
+    Task SeedRolesAsync();
 }

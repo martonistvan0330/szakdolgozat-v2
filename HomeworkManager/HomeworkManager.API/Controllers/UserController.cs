@@ -1,7 +1,8 @@
 ﻿using HomeworkManager.API.Attributes;
+using HomeworkManager.BusinessLogic.Managers;
+using HomeworkManager.Model.Constants;
+using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.User;
-using HomeworkManager.Model.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeworkManager.API.Controllers;
@@ -11,9 +12,9 @@ namespace HomeworkManager.API.Controllers;
 [Route("api/User")]
 public class UserController : ControllerBase
 {
-    private readonly UserManager<User> _userManager;
+    private readonly UserManager _userManager;
 
-    public UserController(UserManager<User> userManager)
+    public UserController(UserManager userManager)
     {
         _userManager = userManager;
     }
@@ -23,23 +24,27 @@ public class UserController : ControllerBase
     {
         if (User.Identity?.Name is not null)
         {
-            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            var user = await _userManager.GetByNameAsync(User.Identity.Name);
 
-            if (user is not null)
+            if (user is null)
             {
-                return Ok(new UserModel
-                {
-                    Username = user.UserName!,
-                    Password = "*****",
-                    Email = user.Email!
-                });
+                return NotFound();
             }
+
+            return Ok(user);
         }
 
         return Unauthorized();
     }
 
-    [HttpGet("UserName")]
+    [HomeworkManagerAuthorize(Roles = Roles.ADMINISTRATOR)]
+    [HttpGet]
+    public async Task<ActionResult<Pageable<UserListRow>>> GetAll([FromQuery] SortOptions sortOptions, [FromQuery] PageData pageData)
+    {
+        return Ok(await _userManager.GetAllAsync(sortOptions, pageData));
+    }
+
+    [HttpGet("Username")]
     public async Task<ActionResult<string>> GetUsernameAsync()
     {
         if (User.Identity?.Name is not null)

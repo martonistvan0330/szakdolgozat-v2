@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeworkManager.Model.Migrations
 {
     [DbContext(typeof(HomeworkManagerContext))]
-    [Migration("20231019221011_RevokableTokens")]
-    partial class RevokableTokens
+    [Migration("20231022041219_Recreate")]
+    partial class Recreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,7 +36,7 @@ namespace HomeworkManager.Model.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Token")
+                    b.Property<string>("TokenHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -81,7 +81,7 @@ namespace HomeworkManager.Model.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Token")
+                    b.Property<string>("TokenHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -111,12 +111,17 @@ namespace HomeworkManager.Model.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
                         .HasDatabaseName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("AspNetRoles", (string)null);
                 });
@@ -312,6 +317,13 @@ namespace HomeworkManager.Model.Migrations
                     b.Navigation("AccessToken");
                 });
 
+            modelBuilder.Entity("HomeworkManager.Model.Entities.Role", b =>
+                {
+                    b.HasOne("HomeworkManager.Model.Entities.User", null)
+                        .WithMany("Roles")
+                        .HasForeignKey("UserId");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("HomeworkManager.Model.Entities.Role", null)
@@ -372,6 +384,8 @@ namespace HomeworkManager.Model.Migrations
             modelBuilder.Entity("HomeworkManager.Model.Entities.User", b =>
                 {
                     b.Navigation("AccessTokens");
+
+                    b.Navigation("Roles");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,7 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { AuthorizedApiClientService } from "../api-client/authorized-api-client/authorized-api-client.service";
-import {BehaviorSubject, mergeMap, of} from "rxjs";
-import { AuthenticationRequest, AuthenticationResponse, RevokeRequest, UserModel } from "../../../shared-module";
+import { BehaviorSubject, mergeMap, of } from "rxjs";
+import {
+  AuthenticationRequest,
+  AuthenticationResponse,
+  NewUser,
+  RevokeRequest,
+  UserModel
+} from "../../../shared-module";
 import { ApiClientService } from "../api-client/api-client.service";
 import { map } from "rxjs/operators";
 
@@ -28,7 +34,7 @@ export class AuthService {
     );
   }
 
-  register(user: UserModel) {
+  register(user: NewUser) {
     return this.apiClient.post<AuthenticationResponse>(
       'Auth/Register',
       user

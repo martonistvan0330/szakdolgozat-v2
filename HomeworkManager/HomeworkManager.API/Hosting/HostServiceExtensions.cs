@@ -18,6 +18,7 @@ public static class HostServiceExtensions
         services.AddScoped<IAccessTokenRepository, AccessTokenRepository>();
         services.AddScoped<IEntityRepository, EntityRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
         return services;
     }
 
@@ -25,6 +26,7 @@ public static class HostServiceExtensions
     {
         services.AddScoped<IAuthenticationManager, AuthenticationManager>();
         services.AddScoped<IEntityManager, EntityManager>();
+        services.AddScoped<UserManager>();
         return services;
     }
 

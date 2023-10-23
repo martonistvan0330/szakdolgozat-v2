@@ -36,14 +36,14 @@ export class AuthorizedApiClientService {
               this.apiUrl + 'Auth/RefreshToken',
               new RefreshRequest(accessToken, refreshToken)
             ).pipe(
+              catchError(error => {
+                throw error;
+              }),
               switchMap(authResponse => {
                 localStorage.setItem('access-token', authResponse.accessToken);
                 localStorage.setItem('refresh-token', authResponse.refreshToken);
 
                 return caught;
-              }),
-              catchError(error => {
-                throw error;
               })
             );
           }
