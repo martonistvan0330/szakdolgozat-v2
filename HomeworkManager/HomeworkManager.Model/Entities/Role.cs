@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace HomeworkManager.Model.Entities
+namespace HomeworkManager.Model.Entities;
+
+public class Role : IdentityRole<Guid>
 {
-    public class Role : IdentityRole<Guid>
-    {
-    }
 }

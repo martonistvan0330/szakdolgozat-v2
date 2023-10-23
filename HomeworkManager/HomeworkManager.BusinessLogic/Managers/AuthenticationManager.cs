@@ -15,12 +15,12 @@ public class AuthenticationManager : IAuthenticationManager
 {
     private readonly IJwtService _jwtService;
     private readonly ITokenService _tokenService;
-    private readonly UserManager<User> _userManager;
+    private readonly UserManager _userManager;
 
     public AuthenticationManager(
         IJwtService jwtService,
         ITokenService tokenService,
-        UserManager<User> userManager
+        UserManager userManager
     )
     {
         _jwtService = jwtService;
@@ -28,7 +28,7 @@ public class AuthenticationManager : IAuthenticationManager
         _userManager = userManager;
     }
 
-    public async Task<Result<AuthenticationResponse, BusinessError>> RegisterAsync(UserModel newUser)
+    public async Task<Result<AuthenticationResponse, BusinessError>> RegisterAsync(NewUser newUser)
     {
         User user = new() { UserName = newUser.Username, Email = newUser.Email };
 
@@ -39,10 +39,10 @@ public class AuthenticationManager : IAuthenticationManager
 
         if (!createResult.Succeeded)
         {
-            return new BusinessError(createResult.Errors.Select(e => e.Description).ToArray());
+            return new BusinessError(createResult.Errors.Select<IdentityError, string>(e => e.Description).ToArray());
         }
 
-        var addToRoleResult = await _userManager.AddToRoleAsync(user, Roles.Teacher);
+        var addToRoleResult = await _userManager.AddToRoleAsync(user, Roles.STUDENT);
 
         if (!addToRoleResult.Succeeded)
         {

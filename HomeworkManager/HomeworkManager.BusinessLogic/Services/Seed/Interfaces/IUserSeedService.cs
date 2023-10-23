@@ -1,7 +1,6 @@
-namespace HomeworkManager.BusinessLogic.Services.Seed.Interfaces
+namespace HomeworkManager.BusinessLogic.Services.Seed.Interfaces;
+
+public interface IUserSeedService
 {
-    public interface IUserSeedService
-    {
-        Task SeedUserAsync();
-    }
+    Task SeedUsersAsync();
 }

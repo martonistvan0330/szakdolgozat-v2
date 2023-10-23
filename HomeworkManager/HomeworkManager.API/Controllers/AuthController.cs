@@ -20,7 +20,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("Register")]
-    public async Task<ActionResult<AuthenticationResponse>> RegisterAsync(UserModel newUser)
+    public async Task<ActionResult<AuthenticationResponse>> RegisterAsync(NewUser newUser)
     {
         var registerUserResult = await _authenticationManager.RegisterAsync(newUser);
 
