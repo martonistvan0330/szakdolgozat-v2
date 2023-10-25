@@ -7,7 +7,7 @@
         </div>
 
         <mat-table [dataSource]="dataSource" class="user-list-table mat-elevation-z8"
-                   matSort matSortActive="userId" matSortDirection="asc" matSortDisableClear>
+                   matSort matSortActive="username" matSortDirection="asc" matSortDisableClear>
             <ng-container matColumnDef="userId">
                 <mat-header-cell *matHeaderCellDef mat-header-cell mat-sort-header>ID</mat-header-cell>
                 <mat-cell *matCellDef="let user" mat-cell> {{ user.userId }} </mat-cell>
@@ -29,7 +29,9 @@
             </ng-container>
 
             <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-            <mat-row *matRowDef="let row; columns: displayedColumns;" matRipple></mat-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;"
+                     [routerLink]="[NavigationItems.userDetail.navigationUrl, row.userId]"
+                     matRipple></mat-row>
         </mat-table>
 
         <mat-divider/>

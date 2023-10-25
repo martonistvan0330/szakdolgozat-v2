@@ -1,0 +1,34 @@
+<div class="container">
+    <mat-card *ngIf="!!user" class="user-card">
+        <mat-card-title>User details</mat-card-title>
+        <mat-card-content class="user-card-content">
+            <div class="column">
+                <mat-form-field>
+                    <mat-label>Username</mat-label>
+                    <input disabled matInput value="{{ user.username }}">
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Email</mat-label>
+                    <input disabled matInput value="{{ user.email }}">
+                </mat-form-field>
+            </div>
+            <div class="column">
+                <mat-form-field>
+                    <mat-label>Roles</mat-label>
+                    <mat-select #rolesSelect="ngForm" [formControl]="roles"
+                                [required]="isAdministrator" multiple>
+                        <mat-option *ngFor="let role of allRoles"
+                                    [value]="role.roleId">{{ role.name }}</mat-option>
+                    </mat-select>
+                    <mat-error
+                            *ngIf="roles.invalid && (rolesSelect.dirty || rolesSelect.touched)">
+                        At least one role required
+                    </mat-error>
+                </mat-form-field>
+                <button (click)="updateRoles()" *ngIf="isAdministrator" class="user-form-field" color="accent"
+                        mat-raised-button>Save
+                </button>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>
