@@ -1,4 +1,4 @@
-import { RoleModel } from "./role-model";
+import { RoleModel } from "../role/role-model";
 
 export class UserModel {
   userId!: string

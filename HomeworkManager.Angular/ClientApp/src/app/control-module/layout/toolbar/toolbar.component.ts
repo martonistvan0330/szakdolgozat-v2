@@ -1,5 +1,5 @@
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
-import { AuthService } from "../../../core-module";
+import { AuthService, NavigationItems } from "../../../core-module";
 import { Router } from "@angular/router";
 
 @Component({
@@ -8,10 +8,11 @@ import { Router } from "@angular/router";
   styleUrls: ['./toolbar.component.scss']
 })
 export class ToolbarComponent {
+  private router = inject(Router);
+  protected readonly NavigationItems = NavigationItems;
   @Input() isMobile: boolean | null = false;
   @Output() toggleNavbar = new EventEmitter<void>();
   authService = inject(AuthService);
-  private router = inject(Router);
 
   onClick() {
     this.toggleNavbar.emit();
@@ -21,7 +22,8 @@ export class ToolbarComponent {
     this.authService.logout()
       .subscribe(
         () => {
-          this.router.navigateByUrl('/login');
+          this.router.navigate([NavigationItems.login.navigationUrl]).then(_ => {
+          });
         }
       )
   }

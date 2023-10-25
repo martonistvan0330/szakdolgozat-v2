@@ -5,3 +5,12 @@
 .sidenav {
   width: 200px;
 }
+
+.nav-menu-item {
+  display: flex;
+  align-items: center;
+}
+
+.nav-menu-item-title {
+  margin-left: 12px;
+}

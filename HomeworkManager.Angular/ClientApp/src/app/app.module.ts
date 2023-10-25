@@ -11,7 +11,7 @@ import { ControlModule } from "./control-module/control.module";
 import { HTTP_INTERCEPTORS } from "@angular/common/http";
 import { TokenInterceptor } from "./core-module/interceptors/token-interceptor";
 import { AuthModule } from "./auth-module/auth.module";
-import { AdminModule } from "./admin-module/admin.module";
+import { UserModule } from "./user-module/user.module";
 
 @NgModule({
   declarations: [
@@ -19,11 +19,11 @@ import { AdminModule } from "./admin-module/admin.module";
   ],
   imports: [
     AuthModule,
-    AdminModule,
     ControlModule,
     CoreModule,
     HomeworkManagerModule,
     SharedModule,
+    UserModule,
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,

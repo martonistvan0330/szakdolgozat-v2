@@ -6,6 +6,7 @@ import {
   AuthenticationResponse,
   NewUser,
   RevokeRequest,
+  Role,
   UserModel
 } from "../../../shared-module";
 import { ApiClientService } from "../api-client/api-client.service";
@@ -16,9 +17,9 @@ import { map } from "rxjs/operators";
 })
 export class AuthService {
   private currentUserSource = new BehaviorSubject<UserModel | null>(null);
-  currentUser$ = this.currentUserSource.asObservable();
   private authApiClient = inject(AuthorizedApiClientService);
   private apiClient = inject(ApiClientService);
+  currentUser$ = this.currentUserSource.asObservable();
 
   login(authRequest: AuthenticationRequest) {
     return this.apiClient.post<AuthenticationResponse>(
@@ -78,5 +79,37 @@ export class AuthService {
           this.currentUserSource.next(user);
         })
       );
+  }
+
+  hasRole(roles: Role[]) {
+    return this.currentUser$.pipe(
+      map(user => {
+        if (!user) {
+          return false;
+        }
+
+        for (let role of user.roles) {
+          if (roles.includes(role.roleId)) {
+            return true;
+          }
+        }
+
+        return false;
+      })
+    )
+  }
+
+  userHasRole(user: UserModel, roles: Role[]) {
+    if (!user) {
+      return false;
+    }
+
+    for (let role of user.roles) {
+      if (roles.includes(role.roleId)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

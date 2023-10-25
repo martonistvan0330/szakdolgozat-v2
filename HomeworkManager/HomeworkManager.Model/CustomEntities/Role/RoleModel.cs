@@ -2,6 +2,6 @@
 
 public class RoleModel
 {
-    public required Guid RoleId { get; set; }
+    public required int RoleId { get; set; }
     public required string? Name { get; set; }
 }

@@ -41,6 +41,11 @@ public class UserManager : UserManager<User>, IUserManager
         _userRepository = userRepository;
     }
 
+    public async Task<UserModel?> GetByIdAsync(Guid userId)
+    {
+        return await _userRepository.GetModelByIdAsync(userId);
+    }
+
     public async Task<UserModel?> GetByNameAsync(string username)
     {
         return await _userRepository.GetModelByNameAsync(username);
@@ -52,7 +57,7 @@ public class UserManager : UserManager<User>, IUserManager
 
         var users = sortOptions.Sort switch
         {
-            "userId" => await _userRepository.GetAllModelsAsync(u => u.UserId, sortOptions.SortDirection.ToSortDirection(), pageData),
+            "userId" => await _userRepository.GetAllModelsAsync(u => u.UserId.ToString(), sortOptions.SortDirection.ToSortDirection(), pageData),
             "username" => await _userRepository.GetAllModelsAsync(u => u.Username, sortOptions.SortDirection.ToSortDirection(), pageData),
             "email" => await _userRepository.GetAllModelsAsync(u => u.Email, sortOptions.SortDirection.ToSortDirection(), pageData),
             _ => await _userRepository.GetAllModelsAsync(u => u.UserId, sortOptions.SortDirection.ToSortDirection(), pageData)

@@ -6,6 +6,7 @@ namespace HomeworkManager.DataAccess.Repositories.Interfaces;
 
 public interface IUserRepository
 {
+    Task<UserModel?> GetModelByIdAsync(Guid userId);
     Task<UserModel?> GetModelByNameAsync(string username);
 
     Task<IEnumerable<UserListRow>> GetAllModelsAsync<TKey>

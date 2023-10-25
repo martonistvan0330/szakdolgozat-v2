@@ -25,3 +25,11 @@
   align-items: center;
   justify-content: center;
 }
+
+.mat-mdc-row .mat-mdc-cell {
+  cursor: pointer;
+}
+
+.mat-mdc-row:hover .mat-mdc-cell {
+  background: rgba(0, 0, 0, 0.15);
+}

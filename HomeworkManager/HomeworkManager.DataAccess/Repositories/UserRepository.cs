@@ -5,6 +5,7 @@ using HomeworkManager.Model.Contexts;
 using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.Role;
 using HomeworkManager.Model.CustomEntities.User;
+using HomeworkManager.Model.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace HomeworkManager.DataAccess.Repositories;
@@ -18,36 +19,18 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
+    public async Task<UserModel?> GetModelByIdAsync(Guid userId)
+    {
+        var user = await _context.Users.Where(u => u.Id == userId).SingleOrDefaultAsync();
+
+        return await CreateModelAsync(user);
+    }
+
     public async Task<UserModel?> GetModelByNameAsync(string username)
     {
         var user = await _context.Users.Where(u => u.UserName == username).SingleOrDefaultAsync();
 
-        if (user is null)
-        {
-            return null;
-        }
-
-        var roles = await _context.UserRoles
-            .Where(ur => ur.UserId == user.Id)
-            .Join(
-                _context.Roles,
-                ur => ur.RoleId,
-                r => r.Id,
-                (ur, r) => new RoleModel
-                {
-                    RoleId = r.Id,
-                    Name = r.Name!
-                }
-            )
-            .ToListAsync();
-
-        return new UserModel
-        {
-            UserId = user.Id,
-            Username = user.UserName!,
-            Email = user.Email!,
-            Roles = roles
-        };
+        return await CreateModelAsync(user);
     }
 
     public async Task<IEnumerable<UserListRow>> GetAllModelsAsync<TKey>(Expression<Func<UserListRow, TKey>> orderBy, SortDirection sortDirection,
@@ -96,5 +79,35 @@ public class UserRepository : IUserRepository
     public async Task<int> GetCountAsync()
     {
         return await _context.Users.CountAsync();
+    }
+
+    private async Task<UserModel?> CreateModelAsync(User? user)
+    {
+        if (user is null)
+        {
+            return null;
+        }
+
+        var roles = await _context.UserRoles
+            .Where(ur => ur.UserId == user.Id)
+            .Join(
+                _context.Roles,
+                ur => ur.RoleId,
+                r => r.Id,
+                (ur, r) => new RoleModel
+                {
+                    RoleId = r.RoleId,
+                    Name = r.Name!
+                }
+            )
+            .ToListAsync();
+
+        return new UserModel
+        {
+            UserId = user.Id,
+            Username = user.UserName!,
+            Email = user.Email!,
+            Roles = roles
+        };
     }
 }

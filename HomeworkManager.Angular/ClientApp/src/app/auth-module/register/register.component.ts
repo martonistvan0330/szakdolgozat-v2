@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { AuthService } from "../../core-module";
+import { AuthService, NavigationItems } from "../../core-module";
 import { Router } from "@angular/router";
 import { NewUser } from "../../shared-module";
 
@@ -9,14 +9,15 @@ import { NewUser } from "../../shared-module";
   styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent {
-  user: NewUser = new NewUser();
   private authService = inject(AuthService);
   private router = inject(Router);
+  user: NewUser = new NewUser();
 
   register() {
     this.authService.register(this.user)
       .subscribe(() => {
-          this.router.navigateByUrl('/home')
+          this.router.navigate([NavigationItems.home.navigationUrl]).then(_ => {
+          });
         }
       );
   }

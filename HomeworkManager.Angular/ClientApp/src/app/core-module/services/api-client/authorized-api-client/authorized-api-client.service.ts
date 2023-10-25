@@ -24,6 +24,10 @@ export class AuthorizedApiClientService {
     return this.httpRequest(() => this.http.post<T>(this.apiUrl + route, body));
   }
 
+  put<T>(route: string, body: any) {
+    return this.httpRequest(() => this.http.put<T>(this.apiUrl + route, body));
+  }
+
   private httpRequest<T>(request: () => Observable<T>) {
     return request().pipe(
       catchError((error, caught) => {

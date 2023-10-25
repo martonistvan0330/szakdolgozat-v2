@@ -10,6 +10,8 @@
             <mat-icon>account_circle</mat-icon>
         </button>
         <mat-menu #accountMenu="matMenu">
+            <button [routerLink]="[NavigationItems.userDetail.navigationUrl, user.userId]" mat-menu-item>Account
+            </button>
             <button (click)="logout()" mat-menu-item>Logout</button>
         </mat-menu>
     </ng-container>
