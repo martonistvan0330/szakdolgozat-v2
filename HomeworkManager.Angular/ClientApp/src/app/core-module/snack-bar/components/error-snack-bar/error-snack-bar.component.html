@@ -1,0 +1,11 @@
+<div class="error-container">
+    <div class="error-body">
+        <h2>{{ data.title ?? 'ERROR' }}</h2>
+        <span>{{ data.message ?? 'Something went wrong!' }}</span>
+    </div>
+    <div class="error-actions" matSnackBarActions>
+        <button (click)="snackbarRef.dismissWithAction()" mat-icon-button matSnackBarAction>
+            <mat-icon class="close-button-icon">cancel</mat-icon>
+        </button>
+    </div>
+</div>

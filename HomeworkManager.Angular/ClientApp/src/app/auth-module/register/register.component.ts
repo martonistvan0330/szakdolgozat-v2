@@ -1,7 +1,8 @@
 import { Component, inject } from '@angular/core';
-import { AuthService, NavigationItems } from "../../core-module";
+import { NavigationItems } from "../../core-module";
 import { Router } from "@angular/router";
 import { NewUser } from "../../shared-module";
+import { AuthService } from "../../services";
 
 @Component({
   selector: 'hwm-register',

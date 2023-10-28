@@ -32,7 +32,8 @@ import { AuthLayoutComponent } from './auth-layout/auth-layout.component';
   ],
   exports: [
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    AuthLayoutComponent
   ]
 })
 export class AuthModule {

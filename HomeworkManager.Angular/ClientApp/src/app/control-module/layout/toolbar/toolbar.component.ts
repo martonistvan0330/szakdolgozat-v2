@@ -1,6 +1,7 @@
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
-import { AuthService, NavigationItems } from "../../../core-module";
+import { NavigationItems } from "../../../core-module";
 import { Router } from "@angular/router";
+import { AuthService } from "../../../services";
 
 @Component({
   selector: 'hwm-toolbar',

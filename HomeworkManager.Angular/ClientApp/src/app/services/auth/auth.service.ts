@@ -8,7 +8,7 @@ import {
   RevokeRequest,
   Role,
   UserModel
-} from "../../../shared-module";
+} from "../../shared-module";
 import { ApiClientService } from "../api-client/api-client.service";
 import { map } from "rxjs/operators";
 
