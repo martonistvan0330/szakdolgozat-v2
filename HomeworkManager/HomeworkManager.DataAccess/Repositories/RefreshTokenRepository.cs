@@ -19,8 +19,8 @@ public class RefreshTokenRepository : IRefreshTokenRepository
 
     public async Task<RefreshToken?> GetAsync(string refreshToken, AccessToken accessToken)
     {
-        string refreshTokenHash = await _hashingService.GetHashString(refreshToken);
-        
+        var refreshTokenHash = await _hashingService.GetHashString(refreshToken);
+
         return await _context.RefreshTokens
             .Where(rt => rt.TokenHash == refreshTokenHash
                          && rt.AccessTokenId == accessToken.AccessTokenId)
