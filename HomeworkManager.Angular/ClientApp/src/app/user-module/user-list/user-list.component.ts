@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, ViewChild } from '@angular/core';
 import { catchError, merge, Observable, of, startWith, switchMap } from "rxjs";
 import { UserListRow } from "../../shared-module";
 import { MatSort } from "@angular/material/sort";
@@ -12,7 +12,7 @@ import { NavigationItems } from "../../core-module";
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.scss']
 })
-export class UserListComponent {
+export class UserListComponent implements AfterViewInit {
   private userService = inject(UserService);
   protected readonly NavigationItems = NavigationItems;
   displayedColumns: string[] = ['userId', 'username', 'email', 'roles'];

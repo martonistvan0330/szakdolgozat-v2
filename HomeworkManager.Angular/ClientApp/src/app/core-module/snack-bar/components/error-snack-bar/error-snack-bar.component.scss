@@ -1,0 +1,14 @@
+.error-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.error-body {
+  color: red;
+}
+
+.error-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}

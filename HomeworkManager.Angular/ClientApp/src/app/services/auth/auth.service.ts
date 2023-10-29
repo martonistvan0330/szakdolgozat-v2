@@ -8,7 +8,7 @@ import {
   RevokeRequest,
   Role,
   UserModel
-} from "../../../shared-module";
+} from "../../shared-module";
 import { ApiClientService } from "../api-client/api-client.service";
 import { map } from "rxjs/operators";
 
@@ -88,7 +88,7 @@ export class AuthService {
           return false;
         }
 
-        for (let role of user.roles) {
+        for (const role of user.roles) {
           if (roles.includes(role.roleId)) {
             return true;
           }
@@ -104,7 +104,7 @@ export class AuthService {
       return false;
     }
 
-    for (let role of user.roles) {
+    for (const role of user.roles) {
       if (roles.includes(role.roleId)) {
         return true;
       }

@@ -1,5 +1,5 @@
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
-using HomeworkManager.Model.CustomEntities.Enitity;
+using HomeworkManager.Model.CustomEntities.Entity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeworkManager.API.Controllers;
@@ -21,7 +21,7 @@ public class EntityController : ControllerBase
         _entityManager = entityManager;
     }
 
-    [HttpGet("{entityId}")]
+    [HttpGet("{entityId:int}")]
     public async Task<ActionResult<EntityModel>> GetAll(int entityId)
     {
         var entity = await _entityManager.GetOrNullAsync(entityId);
@@ -46,7 +46,7 @@ public class EntityController : ControllerBase
         return await _entityManager.CreateAsync(entityModel);
     }
 
-    [HttpDelete("{entityId}")]
+    [HttpDelete("{entityId:int}")]
     public async Task<ActionResult> Delete(int entityId)
     {
         await _entityManager.DeleteAsync(entityId);

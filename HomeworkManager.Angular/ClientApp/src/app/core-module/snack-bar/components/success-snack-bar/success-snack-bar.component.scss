@@ -1,0 +1,14 @@
+.success-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.success-body {
+  color: green;
+}
+
+.success-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}

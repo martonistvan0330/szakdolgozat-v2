@@ -1,8 +1,8 @@
 ﻿using HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
 using HomeworkManager.DataAccess.Repositories.Interfaces;
+using HomeworkManager.Model.Constants.Errors.Authentication;
 using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.ErrorEntities;
-using HomeworkManager.Model.ErrorEntities.Authentication;
 
 namespace HomeworkManager.BusinessLogic.Services.Authentication;
 

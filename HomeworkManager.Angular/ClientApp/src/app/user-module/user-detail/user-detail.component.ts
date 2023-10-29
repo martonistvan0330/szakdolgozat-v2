@@ -4,7 +4,8 @@ import { Role, RoleModel, UserModel } from "../../shared-module";
 import { RoleService } from "../services/role.service";
 import { FormControl } from "@angular/forms";
 import { UserService } from "../services/user.service";
-import { AuthService } from "../../core-module";
+import { AuthService } from "../../services";
+import { SnackBarService } from "../../core-module";
 
 @Component({
   selector: 'hwm-user-detail',
@@ -16,6 +17,7 @@ export class UserDetailComponent implements OnInit {
   private authService = inject(AuthService);
   private userService = inject(UserService);
   private roleService = inject(RoleService);
+  private snackBarService = inject(SnackBarService);
   saveClicked = false;
   roles: FormControl<number[] | null> = new FormControl({ value: null, disabled: true });
   allRoles: RoleModel[] = [];
@@ -55,7 +57,12 @@ export class UserDetailComponent implements OnInit {
     this.saveClicked = true;
 
     if (this.user && this.user.userId && this.roles.value && this.roles.value.length > 0) {
-      this.userService.updateRoles(this.user.userId, this.roles.value!);
+      this.userService.updateRoles(this.user.userId, this.roles.value!)
+        .subscribe(success => {
+          if (success) {
+            this.snackBarService.success('Role update', 'Roles have been updated');
+          }
+        })
     }
   }
 }

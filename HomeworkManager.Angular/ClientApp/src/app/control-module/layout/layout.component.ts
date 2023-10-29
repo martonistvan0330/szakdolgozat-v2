@@ -3,8 +3,9 @@ import { BreakpointObserver, Breakpoints } from "@angular/cdk/layout";
 import { Observable } from "rxjs";
 import { map, shareReplay } from "rxjs/operators";
 import { NavMenuComponent } from "./nav-menu/nav-menu.component";
-import { AuthService, NAVBAR_ITEMS, NavbarItem } from "../../core-module";
+import { NAVBAR_ITEMS, NavbarItem } from "../../core-module";
 import { UserModel } from "../../shared-module";
+import { AuthService } from "../../services";
 
 @Component({
   selector: 'hwm-layout',

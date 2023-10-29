@@ -1,15 +1,13 @@
 import { Inject, inject, Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { Router } from "@angular/router";
 import { catchError, Observable, switchMap } from "rxjs";
-import { AuthenticationResponse, RefreshRequest } from "../../../../shared-module";
+import { AuthenticationResponse, RefreshRequest } from "../../../shared-module";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthorizedApiClientService {
   private readonly http = inject(HttpClient);
-  private readonly router = inject(Router);
   private readonly apiUrl: string;
 
   constructor(@Inject('API_URL') apiUrl: string) {

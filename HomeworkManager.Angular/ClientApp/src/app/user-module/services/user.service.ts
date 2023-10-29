@@ -1,14 +1,14 @@
 import { inject, Injectable } from '@angular/core';
-import { AuthorizedApiClientService } from "../../core-module";
 import { SortDirection } from "@angular/material/sort";
 import { Pageable, UserListRow, UserModel } from "../../shared-module";
 import { delay } from "rxjs";
+import { AuthorizedApiClientService } from "../../services";
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private authApiClient = inject(AuthorizedApiClientService)
+  private authApiClient = inject(AuthorizedApiClientService);
 
   getUser(userId: string) {
     return this.authApiClient.get<UserModel>('User/' + userId);
@@ -20,8 +20,6 @@ export class UserService {
   }
 
   updateRoles(userId: string, roles: number[]) {
-    return this.authApiClient.put<boolean>('User/' + userId + '/Roles', roles)
-      .subscribe(_ => {
-      });
+    return this.authApiClient.put<boolean>('User/' + userId + '/Roles', roles);
   }
 }

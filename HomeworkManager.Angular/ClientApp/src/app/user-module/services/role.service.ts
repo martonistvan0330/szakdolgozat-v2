@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { AuthorizedApiClientService } from "../../core-module";
 import { RoleModel } from "../../shared-module";
+import { AuthorizedApiClientService } from "../../services";
 
 @Injectable({
   providedIn: 'root'

@@ -4,6 +4,7 @@ using HomeworkManager.Model.Constants;
 using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.User;
 using HomeworkManager.Model.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +38,7 @@ public class UserController : ControllerBase
         return user;
     }
 
-    [HttpGet("{userId}")]
+    [HttpGet("{userId:guid}")]
     public async Task<ActionResult<UserModel?>> GetAsync(Guid userId)
     {
         var currentUser = await _userManager.FindByNameAsync(User.Identity!.Name!);
@@ -47,12 +48,9 @@ public class UserController : ControllerBase
             return NotFound();
         }
 
-        if (currentUser.Id != userId)
+        if (currentUser.Id != userId && !await _userManager.IsInRoleAsync(currentUser, Roles.ADMINISTRATOR))
         {
-            if (!await _userManager.IsInRoleAsync(currentUser, Roles.ADMINISTRATOR))
-            {
-                return Forbid();
-            }
+            return Forbid();
         }
 
         return await _userManager.GetByIdAsync(userId);
@@ -64,7 +62,6 @@ public class UserController : ControllerBase
     {
         return await _userManager.GetAllAsync(sortOptions, pageData);
     }
-
 
     [HttpGet("Username")]
     public async Task<ActionResult<string>> GetUsernameAsync()
@@ -80,6 +77,24 @@ public class UserController : ControllerBase
         }
 
         return Unauthorized();
+    }
+
+    [AllowAnonymous]
+    [HttpGet("EmailAvailable")]
+    public async Task<ActionResult<bool>> EmailAvailableAsync(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        return user is null;
+    }
+
+    [AllowAnonymous]
+    [HttpGet("UsernameAvailable")]
+    public async Task<ActionResult<bool>> UsernameAvailableAsync(string username)
+    {
+        var user = await _userManager.FindByNameAsync(username);
+
+        return user is null;
     }
 
     [HomeworkManagerAuthorize(Roles = Roles.ADMINISTRATOR)]
