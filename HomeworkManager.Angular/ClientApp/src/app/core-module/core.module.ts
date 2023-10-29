@@ -7,12 +7,22 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { MatProgressBarModule } from "@angular/material/progress-bar";
 import { ErrorSnackBarComponent } from './snack-bar/components/error-snack-bar/error-snack-bar.component';
+import { ContainsDigitValidatorDirective } from './validation/contains-digit/contains-digit-validator.directive';
+import {
+  ContainsLowerCaseValidatorDirective
+} from './validation/contains-lower-case/contains-lower-case-validator.directive';
+import {
+  ContainsUpperCaseValidatorDirective
+} from './validation/contains-upper-case/contains-upper-case-validator.directive';
 
 
 @NgModule({
   declarations: [
     SuccessSnackBarComponent,
-    ErrorSnackBarComponent
+    ErrorSnackBarComponent,
+    ContainsDigitValidatorDirective,
+    ContainsLowerCaseValidatorDirective,
+    ContainsUpperCaseValidatorDirective
   ],
   imports: [
     CommonModule,
@@ -21,6 +31,11 @@ import { ErrorSnackBarComponent } from './snack-bar/components/error-snack-bar/e
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule
+  ],
+  exports: [
+    ContainsDigitValidatorDirective,
+    ContainsLowerCaseValidatorDirective,
+    ContainsUpperCaseValidatorDirective
   ]
 })
 export class CoreModule {

@@ -1,6 +1,5 @@
 import { Inject, inject, Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { Router } from "@angular/router";
 import { Observable } from "rxjs";
 
 @Injectable({
@@ -8,7 +7,6 @@ import { Observable } from "rxjs";
 })
 export class ApiClientService {
   private readonly http = inject(HttpClient);
-  private readonly router = inject(Router);
   private readonly apiUrl: string;
 
   constructor(@Inject('API_URL') apiUrl: string) {

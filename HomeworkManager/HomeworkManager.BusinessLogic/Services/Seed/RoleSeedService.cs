@@ -27,7 +27,7 @@ public class RoleSeedService : IRoleSeedService
             if (role is null || role.RoleId != 1)
             {
                 role!.RoleId = 1;
-                await _roleManager.UpdateAsync(role!);
+                await _roleManager.UpdateAsync(role);
             }
         }
 
@@ -42,7 +42,7 @@ public class RoleSeedService : IRoleSeedService
             if (role is null || role.RoleId != 2)
             {
                 role!.RoleId = 2;
-                await _roleManager.UpdateAsync(role!);
+                await _roleManager.UpdateAsync(role);
             }
         }
 
@@ -57,7 +57,7 @@ public class RoleSeedService : IRoleSeedService
             if (role is null || role.RoleId != 3)
             {
                 role!.RoleId = 3;
-                await _roleManager.UpdateAsync(role!);
+                await _roleManager.UpdateAsync(role);
             }
         }
     }

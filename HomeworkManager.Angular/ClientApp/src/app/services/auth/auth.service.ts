@@ -88,7 +88,7 @@ export class AuthService {
           return false;
         }
 
-        for (let role of user.roles) {
+        for (const role of user.roles) {
           if (roles.includes(role.roleId)) {
             return true;
           }
@@ -104,7 +104,7 @@ export class AuthService {
       return false;
     }
 
-    for (let role of user.roles) {
+    for (const role of user.roles) {
       if (roles.includes(role.roleId)) {
         return true;
       }

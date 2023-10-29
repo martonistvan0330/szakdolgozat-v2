@@ -9,15 +9,20 @@ import { RouterLink } from "@angular/router";
 import { MatCardModule } from "@angular/material/card";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
-import { FormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AuthLayoutComponent } from './auth-layout/auth-layout.component';
+import { CoreModule } from "../core-module/core.module";
+import { UniqueEmailAsyncValidatorDirective } from './register/validation/unique-email/unique-email-async-validator.directive';
+import { UniqueUsernameAsyncValidatorDirective } from './register/validation/unique-username/unique-username-async-validator.directive';
 
 
 @NgModule({
   declarations: [
     LoginComponent,
     RegisterComponent,
-    AuthLayoutComponent
+    AuthLayoutComponent,
+    UniqueEmailAsyncValidatorDirective,
+    UniqueUsernameAsyncValidatorDirective
   ],
   imports: [
     CommonModule,
@@ -28,7 +33,9 @@ import { AuthLayoutComponent } from './auth-layout/auth-layout.component';
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule,
+    CoreModule
   ],
   exports: [
     LoginComponent,

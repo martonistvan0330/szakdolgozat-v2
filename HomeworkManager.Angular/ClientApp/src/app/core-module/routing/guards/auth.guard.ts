@@ -7,7 +7,7 @@ import { Role } from "../../../shared-module";
 import { NavigationItems } from "../navigation-items";
 
 export class AuthGuard {
-  static requireAuthenticated: CanActivateFn = (route, state) => {
+  static requireAuthenticated: CanActivateFn = (_route, _state) => {
     const authService = inject(AuthService);
 
     return this.authenticateUser(authService)
@@ -23,7 +23,7 @@ export class AuthGuard {
   }
 
   static requireAnyRole(roles: Role[]): CanActivateFn {
-    return (route, state) => {
+    return (_route, _state) => {
       const authService = inject(AuthService);
 
       return this.authenticateUser(authService)
@@ -35,7 +35,7 @@ export class AuthGuard {
     }
   }
 
-  static requireUserOrAdmin: CanActivateFn = (route, state) => {
+  static requireUserOrAdmin: CanActivateFn = (route, _state) => {
     const authService = inject(AuthService);
 
     return this.authenticateUser(authService)

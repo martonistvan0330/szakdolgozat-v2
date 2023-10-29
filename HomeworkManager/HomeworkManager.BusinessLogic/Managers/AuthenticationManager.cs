@@ -1,12 +1,12 @@
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
 using HomeworkManager.Model.Constants;
+using HomeworkManager.Model.Constants.Errors.Authentication;
 using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.Authentication;
 using HomeworkManager.Model.CustomEntities.User;
 using HomeworkManager.Model.Entities;
 using HomeworkManager.Model.ErrorEntities;
-using HomeworkManager.Model.ErrorEntities.Authentication;
 using Microsoft.AspNetCore.Identity;
 
 namespace HomeworkManager.BusinessLogic.Managers;

@@ -6,11 +6,11 @@ using System.Text;
 using HomeworkManager.BusinessLogic.Managers;
 using HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
 using HomeworkManager.Model.Configurations;
+using HomeworkManager.Model.Constants.Errors.Authentication;
 using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.Authentication;
 using HomeworkManager.Model.Entities;
 using HomeworkManager.Model.ErrorEntities;
-using HomeworkManager.Model.ErrorEntities.Authentication;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -140,7 +140,7 @@ public class JwtService : IJwtService
         );
     }
 
-    private string GenerateRefreshToken()
+    private static string GenerateRefreshToken()
     {
         var randomNumber = new byte[64];
         using var randomNumberGenerator = RandomNumberGenerator.Create();

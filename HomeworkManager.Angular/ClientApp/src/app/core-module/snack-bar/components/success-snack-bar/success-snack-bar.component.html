@@ -1,11 +1,11 @@
 <div class="success-container">
     <div class="success-body">
-        <h2>{{ data.title ?? 'SUCCESS' }}</h2>
+        <h2>{{ data.title }}</h2>
         <span>{{ data.message }}</span>
     </div>
     <div class="success-actions" matSnackBarActions>
-        <button (click)="snackbarRef.dismissWithAction()" mat-icon-button matSnackBarAction>
-            <mat-icon class="close-button-icon">cancel</mat-icon>
+        <button (click)="snackbarRef.dismissWithAction()" color="accent" mat-icon-button matSnackBarAction>
+            <mat-icon>cancel</mat-icon>
         </button>
     </div>
 </div>
