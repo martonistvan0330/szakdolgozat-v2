@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
-import { RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
+import { RouterLink, RouterOutlet } from "@angular/router";
 import { LayoutComponent } from './layout/layout.component';
 import { ToolbarComponent } from './layout/toolbar/toolbar.component';
 import { MatMenuModule } from "@angular/material/menu";
@@ -26,8 +26,7 @@ import { MatMenuModule } from "@angular/material/menu";
     MatListModule,
     MatMenuModule,
     RouterOutlet,
-    RouterLink,
-    RouterLinkActive
+    RouterLink
   ],
   exports: [
     NavMenuComponent,
