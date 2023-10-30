@@ -1,6 +1,3 @@
-using System.Net;
-using System.Net.Mail;
-using System.Text;
 using HomeworkManager.API.Attributes;
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.Model.CustomEntities.Authentication;
@@ -94,26 +91,6 @@ public class AuthController : ControllerBase
     [HttpPost("PasswordRecovery")]
     public async Task<ActionResult> PasswordRecoveryAsync(PasswordRecoveryRequest passwordRecoveryRequest)
     {
-        var smtpClient = new SmtpClient
-        {
-            Host = "smtp.gmail.com",
-            Port = 587,
-            EnableSsl = true,
-            UseDefaultCredentials = false,
-            Credentials = new NetworkCredential("noreply.hwm@gmail.com", "ngny aies brvq wdbv")
-        };
-
-        MailAddress from = new("noreply.hwm@gmail.com", "Homework Manager Admin", Encoding.UTF8);
-        MailAddress to = new("mistvan0330@gmail.com");
-
-        MailMessage message = new(from, to);
-        message.Subject = "Test";
-        message.SubjectEncoding = Encoding.UTF8;
-        message.Body = "Hi!";
-        message.BodyEncoding = Encoding.UTF8;
-
-        await smtpClient.SendMailAsync(message);
-
         return Ok();
     }
 }
