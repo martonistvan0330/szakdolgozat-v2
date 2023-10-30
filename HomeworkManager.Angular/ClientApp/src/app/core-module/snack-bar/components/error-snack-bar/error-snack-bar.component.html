@@ -1,10 +1,10 @@
 <div class="error-container">
     <div class="error-body">
-        <h2>{{ data.title }}</h2>
+        <h3>{{ data.title }}</h3>
         <span>{{ data.message }}</span>
     </div>
     <div class="error-actions" matSnackBarActions>
-        <button (click)="snackbarRef.dismissWithAction()" color="accent" mat-icon-button matSnackBarAction>
+        <button (click)="snackbarRef.dismissWithAction()" color="warn" mat-icon-button matSnackBarAction>
             <mat-icon>cancel</mat-icon>
         </button>
     </div>
