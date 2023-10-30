@@ -8,8 +8,10 @@ import { AuthGuard, NavigationItems } from "./core-module";
 
 const routes: Routes = [
   // Auth
-  { path: 'login', component: auth.LoginComponent },
-  { path: 'register', component: auth.RegisterComponent },
+  { path: NavigationItems.login.routerUrlPattern, component: auth.LoginComponent },
+  { path: NavigationItems.register.routerUrlPattern, component: auth.RegisterComponent },
+  { path: NavigationItems.emailConfirmation.routerUrlPattern, component: auth.EmailConfirmationComponent },
+  { path: NavigationItems.passwordRecovery.routerUrlPattern, component: auth.PasswordRecoveryComponent },
 
   // App
   {

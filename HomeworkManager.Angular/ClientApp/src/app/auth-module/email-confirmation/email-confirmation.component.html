@@ -1,0 +1,7 @@
+<hwm-auth-layout>
+    <h1 *ngIf="!authenticated">
+        Please <a [routerLink]="[NavigationItems.login.navigationUrl]" class="login-link">log in</a> first and
+        try again.
+    </h1>
+    <h1 *ngIf="confirmed">Email confirmed</h1>
+</hwm-auth-layout>

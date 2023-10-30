@@ -11,6 +11,14 @@
                     <mat-label>Email</mat-label>
                     <input disabled matInput value="{{ user.email }}">
                 </mat-form-field>
+                <mat-checkbox [checked]="user.emailConfirmed" class="email-confirmed-checkbox" disabled
+                              labelPosition="before">
+                    Email Confirmed
+                </mat-checkbox>
+                <button (click)="resendConfirmation()" [disabled]="user.emailConfirmed" color="accent"
+                        mat-raised-button>
+                    Resend confirmation
+                </button>
             </div>
             <div class="column">
                 <mat-form-field>
@@ -25,7 +33,9 @@
                         At least one role required
                     </mat-error>
                 </mat-form-field>
-                <button (click)="updateRoles()" *ngIf="isAdministrator" class="user-form-field" color="accent"
+                <button (click)="updateRoles()" *ngIf="isAdministrator" [disabled]="rolesLoading"
+                        class="user-form-field"
+                        color="accent"
                         mat-raised-button>Save
                 </button>
             </div>

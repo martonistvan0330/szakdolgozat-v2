@@ -14,9 +14,9 @@ export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
   private snackBarService = inject(SnackBarService);
+  protected readonly NavigationItems = NavigationItems;
   @ViewChild('loginForm') loginForm!: NgForm;
   authRequest: AuthenticationRequest = new AuthenticationRequest();
-
   isLoading = false;
 
   login() {

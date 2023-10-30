@@ -12,8 +12,15 @@ import { MatInputModule } from "@angular/material/input";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AuthLayoutComponent } from './auth-layout/auth-layout.component';
 import { CoreModule } from "../core-module/core.module";
-import { UniqueEmailAsyncValidatorDirective } from './register/validation/unique-email/unique-email-async-validator.directive';
-import { UniqueUsernameAsyncValidatorDirective } from './register/validation/unique-username/unique-username-async-validator.directive';
+import {
+  UniqueEmailAsyncValidatorDirective
+} from './register/validation/unique-email/unique-email-async-validator.directive';
+import {
+  UniqueUsernameAsyncValidatorDirective
+} from './register/validation/unique-username/unique-username-async-validator.directive';
+import { PasswordRecoveryComponent } from './password-recovery/password-recovery.component';
+import { PasswordResetComponent } from './password-reset/password-reset.component';
+import { EmailConfirmationComponent } from './email-confirmation/email-confirmation.component';
 
 
 @NgModule({
@@ -22,7 +29,10 @@ import { UniqueUsernameAsyncValidatorDirective } from './register/validation/uni
     RegisterComponent,
     AuthLayoutComponent,
     UniqueEmailAsyncValidatorDirective,
-    UniqueUsernameAsyncValidatorDirective
+    UniqueUsernameAsyncValidatorDirective,
+    PasswordRecoveryComponent,
+    PasswordResetComponent,
+    EmailConfirmationComponent
   ],
   imports: [
     CommonModule,
@@ -40,7 +50,10 @@ import { UniqueUsernameAsyncValidatorDirective } from './register/validation/uni
   exports: [
     LoginComponent,
     RegisterComponent,
-    AuthLayoutComponent
+    AuthLayoutComponent,
+    PasswordRecoveryComponent,
+    PasswordResetComponent,
+    EmailConfirmationComponent
   ]
 })
 export class AuthModule {

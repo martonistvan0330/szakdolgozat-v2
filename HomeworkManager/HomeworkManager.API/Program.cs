@@ -1,7 +1,7 @@
 using HomeworkManager.API.Hosting;
-using HomeworkManager.Model.Configurations;
 using HomeworkManager.Model.Contexts;
 using HomeworkManager.Model.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
 
 // Add services to the container.
-builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetSection("JWT"));
+builder.CreateConfigurations();
 
 var connectionString =
     builder.Configuration["PRODUCTION_DB_CONNECTION_STRING"]
@@ -21,16 +21,17 @@ builder.Services.AddDbContext<HomeworkManagerContext>(
 
 builder.Services.AddIdentityCore<User>(options =>
     {
-        options.SignIn.RequireConfirmedAccount = false;
+        options.SignIn.RequireConfirmedAccount = true;
         options.User.RequireUniqueEmail = true;
-        options.Password.RequiredLength = 3;
-        options.Password.RequireDigit = false;
-        options.Password.RequireUppercase = false;
-        options.Password.RequireLowercase = false;
+        options.Password.RequiredLength = 6;
+        options.Password.RequireDigit = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireLowercase = true;
         options.Password.RequireNonAlphanumeric = false;
     })
     .AddRoles<Role>()
-    .AddEntityFrameworkStores<HomeworkManagerContext>();
+    .AddEntityFrameworkStores<HomeworkManagerContext>()
+    .AddDefaultTokenProviders();
 
 builder.AddJwtAuthentication();
 

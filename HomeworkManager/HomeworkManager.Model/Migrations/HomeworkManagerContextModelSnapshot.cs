@@ -47,6 +47,31 @@ namespace HomeworkManager.Model.Migrations
                     b.ToTable("AccessTokens");
                 });
 
+            modelBuilder.Entity("HomeworkManager.Model.Entities.EmailConfirmationToken", b =>
+                {
+                    b.Property<int>("EmailConfirmationTokenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmailConfirmationTokenId"));
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("EmailConfirmationTokenId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EmailConfirmationTokens");
+                });
+
             modelBuilder.Entity("HomeworkManager.Model.Entities.Entity", b =>
                 {
                     b.Property<int>("EntityId")
@@ -294,6 +319,17 @@ namespace HomeworkManager.Model.Migrations
                 {
                     b.HasOne("HomeworkManager.Model.Entities.User", "User")
                         .WithMany("AccessTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("HomeworkManager.Model.Entities.EmailConfirmationToken", b =>
+                {
+                    b.HasOne("HomeworkManager.Model.Entities.User", "User")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

@@ -22,6 +22,16 @@
   align-items: center;
 }
 
+.password-recovery {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 5px;
+
+  a {
+    color: currentColor;
+  }
+}
+
 .login-actions {
   display: flex;
   flex-direction: column;

@@ -23,6 +23,9 @@
                         Password required
                     </mat-error>
                 </mat-form-field>
+                <div class="password-recovery">
+                    <a [routerLink]="[NavigationItems.passwordRecovery.navigationUrl]">Forgotten password</a>
+                </div>
             </mat-card-content>
             <mat-card-actions class="login-actions">
                 <button (click)="login()" [disabled]="isLoading" color="primary" mat-raised-button>Log In</button>
@@ -30,7 +33,7 @@
         </form>
         <mat-card-footer class="login-footer">
             <mat-divider></mat-divider>
-            <a color="accent" mat-button routerLink="/register">Sign Up</a>
+            <a [routerLink]="[NavigationItems.register.navigationUrl]" mat-button>Sign Up</a>
         </mat-card-footer>
     </mat-card>
 </hwm-auth-layout>

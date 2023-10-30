@@ -1,0 +1,11 @@
+<div class="info-container">
+    <div class="info-body">
+        <h2>{{ data.title }}</h2>
+        <span>{{ data.message }}</span>
+    </div>
+    <div class="info-actions" matSnackBarActions>
+        <button (click)="snackbarRef.dismissWithAction()" color="accent" mat-icon-button matSnackBarAction>
+            <mat-icon>cancel</mat-icon>
+        </button>
+    </div>
+</div>

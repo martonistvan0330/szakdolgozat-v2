@@ -14,6 +14,24 @@ export class NavigationItems {
     roles: []
   }
 
+  public static emailConfirmation: NavigationItem = {
+    routerUrlPattern: 'email-confirmation',
+    navigationUrl: '/email-confirmation',
+    roles: []
+  }
+
+  public static passwordRecovery: NavigationItem = {
+    routerUrlPattern: 'password-recovery',
+    navigationUrl: '/password-recovery',
+    roles: []
+  }
+
+  public static passwordReset: NavigationItem = {
+    routerUrlPattern: 'password-reset',
+    navigationUrl: '/password-reset',
+    roles: []
+  }
+
   public static home: NavigationItem = {
     routerUrlPattern: 'home',
     navigationUrl: '/home',

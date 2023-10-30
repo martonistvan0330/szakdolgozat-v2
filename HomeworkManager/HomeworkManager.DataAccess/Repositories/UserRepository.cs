@@ -107,6 +107,7 @@ public class UserRepository : IUserRepository
             UserId = user.Id,
             Username = user.UserName!,
             Email = user.Email!,
+            EmailConfirmed = user.EmailConfirmed,
             Roles = roles
         };
     }

@@ -70,7 +70,7 @@
         </form>
         <mat-card-footer class="register-footer">
             <mat-divider></mat-divider>
-            <a color="accent" mat-button routerLink="/login">Sign In</a>
+            <a [routerLink]="[NavigationItems.login.navigationUrl]" mat-button>Sign In</a>
         </mat-card-footer>
     </mat-card>
 </hwm-auth-layout>

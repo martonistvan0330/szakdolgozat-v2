@@ -18,7 +18,7 @@ export class UserDetailComponent implements OnInit {
   private userService = inject(UserService);
   private roleService = inject(RoleService);
   private snackBarService = inject(SnackBarService);
-  saveClicked = false;
+  rolesLoading = false;
   roles: FormControl<number[] | null> = new FormControl({ value: null, disabled: true });
   allRoles: RoleModel[] = [];
   user: UserModel | null = null;
@@ -54,15 +54,33 @@ export class UserDetailComponent implements OnInit {
   }
 
   updateRoles() {
-    this.saveClicked = true;
+    this.rolesLoading = true;
 
     if (this.user && this.user.userId && this.roles.value && this.roles.value.length > 0) {
       this.userService.updateRoles(this.user.userId, this.roles.value!)
         .subscribe(success => {
+          this.rolesLoading = false;
+
           if (success) {
             this.snackBarService.success('Role update', 'Roles have been updated');
           }
-        })
+        });
     }
+  }
+
+  resendConfirmation() {
+    this.authService.resendConfirmation()
+      .subscribe({
+        next: success => {
+          if (success) {
+            this.snackBarService.success('Email has been sent');
+          } else {
+            this.snackBarService.error('Could not send email')
+          }
+        },
+        error: error => {
+          this.snackBarService.error('Could not send email', error.error);
+        }
+      });
   }
 }

@@ -18,6 +18,10 @@ export class AuthorizedApiClientService {
     return this.httpRequest(() => this.http.get<T>(this.apiUrl + route));
   }
 
+  patch<T>(route: string, body: any) {
+    return this.httpRequest(() => this.http.patch<T>(this.apiUrl + route, body));
+  }
+
   post<T>(route: string, body: any) {
     return this.httpRequest(() => this.http.post<T>(this.apiUrl + route, body));
   }

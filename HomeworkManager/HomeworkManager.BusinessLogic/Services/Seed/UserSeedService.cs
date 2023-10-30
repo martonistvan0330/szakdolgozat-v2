@@ -32,10 +32,11 @@ public class UserSeedService : IUserSeedService
             {
                 UserName = "admin",
                 Email = "admin@homeworkmanager.aut.bme.hu",
+                EmailConfirmed = true,
                 SecurityStamp = Guid.NewGuid().ToString()
             };
 
-            var createResult = await _userManager.CreateAsync(adminUser, "admin");
+            var createResult = await _userManager.CreateAsync(adminUser, "Admin1");
 
             if (!createResult.Succeeded)
             {
@@ -73,10 +74,11 @@ public class UserSeedService : IUserSeedService
                 {
                     UserName = student.Username,
                     Email = student.Email,
+                    EmailConfirmed = true,
                     SecurityStamp = Guid.NewGuid().ToString()
                 };
 
-                var createResult = await _userManager.CreateAsync(studentUser, student.Password);
+                var createResult = await _userManager.CreateAsync(studentUser, "Student1");
 
                 if (!createResult.Succeeded)
                 {
@@ -115,10 +117,11 @@ public class UserSeedService : IUserSeedService
                 {
                     UserName = teacher.Username,
                     Email = teacher.Email,
+                    EmailConfirmed = true,
                     SecurityStamp = Guid.NewGuid().ToString()
                 };
 
-                var createResult = await _userManager.CreateAsync(teacherUser, teacher.Password);
+                var createResult = await _userManager.CreateAsync(teacherUser, "Teacher1");
 
                 if (!createResult.Succeeded)
                 {

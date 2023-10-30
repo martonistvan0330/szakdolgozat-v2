@@ -25,10 +25,9 @@ export class RegisterComponent implements OnInit {
   private uniqueEmailAsyncValidator = inject(UniqueEmailAsyncValidator);
   private uniqueUsernameAsyncValidator = inject(UniqueUsernameAsyncValidator);
   protected readonly Errors = Errors;
+  protected readonly NavigationItems = NavigationItems;
   registerForm!: FormGroup;
-
   isLoading = false;
-
   emailError = Errors.NoError;
   usernameError = Errors.NoError;
   passwordError = Errors.NoError;
@@ -71,7 +70,7 @@ export class RegisterComponent implements OnInit {
           this.router.navigate([NavigationItems.home.navigationUrl])
             .then(success => {
               if (success) {
-                this.snackBarService.success('Successful registration', '');
+                this.snackBarService.success('Successful registration', 'Please confirm your email');
               }
             });
         },

@@ -4,7 +4,9 @@ import { BehaviorSubject, mergeMap, of } from "rxjs";
 import {
   AuthenticationRequest,
   AuthenticationResponse,
+  EmailConfirmationRequest,
   NewUser,
+  PasswordRecoveryRequest,
   RevokeRequest,
   Role,
   UserModel
@@ -20,6 +22,16 @@ export class AuthService {
   private authApiClient = inject(AuthorizedApiClientService);
   private apiClient = inject(ApiClientService);
   currentUser$ = this.currentUserSource.asObservable();
+
+  authenticate() {
+    return this.authApiClient.get<UserModel>('User/Authenticate')
+      .pipe(
+        map(user => {
+          localStorage.setItem('user', JSON.stringify(user));
+          this.currentUserSource.next(user);
+        })
+      );
+  }
 
   login(authRequest: AuthenticationRequest) {
     return this.apiClient.post<AuthenticationResponse>(
@@ -49,6 +61,10 @@ export class AuthService {
     );
   }
 
+  confirmEmail(token: string) {
+    return this.apiClient.post<boolean>('Auth/ConfirmEmail', new EmailConfirmationRequest(token));
+  }
+
   logout() {
     const accessToken = localStorage.getItem('access-token');
     const refreshToken = localStorage.getItem('refresh-token');
@@ -71,14 +87,12 @@ export class AuthService {
     }
   }
 
-  authenticate() {
-    return this.authApiClient.get<UserModel>('User/Authenticate')
-      .pipe(
-        map(user => {
-          localStorage.setItem('user', JSON.stringify(user));
-          this.currentUserSource.next(user);
-        })
-      );
+  resendConfirmation() {
+    return this.authApiClient.patch<boolean>('Auth/ResendConfirmation', null);
+  }
+
+  recoverPassword(passwordRecoveryRequest: PasswordRecoveryRequest) {
+    return this.apiClient.post<void>('Auth/PasswordRecovery', passwordRecoveryRequest);
   }
 
   hasRole(roles: Role[]) {

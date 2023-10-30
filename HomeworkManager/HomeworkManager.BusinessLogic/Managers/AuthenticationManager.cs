@@ -1,5 +1,6 @@
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
+using HomeworkManager.BusinessLogic.Services.Email.Interfaces;
 using HomeworkManager.Model.Constants;
 using HomeworkManager.Model.Constants.Errors.Authentication;
 using HomeworkManager.Model.CustomEntities;
@@ -13,16 +14,19 @@ namespace HomeworkManager.BusinessLogic.Managers;
 
 public class AuthenticationManager : IAuthenticationManager
 {
+    private readonly IEmailService _emailService;
     private readonly IJwtService _jwtService;
     private readonly ITokenService _tokenService;
     private readonly UserManager _userManager;
 
     public AuthenticationManager(
+        IEmailService emailService,
         IJwtService jwtService,
         ITokenService tokenService,
         UserManager userManager
     )
     {
+        _emailService = emailService;
         _jwtService = jwtService;
         _tokenService = tokenService;
         _userManager = userManager;
@@ -49,7 +53,33 @@ public class AuthenticationManager : IAuthenticationManager
             return new BusinessError(createResult.Errors.Select(e => e.Description).ToArray());
         }
 
+        await SendEmailConfirmationAsync(user);
+
         return await _jwtService.CreateTokensAsync(user);
+    }
+
+    public async Task<Result<bool, BusinessError>> ConfirmEmailAsync(string? username, EmailConfirmationRequest emailConfirmationRequest)
+    {
+        if (username is null)
+        {
+            return new BusinessError(AuthenticationErrorMessages.INVALID_USERNAME);
+        }
+
+        var user = await _userManager.FindByNameAsync(username);
+        if (user is null)
+        {
+            return new BusinessError(AuthenticationErrorMessages.USER_NOT_FOUND);
+        }
+
+        var emailConfirmationResult = await _tokenService.CheckEmailConfirmationTokenAsync(user.Id, emailConfirmationRequest.Token);
+
+        if (emailConfirmationResult.Success)
+        {
+            user.EmailConfirmed = true;
+            await _userManager.UpdateAsync(user);
+        }
+
+        return emailConfirmationResult;
     }
 
     public async Task<Result<AuthenticationResponse, BusinessError>> LoginAsync(AuthenticationRequest authenticationRequest)
@@ -90,11 +120,45 @@ public class AuthenticationManager : IAuthenticationManager
 
         if (user is null)
         {
-            return new BusinessError(AuthenticationErrorMessages.INVALID_USERNAME);
+            return new BusinessError(AuthenticationErrorMessages.USER_NOT_FOUND);
         }
 
         await _tokenService.RevokeTokensAsync(tokens.AccessToken, tokens.RefreshToken, user.Id);
 
         return true;
+    }
+
+    public async Task<Result<bool, BusinessError>> ResendEmailConfirmationAsync(string? username)
+    {
+        if (username is null)
+        {
+            return new BusinessError(AuthenticationErrorMessages.INVALID_USERNAME);
+        }
+
+        var user = await _userManager.FindByNameAsync(username);
+
+        if (user is null)
+        {
+            return new BusinessError(AuthenticationErrorMessages.USER_NOT_FOUND);
+        }
+
+        if (user.EmailConfirmed)
+        {
+            return new BusinessError(AuthenticationErrorMessages.USER_EMAIL_ALREADY_CONFIRMED);
+        }
+
+        await SendEmailConfirmationAsync(user);
+
+        return true;
+    }
+
+    private async Task SendEmailConfirmationAsync(User user)
+    {
+        var confirmationToken = await _tokenService.CreateEmailConfirmationTokenAsync(user.Id);
+
+        if (confirmationToken is not null)
+        {
+            await _emailService.SendConfirmationAsync(user, confirmationToken);
+        }
     }
 }
