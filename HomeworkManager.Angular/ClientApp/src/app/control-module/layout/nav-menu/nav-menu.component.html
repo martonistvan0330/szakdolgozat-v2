@@ -7,7 +7,8 @@
                  fixedInViewport>
         <mat-nav-list>
             <a *ngFor="let navItem of navbarItems" [routerLink]="[navItem.navigationItem.navigationUrl]"
-               mat-list-item>
+               mat-list-item
+               routerLinkActive="active">
                 <div class="nav-menu-item">
                     <mat-icon class="nav-menu-item-icon-container">{{ navItem.icon }}</mat-icon>
                     <div class="nav-menu-item-title">{{ navItem.title }}</div>
