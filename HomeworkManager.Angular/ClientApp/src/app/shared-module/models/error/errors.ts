@@ -12,6 +12,7 @@ export enum Errors {
   ContainsLowerCase = 101,
   ContainsUpperCase = 102,
   ContainsDigit = 103,
+  Equal = 104,
 
   Unique = 201
 }

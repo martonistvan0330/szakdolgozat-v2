@@ -3,6 +3,7 @@ import {
   containsDigitValidator,
   containsLowerCaseValidator,
   containsUpperCaseValidator,
+  equalValueValidator,
   NavigationItems,
   SnackBarService
 } from "../../core-module";
@@ -31,6 +32,7 @@ export class RegisterComponent implements OnInit {
   emailError = Errors.NoError;
   usernameError = Errors.NoError;
   passwordError = Errors.NoError;
+  confirmPasswordError = Errors.NoError;
 
   get email() {
     return this.registerForm.get('email')!!;
@@ -44,12 +46,17 @@ export class RegisterComponent implements OnInit {
     return this.registerForm.get('password')!!;
   }
 
+  get confirmPassword() {
+    return this.registerForm.get('confirmPassword')!!;
+  }
+
   ngOnInit() {
     this.formSetup();
 
     this.emailControlSetup();
     this.usernameControlSetup();
     this.passwordControlSetup();
+    this.confirmPasswordControlSetup();
   }
 
   register() {
@@ -91,7 +98,7 @@ export class RegisterComponent implements OnInit {
       username: new FormControl('', {
         validators: [Validators.required],
         asyncValidators: [this.uniqueUsernameAsyncValidator.validate.bind(this.uniqueUsernameAsyncValidator)],
-        updateOn: 'blur'
+        updateOn: 'change'
       }),
       password: new FormControl('', [
         Validators.required,
@@ -99,6 +106,10 @@ export class RegisterComponent implements OnInit {
         containsLowerCaseValidator(1),
         containsUpperCaseValidator(1),
         containsDigitValidator(1)
+      ]),
+      confirmPassword: new FormControl('', [
+        Validators.required,
+        equalValueValidator('password')
       ])
     });
   }
@@ -157,6 +168,23 @@ export class RegisterComponent implements OnInit {
             this.passwordError = Errors.ContainsUpperCase;
           } else if (this.password.errors?.['containsDigit']) {
             this.passwordError = Errors.ContainsDigit;
+          }
+        }
+      });
+  }
+
+  private confirmPasswordControlSetup() {
+    this.confirmPassword.statusChanges
+      .subscribe(() => {
+        if (this.confirmPassword.status === 'VALID') {
+          this.confirmPasswordError = Errors.NoError;
+        }
+
+        if (this.confirmPassword.status === 'INVALID') {
+          if (this.confirmPassword.errors?.['required']) {
+            this.confirmPasswordError = Errors.Required;
+          } else if (this.confirmPassword.errors?.['notEqual']) {
+            this.confirmPasswordError = Errors.Equal;
           }
         }
       });

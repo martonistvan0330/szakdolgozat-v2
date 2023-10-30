@@ -15,6 +15,7 @@ import {
   ContainsUpperCaseValidatorDirective
 } from './validation/contains-upper-case/contains-upper-case-validator.directive';
 import { InfoSnackBarComponent } from './snack-bar/components/info-snack-bar/info-snack-bar.component';
+import { EqualValuesValidatorDirective } from './validation/equal-values/equal-values-validator.directive';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import { InfoSnackBarComponent } from './snack-bar/components/info-snack-bar/inf
     ContainsDigitValidatorDirective,
     ContainsLowerCaseValidatorDirective,
     ContainsUpperCaseValidatorDirective,
-    InfoSnackBarComponent
+    InfoSnackBarComponent,
+    EqualValuesValidatorDirective
   ],
   imports: [
     CommonModule,
@@ -37,7 +39,8 @@ import { InfoSnackBarComponent } from './snack-bar/components/info-snack-bar/inf
   exports: [
     ContainsDigitValidatorDirective,
     ContainsLowerCaseValidatorDirective,
-    ContainsUpperCaseValidatorDirective
+    ContainsUpperCaseValidatorDirective,
+    EqualValuesValidatorDirective
   ],
   providers: [
     {

@@ -22,7 +22,6 @@ import { PasswordRecoveryComponent } from './password-recovery/password-recovery
 import { PasswordResetComponent } from './password-reset/password-reset.component';
 import { EmailConfirmationComponent } from './email-confirmation/email-confirmation.component';
 
-
 @NgModule({
   declarations: [
     LoginComponent,

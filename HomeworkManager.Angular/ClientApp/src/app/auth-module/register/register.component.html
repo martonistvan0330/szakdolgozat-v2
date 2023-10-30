@@ -19,6 +19,9 @@
                         <span *ngSwitchCase="Errors.Unique">
                             Email is already taken
                         </span>
+                        <span *ngSwitchDefault>
+                            Email required
+                        </span>
                     </mat-error>
                 </mat-form-field>
 
@@ -27,13 +30,16 @@
                     <input formControlName="username"
                            id="username" matInput
                            name="username" required type="text">
-                    <mat-error *ngIf="username.invalid && (username.dirty || username.touched)"
-                               [ngSwitch]="usernameError">
+                    <mat-error
+                            [ngSwitch]="usernameError">
                         <span *ngSwitchCase="Errors.Required">
                             Username required
                         </span>
                         <span *ngSwitchCase="Errors.Unique">
                             Username is already taken
+                        </span>
+                        <span *ngSwitchDefault>
+                            Username required
                         </span>
                     </mat-error>
                 </mat-form-field>
@@ -42,8 +48,7 @@
                     <input formControlName="password" id="password" matInput name="password"
                            required
                            type="password">
-                    <mat-error *ngIf="password.invalid && (password.dirty || password.touched)"
-                               [ngSwitch]="passwordError">
+                    <mat-error [ngSwitch]="passwordError">
                         <span *ngSwitchCase="Errors.Required">
                             Password required
                         </span>
@@ -58,6 +63,26 @@
                         </span>
                         <span *ngSwitchCase="Errors.ContainsDigit">
                             Must contain at least 1 digit
+                        </span>
+                        <span *ngSwitchDefault>
+                            Password required
+                        </span>
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Confirm Password</mat-label>
+                    <input formControlName="confirmPassword" id="confirmPassword" matInput name="confirmPassword"
+                           required
+                           type="password">
+                    <mat-error [ngSwitch]="confirmPasswordError">
+                        <span *ngSwitchCase="Errors.Required">
+                            Confirm password required
+                        </span>
+                        <span *ngSwitchCase="Errors.Equal">
+                            Password must be the same
+                        </span>
+                        <span *ngSwitchDefault>
+                            Confirm password required
                         </span>
                     </mat-error>
                 </mat-form-field>
