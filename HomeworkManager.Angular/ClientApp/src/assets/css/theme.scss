@@ -1,5 +1,4 @@
 @use '@angular/material' as mat;
-@use '../../app/auth-module/login/login.component.scss' as login;
 
 @include mat.core;
 
@@ -13,7 +12,6 @@ $dark-theme: mat.define-dark-theme((
 ));
 
 @include mat.all-component-themes($dark-theme);
-//@include login.theme($dark-theme);
 
 $light-theme: mat.define-light-theme((
         color: (
@@ -26,5 +24,4 @@ $light-theme: mat.define-light-theme((
 
 @media (prefers-color-scheme: light) {
   @include mat.all-component-colors($light-theme);
-  //@include login.theme($light-theme)
 }

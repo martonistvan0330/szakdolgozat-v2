@@ -1,15 +1,3 @@
-//@use 'sass:map';
-//@use '@angular/material' as mat;
-//
-//@mixin theme($theme) {
-//  $color-config: mat.get-color-config($theme);
-//  $background-palette: map.get($color-config, 'background');
-//
-//  div {
-//    background-color: mat.get-color-from-palette($background-palette, background);
-//  }
-//}
-
 .login-header {
   display: flex;
   justify-content: center;
