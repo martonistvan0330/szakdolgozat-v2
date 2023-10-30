@@ -1,6 +1,8 @@
 @use '@angular/material' as mat;
 @use '../../app/auth-module/login/login.component.scss' as login;
 
+@include mat.core;
+
 $dark-theme: mat.define-dark-theme((
         color: (
                 primary: mat.define-palette(mat.$purple-palette, 700, 500, 800),
