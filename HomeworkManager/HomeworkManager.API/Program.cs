@@ -22,7 +22,7 @@ builder.Services.AddDbContext<HomeworkManagerContext>(
 builder.Services.AddIdentityCore<User>(options =>
     {
         options.SignIn.RequireConfirmedAccount = true;
-        options.User.RequireUniqueEmail = true;
+        options.User.RequireUniqueEmail = false;
         options.Password.RequiredLength = 6;
         options.Password.RequireDigit = true;
         options.Password.RequireUppercase = true;

@@ -89,8 +89,10 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("PasswordRecovery")]
-    public async Task<ActionResult> PasswordRecoveryAsync(PasswordRecoveryRequest passwordRecoveryRequest)
+    public async Task<ActionResult> RecoverPasswordAsync(PasswordRecoveryRequest passwordRecoveryRequest)
     {
+        await _authenticationManager.SendPasswordRecoveryEmailAsync(passwordRecoveryRequest.Email);
+
         return Ok();
     }
 }

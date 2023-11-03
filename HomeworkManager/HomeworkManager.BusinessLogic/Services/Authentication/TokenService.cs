@@ -67,6 +67,12 @@ public class TokenService : ITokenService
         return await _emailConfirmationTokenRepository.CreateAsync(userId, emailConfirmationToken);
     }
 
+    public async Task<string?> CreatePasswordRecoveryTokenAsync(Guid userId)
+    {
+        var passwordRecoveryToken = GenerateToken();
+        return await _passwordRecoveryTokenRepository.CreateAsync(userId, passwordRecoveryToken);
+    }
+
     public async Task<Result<bool, BusinessError>> CheckEmailConfirmationTokenAsync(Guid userId, string emailConfirmationToken)
     {
         var dbEmailConfirmationToken = await _emailConfirmationTokenRepository.GetActiveByUserAsync(userId);
@@ -83,6 +89,11 @@ public class TokenService : ITokenService
         }
 
         return false;
+    }
+
+    public async Task<Result<bool, BusinessError>> CheckPasswordRecoveryTokenAsync(Guid userId, string passwordRecoveryToken)
+    {
+        return true;
     }
 
     private static string GenerateToken()

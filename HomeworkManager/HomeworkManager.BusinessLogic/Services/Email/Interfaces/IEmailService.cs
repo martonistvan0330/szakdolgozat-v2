@@ -4,5 +4,6 @@ namespace HomeworkManager.BusinessLogic.Services.Email.Interfaces;
 
 public interface IEmailService
 {
-    Task SendConfirmationAsync(User user, string token);
+    Task SendConfirmationEmailAsync(User user, string token);
+    Task SendPasswordRecoveryEmailAsync(User user, string token);
 }

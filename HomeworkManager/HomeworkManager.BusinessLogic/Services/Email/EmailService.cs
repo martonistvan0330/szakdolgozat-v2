@@ -29,17 +29,33 @@ public class EmailService : IEmailService
         };
     }
 
-    public async Task SendConfirmationAsync(User user, string token)
+    public async Task SendConfirmationEmailAsync(User user, string token)
+    {
+        var subject = "Confirm Email";
+        var body = $"""
+                    <a href="{_configuration["WebApiUrl"]}/email-confirmation?token={token}">Confirm</a> your email.
+                    """;
+        await SendEmailAsync(user, subject, body);
+    }
+
+    public async Task SendPasswordRecoveryEmailAsync(User user, string token)
+    {
+        var subject = "Password Recovery";
+        var body = $"""
+                    <a href="{_configuration["WebApiUrl"]}/recover-password?token={token}">Recover your password.</a>
+                    """;
+        await SendEmailAsync(user, subject, body);
+    }
+
+    private async Task SendEmailAsync(User user, string subject, string body)
     {
         MailAddress from = new(_smtpConfiguration.SenderAddress, _smtpConfiguration.SenderName, Encoding.UTF8);
         MailAddress to = new(user.Email!);
 
         MailMessage message = new(from, to);
-        message.Subject = "Confirm Email";
+        message.Subject = subject;
         message.SubjectEncoding = Encoding.UTF8;
-        message.Body = $"""
-                        <a href="{_configuration["WebApiUrl"]}/email-confirmation?token={token}">Confirm</a> your email.
-                        """;
+        message.Body = body;
         message.IsBodyHtml = true;
         message.BodyEncoding = Encoding.UTF8;
 

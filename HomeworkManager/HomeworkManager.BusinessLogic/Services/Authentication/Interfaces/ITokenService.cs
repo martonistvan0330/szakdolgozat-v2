@@ -9,5 +9,7 @@ public interface ITokenService
     Task AddTokensToUserAsync(string accessToken, string refreshToken, Guid userId);
     Task RevokeTokensAsync(string accessToken, string refreshToken, Guid userId);
     Task<string?> CreateEmailConfirmationTokenAsync(Guid userId);
+    Task<string?> CreatePasswordRecoveryTokenAsync(Guid userId);
     Task<Result<bool, BusinessError>> CheckEmailConfirmationTokenAsync(Guid userId, string emailConfirmationToken);
+    Task<Result<bool, BusinessError>> CheckPasswordRecoveryTokenAsync(Guid userId, string passwordRecoveryToken);
 }

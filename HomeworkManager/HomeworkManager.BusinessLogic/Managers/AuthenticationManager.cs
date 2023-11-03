@@ -152,13 +152,28 @@ public class AuthenticationManager : IAuthenticationManager
         return true;
     }
 
+    public async Task SendPasswordRecoveryEmailAsync(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        if (user is not null)
+        {
+            var passwordRecoveryToken = await _tokenService.CreateEmailConfirmationTokenAsync(user.Id);
+
+            if (passwordRecoveryToken is not null)
+            {
+                await _emailService.SendPasswordRecoveryEmailAsync(user, passwordRecoveryToken);
+            }
+        }
+    }
+
     private async Task SendEmailConfirmationAsync(User user)
     {
-        var confirmationToken = await _tokenService.CreateEmailConfirmationTokenAsync(user.Id);
+        var confirmationToken = await _tokenService.CreatePasswordRecoveryTokenAsync(user.Id);
 
         if (confirmationToken is not null)
         {
-            await _emailService.SendConfirmationAsync(user, confirmationToken);
+            await _emailService.SendConfirmationEmailAsync(user, confirmationToken);
         }
     }
 }
