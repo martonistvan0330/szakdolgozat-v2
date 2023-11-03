@@ -6,6 +6,34 @@
         <form [formGroup]="registerForm">
             <mat-card-content class="register-content">
                 <mat-form-field>
+                    <mat-label>First name</mat-label>
+                    <input formControlName="firstName" id="firstName" matInput
+                           name="firstName" required type="text">
+                    <mat-error *ngIf="firstName.invalid && (firstName.dirty || firstName.touched)" [ngSwitch]="firstNameError">
+                        <span *ngSwitchCase="Errors.Required">
+                            First name required
+                        </span>
+                        <span *ngSwitchDefault>
+                            First name required
+                        </span>
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field>
+                    <mat-label>Last name</mat-label>
+                    <input formControlName="lastName" id="lastName" matInput
+                           name="lastName" required type="text">
+                    <mat-error *ngIf="lastName.invalid && (lastName.dirty || lastName.touched)" [ngSwitch]="lastNameError">
+                        <span *ngSwitchCase="Errors.Required">
+                            Last name required
+                        </span>
+                        <span *ngSwitchDefault>
+                            Last name required
+                        </span>
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field>
                     <mat-label>Email</mat-label>
                     <input formControlName="email" id="email" matInput
                            name="email" required type="email">

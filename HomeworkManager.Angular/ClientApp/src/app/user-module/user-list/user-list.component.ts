@@ -15,7 +15,7 @@ import { NavigationItems } from "../../core-module";
 export class UserListComponent implements AfterViewInit {
   private userService = inject(UserService);
   protected readonly NavigationItems = NavigationItems;
-  displayedColumns: string[] = ['userId', 'username', 'email', 'roles'];
+  displayedColumns: string[] = ['userId', 'fullName', 'username', 'email', 'roles'];
   dataSource: Observable<UserListRow[]> = of([]);
   resultsLength = 0;
   isLoadingResults = true;

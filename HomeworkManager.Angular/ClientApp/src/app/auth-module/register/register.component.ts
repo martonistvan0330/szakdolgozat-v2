@@ -29,10 +29,20 @@ export class RegisterComponent implements OnInit {
   protected readonly NavigationItems = NavigationItems;
   registerForm!: FormGroup;
   isLoading = false;
+  firstNameError = Errors.NoError;
+  lastNameError = Errors.NoError;
   emailError = Errors.NoError;
   usernameError = Errors.NoError;
   passwordError = Errors.NoError;
   confirmPasswordError = Errors.NoError;
+
+  get firstName() {
+    return this.registerForm.get('firstName')!!;
+  }
+
+  get lastName() {
+    return this.registerForm.get('lastName')!!;
+  }
 
   get email() {
     return this.registerForm.get('email')!!;
@@ -53,6 +63,8 @@ export class RegisterComponent implements OnInit {
   ngOnInit() {
     this.formSetup();
 
+    this.firstNameControlSetup();
+    this.lastNameControlSetup();
     this.emailControlSetup();
     this.usernameControlSetup();
     this.passwordControlSetup();
@@ -67,6 +79,8 @@ export class RegisterComponent implements OnInit {
     this.isLoading = true;
 
     const newUser = new NewUser();
+    newUser.firstName = this.firstName.value;
+    newUser.lastName = this.lastName.value;
     newUser.email = this.email.value;
     newUser.username = this.username.value;
     newUser.password = this.password.value;
@@ -90,6 +104,12 @@ export class RegisterComponent implements OnInit {
 
   private formSetup() {
     this.registerForm = new FormGroup({
+      firstName: new FormControl('', {
+        validators: [Validators.required]
+      }),
+      lastName: new FormControl('', {
+        validators: [Validators.required]
+      }),
       email: new FormControl('', {
         validators: [Validators.required, Validators.email],
         asyncValidators: [this.uniqueEmailAsyncValidator.validate.bind(this.uniqueEmailAsyncValidator)],
@@ -100,18 +120,52 @@ export class RegisterComponent implements OnInit {
         asyncValidators: [this.uniqueUsernameAsyncValidator.validate.bind(this.uniqueUsernameAsyncValidator)],
         updateOn: 'change'
       }),
-      password: new FormControl('', [
-        Validators.required,
-        Validators.minLength(6),
-        containsLowerCaseValidator(1),
-        containsUpperCaseValidator(1),
-        containsDigitValidator(1)
-      ]),
-      confirmPassword: new FormControl('', [
-        Validators.required,
-        equalValueValidator('password')
-      ])
+      password: new FormControl('', {
+        validators: [
+          Validators.required,
+          Validators.minLength(6),
+          containsLowerCaseValidator(1),
+          containsUpperCaseValidator(1),
+          containsDigitValidator(1)
+        ]
+      }),
+      confirmPassword: new FormControl('', {
+        validators: [
+          Validators.required,
+          equalValueValidator('password')
+        ]
+      })
     });
+  }
+
+  private firstNameControlSetup() {
+    this.firstName.statusChanges
+      .subscribe(() => {
+        if (this.firstName.status === 'VALID') {
+          this.firstNameError = Errors.NoError;
+        }
+
+        if (this.firstName.status === 'INVALID') {
+          if (this.firstName.errors?.['required']) {
+            this.firstNameError = Errors.Required;
+          }
+        }
+      });
+  }
+
+  private lastNameControlSetup() {
+    this.lastName.statusChanges
+      .subscribe(() => {
+        if (this.lastName.status === 'VALID') {
+          this.lastNameError = Errors.NoError;
+        }
+
+        if (this.lastName.status === 'INVALID') {
+          if (this.lastName.errors?.['required']) {
+            this.lastNameError = Errors.Required;
+          }
+        }
+      });
   }
 
   private emailControlSetup() {

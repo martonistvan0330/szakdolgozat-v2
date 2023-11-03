@@ -4,8 +4,8 @@
         <mat-card-content class="user-card-content">
             <div class="column">
                 <mat-form-field>
-                    <mat-label>Username</mat-label>
-                    <input disabled matInput value="{{ user.username }}">
+                    <mat-label>Name</mat-label>
+                    <input disabled matInput value="{{ user.fullName }}">
                 </mat-form-field>
                 <mat-form-field>
                     <mat-label>Email</mat-label>
@@ -21,6 +21,10 @@
                 </button>
             </div>
             <div class="column">
+                <mat-form-field>
+                    <mat-label>Username</mat-label>
+                    <input disabled matInput value="{{ user.username }}">
+                </mat-form-field>
                 <mat-form-field>
                     <mat-label>Roles</mat-label>
                     <mat-select #rolesSelect="ngForm" [formControl]="roles"

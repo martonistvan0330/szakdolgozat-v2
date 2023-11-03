@@ -46,6 +46,7 @@ public class UserRepository : IUserRepository
                 {
                     UserId = u.Id,
                     Username = u.UserName,
+                    FullName = u.FullName,
                     u.Email,
                     ur.RoleId
                 }
@@ -58,17 +59,19 @@ public class UserRepository : IUserRepository
                 (u, r) => new
                 {
                     u.UserId,
+                    u.FullName,
                     u.Username,
                     u.Email,
                     RoleName = r.Name
                 }
             )
-            .GroupBy(u => new { u.UserId, u.Username, u.Email })
+            .GroupBy(u => new { u.UserId, u.FullName, u.Username, u.Email })
             .Select(g => new UserListRow
             {
+                FullName = g.Key.FullName,
                 UserId = g.Key.UserId,
-                Username = g.Key.Username,
-                Email = g.Key.Email,
+                Username = g.Key.Username!,
+                Email = g.Key.Email!,
                 Roles = string.Join(", ", g.Select(ur => ur.RoleName))
             })
             .OrderByWithDirection(orderBy, sortDirection)
@@ -105,6 +108,7 @@ public class UserRepository : IUserRepository
         return new UserModel
         {
             UserId = user.Id,
+            FullName = user.FullName,
             Username = user.UserName!,
             Email = user.Email!,
             EmailConfirmed = user.EmailConfirmed,

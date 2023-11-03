@@ -58,6 +58,7 @@ public class UserManager : UserManager<User>, IUserManager
         var users = sortOptions.Sort switch
         {
             "userId" => await _userRepository.GetAllModelsAsync(u => u.UserId.ToString(), sortOptions.SortDirection.ToSortDirection(), pageData),
+            "fullName" => await _userRepository.GetAllModelsAsync(u => u.FullName, sortOptions.SortDirection.ToSortDirection(), pageData),
             "username" => await _userRepository.GetAllModelsAsync(u => u.Username, sortOptions.SortDirection.ToSortDirection(), pageData),
             "email" => await _userRepository.GetAllModelsAsync(u => u.Email, sortOptions.SortDirection.ToSortDirection(), pageData),
             _ => await _userRepository.GetAllModelsAsync(u => u.UserId, sortOptions.SortDirection.ToSortDirection(), pageData)

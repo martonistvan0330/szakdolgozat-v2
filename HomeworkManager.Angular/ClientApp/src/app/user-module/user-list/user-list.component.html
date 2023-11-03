@@ -7,25 +7,30 @@
         </div>
 
         <mat-table [dataSource]="dataSource" class="user-list-table mat-elevation-z8"
-                   matSort matSortActive="username" matSortDirection="asc" matSortDisableClear>
+                   matSort matSortActive="fullName" matSortDirection="asc" matSortDisableClear>
             <ng-container matColumnDef="userId">
                 <mat-header-cell *matHeaderCellDef mat-header-cell mat-sort-header>ID</mat-header-cell>
-                <mat-cell *matCellDef="let user" mat-cell> {{ user.userId }} </mat-cell>
+                <mat-cell *matCellDef="let user" mat-cell>{{ user.userId }} </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="fullName">
+                <mat-header-cell *matHeaderCellDef mat-header-cell mat-sort-header>Name</mat-header-cell>
+                <mat-cell *matCellDef="let user" mat-cell>{{ user.fullName }}</mat-cell>
             </ng-container>
 
             <ng-container matColumnDef="username">
-                <mat-header-cell *matHeaderCellDef mat-header-cell mat-sort-header>Name</mat-header-cell>
-                <mat-cell *matCellDef="let user" mat-cell> {{ user.username }} </mat-cell>
+                <mat-header-cell *matHeaderCellDef mat-header-cell mat-sort-header>Username</mat-header-cell>
+                <mat-cell *matCellDef="let user" mat-cell>{{ user.username }} </mat-cell>
             </ng-container>
 
             <ng-container matColumnDef="email">
                 <mat-header-cell *matHeaderCellDef mat-header-cell mat-sort-header>Email</mat-header-cell>
-                <mat-cell *matCellDef="let user" mat-cell> {{ user.email }} </mat-cell>
+                <mat-cell *matCellDef="let user" mat-cell>{{ user.email }} </mat-cell>
             </ng-container>
 
             <ng-container matColumnDef="roles">
                 <mat-header-cell *matHeaderCellDef mat-header-cell>Roles</mat-header-cell>
-                <mat-cell *matCellDef="let user" mat-cell> {{ user.roles }} </mat-cell>
+                <mat-cell *matCellDef="let user" mat-cell>{{ user.roles }} </mat-cell>
             </ng-container>
 
             <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>

@@ -30,6 +30,9 @@ public class UserSeedService : IUserSeedService
         {
             var adminUser = new User
             {
+                FirstName = "Admin",
+                LastName = "Homework Manager",
+                FullName = "Homework Manager Admin",
                 UserName = "admin",
                 Email = "admin@homeworkmanager.aut.bme.hu",
                 EmailConfirmed = true,
@@ -72,6 +75,9 @@ public class UserSeedService : IUserSeedService
             {
                 var studentUser = new User
                 {
+                    FirstName = student.FirstName,
+                    LastName = student.LastName,
+                    FullName = $"{student.LastName} {student.FirstName}",
                     UserName = student.Username,
                     Email = student.Email,
                     EmailConfirmed = true,
@@ -115,6 +121,9 @@ public class UserSeedService : IUserSeedService
             {
                 var teacherUser = new User
                 {
+                    FirstName = teacher.FirstName,
+                    LastName = teacher.LastName,
+                    FullName = $"{teacher.LastName} {teacher.FirstName}",
                     UserName = teacher.Username,
                     Email = teacher.Email,
                     EmailConfirmed = true,
@@ -149,8 +158,10 @@ public static class UserGenerationRules
     public static Faker<NewUser> SetUpRules(this Faker<NewUser> faker)
     {
         return faker
-            .RuleFor(u => u.Username, f => f.Internet.UserName())
-            .RuleFor(u => u.Email, f => f.Internet.Email())
+            .RuleFor(u => u.FirstName, f => f.Name.FirstName())
+            .RuleFor(u => u.LastName, f => f.Name.LastName())
+            .RuleFor(u => u.Username, (f, u) => f.Internet.UserName(u.FirstName, u.LastName))
+            .RuleFor(u => u.Email, (f, u) => f.Internet.Email(u.FirstName, u.LastName))
             .RuleFor(u => u.Password, f => f.Internet.Password());
     }
 }

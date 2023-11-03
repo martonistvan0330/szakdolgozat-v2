@@ -34,7 +34,14 @@ public class AuthenticationManager : IAuthenticationManager
 
     public async Task<Result<AuthenticationResponse, BusinessError>> RegisterAsync(NewUser newUser)
     {
-        User user = new() { UserName = newUser.Username, Email = newUser.Email };
+        User user = new()
+        {
+            FirstName = newUser.FirstName,
+            LastName = newUser.LastName,
+            FullName = $"{newUser.LastName} {newUser.FirstName}",
+            UserName = newUser.Username,
+            Email = newUser.Email
+        };
 
         var createResult = await _userManager.CreateAsync(
             user,
