@@ -91,9 +91,14 @@ public class TokenService : ITokenService
         return false;
     }
 
-    public async Task<Result<bool, BusinessError>> CheckPasswordRecoveryTokenAsync(Guid userId, string passwordRecoveryToken)
+    public async Task<string?> GetUserIdByPasswordRecoveryTokenAsync(string passwordRecoveryToken)
     {
-        return true;
+        return await _passwordRecoveryTokenRepository.GetUserIdByActiveTokenAsync(passwordRecoveryToken);
+    }
+    
+    public async Task RevokePasswordRecoveryTokenAsync(string passwordRecoveryToken)
+    {
+        await _passwordRecoveryTokenRepository.RevokeAsync(passwordRecoveryToken);
     }
 
     private static string GenerateToken()

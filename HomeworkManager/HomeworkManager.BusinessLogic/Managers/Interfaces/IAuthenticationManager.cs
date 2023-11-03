@@ -14,4 +14,5 @@ public interface IAuthenticationManager
     Task<Result<bool, BusinessError>> Logout(string? username, RevokeRequest tokens);
     Task<Result<bool, BusinessError>> ResendEmailConfirmationAsync(string? username);
     Task SendPasswordRecoveryEmailAsync(string email);
+    Task ResetPasswordAsync(string password, string passwordRecoveryToken);
 }

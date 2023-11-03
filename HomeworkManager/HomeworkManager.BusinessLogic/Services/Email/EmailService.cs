@@ -42,7 +42,7 @@ public class EmailService : IEmailService
     {
         var subject = "Password Recovery";
         var body = $"""
-                    <a href="{_configuration["WebApiUrl"]}/recover-password?token={token}">Recover your password.</a>
+                    <a href="{_configuration["WebApiUrl"]}/password-reset?token={token}">Recover your password.</a>
                     """;
         await SendEmailAsync(user, subject, body);
     }

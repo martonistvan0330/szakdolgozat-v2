@@ -14,10 +14,11 @@ public class PasswordRecoveryTokenRepository : IPasswordRecoveryTokenRepository
         _context = context;
     }
 
-    public async Task<PasswordRecoveryToken?> GetActiveByUserAsync(Guid userId)
+    public async Task<string?> GetUserIdByActiveTokenAsync(string passwordRecoveryToken)
     {
         return await _context.PasswordRecoveryTokens
-            .Where(ect => ect.UserId == userId && ect.IsActive)
+            .Where(prt => prt.Token == passwordRecoveryToken && prt.IsActive)
+            .Select(prt => prt.UserId.ToString())
             .SingleOrDefaultAsync();
     }
 
@@ -41,10 +42,23 @@ public class PasswordRecoveryTokenRepository : IPasswordRecoveryTokenRepository
 
         return passwordRecoveryToken;
     }
-
-    public async Task RevokeAsync(PasswordRecoveryToken passwordRecoveryToken)
+    
+    public async Task RevokeAsync(string passwordRecoveryToken)
     {
-        passwordRecoveryToken.IsActive = false;
-        await _context.SaveChangesAsync();
+        var dbPasswordRecoveryToken = await _context.PasswordRecoveryTokens
+            .SingleOrDefaultAsync(prt => prt.Token == passwordRecoveryToken);
+
+        if (dbPasswordRecoveryToken is not null)
+        {
+            dbPasswordRecoveryToken.IsActive = false;
+            await _context.SaveChangesAsync();            
+        }
+    }
+    
+    private async Task<PasswordRecoveryToken?> GetActiveByUserAsync(Guid userId)
+    {
+        return await _context.PasswordRecoveryTokens
+            .Where(prt => prt.UserId == userId && prt.IsActive)
+            .SingleOrDefaultAsync();
     }
 }

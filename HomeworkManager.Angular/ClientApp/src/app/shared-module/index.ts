@@ -6,6 +6,7 @@ export * from './models/auth/authentication-response';
 export * from './models/auth/email-confirmation-request';
 export * from './models/auth/new-user';
 export * from './models/auth/password-recovery-request';
+export * from './models/auth/password-reset-request';
 export * from './models/auth/refresh-request';
 export * from './models/auth/revoke-request';
 export * from './models/user/user-list-row';

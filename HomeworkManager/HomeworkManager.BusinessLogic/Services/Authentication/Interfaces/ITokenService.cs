@@ -11,5 +11,6 @@ public interface ITokenService
     Task<string?> CreateEmailConfirmationTokenAsync(Guid userId);
     Task<string?> CreatePasswordRecoveryTokenAsync(Guid userId);
     Task<Result<bool, BusinessError>> CheckEmailConfirmationTokenAsync(Guid userId, string emailConfirmationToken);
-    Task<Result<bool, BusinessError>> CheckPasswordRecoveryTokenAsync(Guid userId, string passwordRecoveryToken);
+    Task<string?> GetUserIdByPasswordRecoveryTokenAsync(string passwordRecoveryToken);
+    Task RevokePasswordRecoveryTokenAsync(string passwordRecoveryToken);
 }

@@ -6,7 +6,7 @@ import {
   AuthenticationResponse,
   EmailConfirmationRequest,
   NewUser,
-  PasswordRecoveryRequest,
+  PasswordRecoveryRequest, PasswordResetRequest,
   RevokeRequest,
   Role,
   UserModel
@@ -93,6 +93,10 @@ export class AuthService {
 
   recoverPassword(passwordRecoveryRequest: PasswordRecoveryRequest) {
     return this.apiClient.post<void>('Auth/PasswordRecovery', passwordRecoveryRequest);
+  }
+
+  resetPassword(passwordResetRequest: PasswordResetRequest) {
+    return this.apiClient.post<void>('Auth/PasswordReset', passwordResetRequest);
   }
 
   hasRole(roles: Role[]) {

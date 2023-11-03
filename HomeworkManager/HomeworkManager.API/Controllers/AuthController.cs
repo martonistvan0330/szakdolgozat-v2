@@ -95,4 +95,12 @@ public class AuthController : ControllerBase
 
         return Ok();
     }
+
+    [HttpPost("PasswordReset")]
+    public async Task<ActionResult> ResetPasswordAsync(PasswordResetRequest passwordResetRequest)
+    {
+        await _authenticationManager.ResetPasswordAsync(passwordResetRequest.Password, passwordResetRequest.Token);
+
+        return Ok();
+    }
 }

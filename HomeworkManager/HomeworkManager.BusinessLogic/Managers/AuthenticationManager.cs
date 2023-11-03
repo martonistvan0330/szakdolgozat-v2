@@ -158,7 +158,7 @@ public class AuthenticationManager : IAuthenticationManager
 
         if (user is not null)
         {
-            var passwordRecoveryToken = await _tokenService.CreateEmailConfirmationTokenAsync(user.Id);
+            var passwordRecoveryToken = await _tokenService.CreatePasswordRecoveryTokenAsync(user.Id);
 
             if (passwordRecoveryToken is not null)
             {
@@ -169,11 +169,30 @@ public class AuthenticationManager : IAuthenticationManager
 
     private async Task SendEmailConfirmationAsync(User user)
     {
-        var confirmationToken = await _tokenService.CreatePasswordRecoveryTokenAsync(user.Id);
+        var confirmationToken = await _tokenService.CreateEmailConfirmationTokenAsync(user.Id);
 
         if (confirmationToken is not null)
         {
             await _emailService.SendConfirmationEmailAsync(user, confirmationToken);
+        }
+    }
+    
+    public async Task ResetPasswordAsync(string password, string passwordRecoveryToken)
+    {
+        var userId = await _tokenService.GetUserIdByPasswordRecoveryTokenAsync(passwordRecoveryToken);
+
+        if (userId is not null)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user is not null)
+            {
+                var passwordHash = _userManager.PasswordHasher.HashPassword(user, password);
+                user.PasswordHash = passwordHash;
+                await _userManager.UpdateAsync(user);
+
+                await _tokenService.RevokePasswordRecoveryTokenAsync(passwordRecoveryToken);
+            }
         }
     }
 }

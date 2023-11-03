@@ -12,6 +12,7 @@ const routes: Routes = [
   { path: NavigationItems.register.routerUrlPattern, component: auth.RegisterComponent },
   { path: NavigationItems.emailConfirmation.routerUrlPattern, component: auth.EmailConfirmationComponent },
   { path: NavigationItems.passwordRecovery.routerUrlPattern, component: auth.PasswordRecoveryComponent },
+  { path: NavigationItems.passwordReset.routerUrlPattern, component: auth.PasswordResetComponent },
 
   // App
   {
