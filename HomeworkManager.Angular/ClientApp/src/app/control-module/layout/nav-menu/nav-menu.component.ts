@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { MatSidenav } from "@angular/material/sidenav";
 import { NavbarItem } from "../../../core-module";
 
@@ -10,7 +10,6 @@ import { NavbarItem } from "../../../core-module";
 export class NavMenuComponent {
   @Input() isMobile: boolean | null = false;
   @Input() navbarItems: NavbarItem[] = [];
-  @Output() sidenavRef = new EventEmitter<MatSidenav>;
   @ViewChild('sidenav') sidenav!: MatSidenav;
 
   async toggle() {

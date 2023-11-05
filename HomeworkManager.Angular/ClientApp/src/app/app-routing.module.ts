@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import * as auth from './auth-module';
 import * as control from './control-module';
+import * as course from './course-module';
 import * as homework_manager from './homework-manager-module';
 import * as user from './user-module';
 import { AuthGuard, NavigationItems } from "./core-module";
@@ -42,6 +43,42 @@ const routes: Routes = [
         },
         canActivate: [AuthGuard.requireUserOrAdmin]
       },
+
+      // Course
+      {
+        path: NavigationItems.courseList.routerUrlPattern,
+        component: course.CourseListComponent,
+        canActivate: [AuthGuard.requireAuthenticated]
+      },
+      {
+        path: NavigationItems.courseEdit.routerUrlPattern,
+        component: course.CourseEditComponent,
+        resolve: {
+          course: course.courseDetailsResolver
+        },
+        canActivate: [AuthGuard.requireCreatorOrAdmin]
+      },
+      {
+        path: NavigationItems.courseCreate.routerUrlPattern,
+        component: course.CourseCreateComponent,
+        canActivate: [AuthGuard.requireAnyRole(NavigationItems.courseCreate.roles)]
+      },
+      {
+        path: NavigationItems.courseDetails.routerUrlPattern,
+        component: course.CourseDetailsComponent,
+        resolve: {
+          course: course.courseDetailsResolver
+        },
+        canActivate: [AuthGuard.requireAuthenticated],
+        children: [
+          {
+            path: NavigationItems.groupDetails.routerUrlPattern,
+            component: course.GroupDetailsComponent,
+            canActivate: [AuthGuard.requireAuthenticated]
+          }
+        ]
+      },
+
       { path: '**', redirectTo: NavigationItems.home.navigationUrl }
     ]
   }

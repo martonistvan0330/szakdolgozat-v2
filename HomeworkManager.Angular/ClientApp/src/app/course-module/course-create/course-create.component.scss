@@ -1,0 +1,28 @@
+.course-create-container {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.course-create-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.course-create-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.course-create-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+mat-form-field {
+  min-width: 300px;
+}

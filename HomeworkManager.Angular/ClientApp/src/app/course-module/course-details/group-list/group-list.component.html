@@ -1,0 +1,23 @@
+<mat-sidenav-container class="group-list-container">
+    <mat-sidenav #sidenav
+                 [mode]="isMobile ? 'over' : 'side'"
+                 [opened]="isMobile === false"
+                 class="group-list-sidenav">
+        <h3 class="group-list-title">Groups</h3>
+        <mat-divider/>
+        <mat-nav-list class="group-list-nav-items">
+            <a *ngFor="let group of groups"
+               [routerLink]="[courseUrl, NavigationItems.groupDetails.navigationUrl, group.name]"
+               mat-list-item
+               routerLinkActive="active">
+                <div class="group-list-nav-item">
+                    <div class="group-list-nav-item-title">{{ group.name }}</div>
+                </div>
+            </a>
+        </mat-nav-list>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+        <ng-content/>
+    </mat-sidenav-content>
+</mat-sidenav-container>

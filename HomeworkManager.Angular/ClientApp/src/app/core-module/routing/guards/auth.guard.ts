@@ -2,10 +2,11 @@ import { CanActivateFn, Router } from '@angular/router';
 import { inject } from "@angular/core";
 import { AuthService } from "../../../services";
 import { map } from "rxjs/operators";
-import { catchError, mergeMap, switchMap } from "rxjs";
+import { catchError, mergeMap, of, switchMap } from "rxjs";
 import { Role } from "../../../shared-module";
 import { NavigationItems } from "../navigation-items";
 import { SnackBarService } from "../../snack-bar/snack-bar.service";
+import { CourseService } from "../../../course-module/services/course.service";
 
 export class AuthGuard {
   static requireAuthenticated: CanActivateFn = (_route, _state) => {
@@ -64,6 +65,36 @@ export class AuthGuard {
               }
 
               return authService.userHasRole(user, [Role.ADMINISTRATOR]);
+            })
+          )
+        })
+      );
+  }
+
+  static requireCreatorOrAdmin: CanActivateFn = (route, _state) => {
+    const authService = inject(AuthService);
+    const courseService = inject(CourseService);
+
+    return this.authenticateUser(authService)
+      .pipe(
+        mergeMap(() => {
+          return authService.currentUser$.pipe(
+            mergeMap(user => {
+              if (!user) {
+                return of(false);
+              }
+
+              // if (authService.userHasRole(user, [Role.ADMINISTRATOR])) {
+              //   return of(true);
+              // }
+
+              const courseId = route.paramMap.get('courseId');
+
+              if (!courseId) {
+                return of(false);
+              }
+
+              return courseService.isCreator(parseInt(courseId));
             })
           )
         })

@@ -47,6 +47,64 @@ namespace HomeworkManager.Model.Migrations
                     b.ToTable("AccessTokens");
                 });
 
+            modelBuilder.Entity("HomeworkManager.Model.Entities.AttendedCourse", b =>
+                {
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("CourseId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AttendedCourses", (string)null);
+                });
+
+            modelBuilder.Entity("HomeworkManager.Model.Entities.AttendedGroup", b =>
+                {
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("GroupId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AttendedGroups", (string)null);
+                });
+
+            modelBuilder.Entity("HomeworkManager.Model.Entities.Course", b =>
+                {
+                    b.Property<int>("CourseId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseId"));
+
+                    b.Property<Guid>("CreatorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("CourseId");
+
+                    b.HasIndex("CreatorId");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Courses");
+                });
+
             modelBuilder.Entity("HomeworkManager.Model.Entities.EmailConfirmationToken", b =>
                 {
                     b.Property<int>("EmailConfirmationTokenId")
@@ -87,6 +145,67 @@ namespace HomeworkManager.Model.Migrations
                     b.HasKey("EntityId");
 
                     b.ToTable("Entities");
+                });
+
+            modelBuilder.Entity("HomeworkManager.Model.Entities.Group", b =>
+                {
+                    b.Property<int>("GroupId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GroupId"));
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("CreatorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("GroupId");
+
+                    b.HasIndex("CreatorId");
+
+                    b.HasIndex("CourseId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("HomeworkManager.Model.Entities.ManagedCourse", b =>
+                {
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("CourseId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ManagedCourses", (string)null);
+                });
+
+            modelBuilder.Entity("HomeworkManager.Model.Entities.ManagedGroup", b =>
+                {
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("GroupId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ManagedGroups", (string)null);
                 });
 
             modelBuilder.Entity("HomeworkManager.Model.Entities.PasswordRecoveryToken", b =>
@@ -363,6 +482,55 @@ namespace HomeworkManager.Model.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("HomeworkManager.Model.Entities.AttendedCourse", b =>
+                {
+                    b.HasOne("HomeworkManager.Model.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HomeworkManager.Model.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("HomeworkManager.Model.Entities.AttendedGroup", b =>
+                {
+                    b.HasOne("HomeworkManager.Model.Entities.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HomeworkManager.Model.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("HomeworkManager.Model.Entities.Course", b =>
+                {
+                    b.HasOne("HomeworkManager.Model.Entities.User", "Creator")
+                        .WithMany("CreatedCourses")
+                        .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Creator");
+                });
+
             modelBuilder.Entity("HomeworkManager.Model.Entities.EmailConfirmationToken", b =>
                 {
                     b.HasOne("HomeworkManager.Model.Entities.User", "User")
@@ -370,6 +538,63 @@ namespace HomeworkManager.Model.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("HomeworkManager.Model.Entities.Group", b =>
+                {
+                    b.HasOne("HomeworkManager.Model.Entities.Course", "Course")
+                        .WithMany("Groups")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HomeworkManager.Model.Entities.User", "Creator")
+                        .WithMany("CreatedGroups")
+                        .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Creator");
+                });
+
+            modelBuilder.Entity("HomeworkManager.Model.Entities.ManagedCourse", b =>
+                {
+                    b.HasOne("HomeworkManager.Model.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HomeworkManager.Model.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("HomeworkManager.Model.Entities.ManagedGroup", b =>
+                {
+                    b.HasOne("HomeworkManager.Model.Entities.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HomeworkManager.Model.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
 
                     b.Navigation("User");
                 });
@@ -453,9 +678,18 @@ namespace HomeworkManager.Model.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("HomeworkManager.Model.Entities.Course", b =>
+                {
+                    b.Navigation("Groups");
+                });
+
             modelBuilder.Entity("HomeworkManager.Model.Entities.User", b =>
                 {
                     b.Navigation("AccessTokens");
+
+                    b.Navigation("CreatedCourses");
+
+                    b.Navigation("CreatedGroups");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,0 +1,5 @@
+<hwm-group-list #groupList *ngIf="course" [courseId]="course.courseId" [groups]="course.groups"
+                [isMobile]="isMedium$ | async">
+    <hwm-course-toolbar (toggleNavbar)="toggleNavbar()" [course]="course" [isMobile]="isMedium$ | async"/>
+    <router-outlet/>
+</hwm-group-list>

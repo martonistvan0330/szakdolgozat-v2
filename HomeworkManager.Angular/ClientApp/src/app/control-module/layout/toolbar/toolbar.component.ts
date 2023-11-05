@@ -15,7 +15,7 @@ export class ToolbarComponent {
   @Output() toggleNavbar = new EventEmitter<void>();
   authService = inject(AuthService);
 
-  onClick() {
+  onToggle() {
     this.toggleNavbar.emit();
   }
 

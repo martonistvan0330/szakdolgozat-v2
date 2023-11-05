@@ -26,6 +26,8 @@ public static class HostServiceExtensions
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IAccessTokenRepository, AccessTokenRepository>();
+        services.AddScoped<ICourseRepository, CourseRepository>();
+        services.AddScoped<IGroupRepository, GroupRepository>();
         services.AddScoped<IEmailConfirmationTokenRepository, EmailConfirmationTokenRepository>();
         services.AddScoped<IEntityRepository, EntityRepository>();
         services.AddScoped<IPasswordRecoveryTokenRepository, PasswordRecoveryTokenRepository>();
@@ -37,6 +39,7 @@ public static class HostServiceExtensions
     public static IServiceCollection AddManagers(this IServiceCollection services)
     {
         services.AddScoped<IAuthenticationManager, AuthenticationManager>();
+        services.AddScoped<ICourseManager, CourseManager>();
         services.AddScoped<IEntityManager, EntityManager>();
         services.AddScoped<UserManager>();
         return services;

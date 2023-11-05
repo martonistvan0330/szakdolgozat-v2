@@ -15,7 +15,7 @@ import { AuthService } from "../../services";
 export class LayoutComponent implements OnInit {
   private breakpointObserver = inject(BreakpointObserver);
   private authService = inject(AuthService);
-  @ViewChild('nav_menu') navMenu!: NavMenuComponent;
+  @ViewChild('navMenu') navMenu!: NavMenuComponent;
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(
       map(result => result.matches),

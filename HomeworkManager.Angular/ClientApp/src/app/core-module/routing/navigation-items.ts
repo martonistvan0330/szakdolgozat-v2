@@ -49,4 +49,34 @@ export class NavigationItems {
     navigationUrl: '/users',
     roles: [Role.ADMINISTRATOR]
   }
+
+  public static courseList: NavigationItem = {
+    routerUrlPattern: 'courses',
+    navigationUrl: '/courses',
+    roles: []
+  }
+
+  public static courseDetails: NavigationItem = {
+    routerUrlPattern: 'courses/:courseId',
+    navigationUrl: '/courses',
+    roles: []
+  }
+
+  public static groupDetails: NavigationItem = {
+    routerUrlPattern: 'groups/:groupName',
+    navigationUrl: 'groups',
+    roles: []
+  }
+
+  public static courseCreate: NavigationItem = {
+    routerUrlPattern: 'courses/create',
+    navigationUrl: '/courses/create',
+    roles: [Role.ADMINISTRATOR, Role.TEACHER]
+  }
+
+  public static courseEdit: NavigationItem = {
+    routerUrlPattern: 'courses/edit/:courseId',
+    navigationUrl: '/courses/edit',
+    roles: [Role.ADMINISTRATOR, Role.TEACHER]
+  }
 }

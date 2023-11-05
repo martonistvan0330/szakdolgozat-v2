@@ -12,10 +12,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Services\Common\"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <PackageReference Include="Bogus" Version="34.0.2"/>
     </ItemGroup>
 

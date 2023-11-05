@@ -12,6 +12,7 @@ import { HTTP_INTERCEPTORS } from "@angular/common/http";
 import { TokenInterceptor } from "./core-module/interceptors/token-interceptor";
 import { AuthModule } from "./auth-module/auth.module";
 import { UserModule } from "./user-module/user.module";
+import { CourseModule } from "./course-module/course.module";
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { UserModule } from "./user-module/user.module";
     AuthModule,
     ControlModule,
     CoreModule,
+    CourseModule,
     HomeworkManagerModule,
     SharedModule,
     UserModule,

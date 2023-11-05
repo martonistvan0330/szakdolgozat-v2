@@ -1,0 +1,36 @@
+<div class="course-create-container">
+    <mat-card class="course-create-card">
+        <mat-card-header class="course-create-header">
+            <mat-card-title>Create Course</mat-card-title>
+        </mat-card-header>
+        <form [formGroup]="courseCreateForm">
+            <mat-card-content class="course-create-content">
+                <mat-form-field>
+                    <mat-label>Name</mat-label>
+                    <input formControlName="name" id="name" matInput name="name" required type="text">
+                    <mat-error [ngSwitch]="nameError">
+                        <span *ngSwitchCase="Errors.Required">
+                            Name required
+                        </span>
+                        <span *ngSwitchCase="Errors.Unique">
+                            Name is already taken
+                        </span>
+                        <span *ngSwitchDefault>
+                            Name required
+                        </span>
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Description</mat-label>
+                    <textarea formControlName="description" id="description" matInput
+                              name="description"></textarea>
+                </mat-form-field>
+            </mat-card-content>
+            <mat-card-actions class="course-create-actions">
+                <button (click)="create()" [disabled]="isLoading" color="primary" mat-raised-button>
+                    Create
+                </button>
+            </mat-card-actions>
+        </form>
+    </mat-card>
+</div>
