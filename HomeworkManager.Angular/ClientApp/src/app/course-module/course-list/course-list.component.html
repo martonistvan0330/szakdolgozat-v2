@@ -1,7 +1,7 @@
 <div class="course-list-container">
     <div class="course-list-header">
         <h1 class="course-list-title">Courses</h1>
-        <a *ngIf="isTeacher" [routerLink]="[NavigationItems.courseCreate.navigationUrl]" color="accent"
+        <a *ngIf="isTeacher" [routerLink]="NavigationItems.courseCreate.navigationUrl" color="accent"
            mat-flat-button>
             <mat-icon>add</mat-icon>
             New Course

@@ -9,7 +9,8 @@
                     <mat-label>First name</mat-label>
                     <input formControlName="firstName" id="firstName" matInput
                            name="firstName" required type="text">
-                    <mat-error *ngIf="firstName.invalid && (firstName.dirty || firstName.touched)" [ngSwitch]="firstNameError">
+                    <mat-error *ngIf="firstName.invalid && (firstName.dirty || firstName.touched)"
+                               [ngSwitch]="firstNameError">
                         <span *ngSwitchCase="Errors.Required">
                             First name required
                         </span>
@@ -23,7 +24,8 @@
                     <mat-label>Last name</mat-label>
                     <input formControlName="lastName" id="lastName" matInput
                            name="lastName" required type="text">
-                    <mat-error *ngIf="lastName.invalid && (lastName.dirty || lastName.touched)" [ngSwitch]="lastNameError">
+                    <mat-error *ngIf="lastName.invalid && (lastName.dirty || lastName.touched)"
+                               [ngSwitch]="lastNameError">
                         <span *ngSwitchCase="Errors.Required">
                             Last name required
                         </span>
@@ -123,7 +125,7 @@
         </form>
         <mat-card-footer class="register-footer">
             <mat-divider></mat-divider>
-            <a [routerLink]="[NavigationItems.login.navigationUrl]" mat-button>Sign In</a>
+            <a [routerLink]="NavigationItems.login.navigationUrl" mat-button>Sign In</a>
         </mat-card-footer>
     </mat-card>
 </hwm-auth-layout>

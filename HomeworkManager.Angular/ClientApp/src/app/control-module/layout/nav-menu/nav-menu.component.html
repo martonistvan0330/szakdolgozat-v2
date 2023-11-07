@@ -6,7 +6,7 @@
                  class="sidenav"
                  fixedInViewport>
         <mat-nav-list>
-            <a *ngFor="let navItem of navbarItems" [routerLink]="[navItem.navigationItem.navigationUrl]"
+            <a *ngFor="let navItem of navbarItems" [routerLink]="navItem.navigationItem.navigationUrl"
                mat-list-item
                routerLinkActive="active">
                 <div class="nav-menu-item">
