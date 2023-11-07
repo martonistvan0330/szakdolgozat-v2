@@ -50,7 +50,8 @@ export class CourseCreateComponent implements OnInit {
     this.courseService.createCourse(newCourse)
       .subscribe({
         next: courseId => {
-          this.router.navigate([NavigationItems.courseDetails.navigationUrl, courseId, NavigationItems.groupDetails.navigationUrl, 'General'])
+          this.isLoading = false;
+          this.router.navigate([NavigationItems.courseDetails.navigationUrl, courseId])
             .then(success => {
               if (success) {
                 this.snackBarService.success('Course created');

@@ -1,0 +1,38 @@
+<div class="group-edit-container">
+    <mat-card class="group-edit-card">
+        <mat-card-header class="group-edit-header">
+            <mat-card-title>Edit Group</mat-card-title>
+        </mat-card-header>
+        <form [formGroup]="groupEditForm">
+            <mat-card-content class="group-edit-content">
+                <mat-form-field>
+                    <mat-label>Name</mat-label>
+                    <input [disabled]="group?.name === 'General'" formControlName="name" id="name" matInput name="name"
+                           required
+                           type="text">
+                    <mat-error [ngSwitch]="nameError">
+                        <span *ngSwitchCase="Errors.Required">
+                            Name required
+                        </span>
+                        <span *ngSwitchCase="Errors.Unique">
+                            Name is already taken
+                        </span>
+                        <span *ngSwitchDefault>
+                            Name required
+                        </span>
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Description</mat-label>
+                    <textarea formControlName="description" id="description" matInput
+                              name="description"></textarea>
+                </mat-form-field>
+            </mat-card-content>
+            <mat-card-actions class="group-edit-actions">
+                <button (click)="update()" [disabled]="isLoading" color="primary" mat-raised-button>
+                    Update
+                </button>
+            </mat-card-actions>
+        </form>
+    </mat-card>
+</div>

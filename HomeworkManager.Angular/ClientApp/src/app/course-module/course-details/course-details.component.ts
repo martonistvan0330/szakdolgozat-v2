@@ -5,7 +5,7 @@ import { ActivatedRoute } from "@angular/router";
 import { Observable } from "rxjs";
 import { BreakpointObserver, Breakpoints } from "@angular/cdk/layout";
 import { map, shareReplay } from "rxjs/operators";
-import { NavMenuComponent } from "../../control-module";
+import { GroupListComponent } from "./group-list/group-list.component";
 
 @Component({
   selector: 'hwm-course-details',
@@ -16,9 +16,14 @@ export class CourseDetailsComponent implements OnInit {
   private activatedRoute = inject(ActivatedRoute);
   private breakpointObserver = inject(BreakpointObserver);
   protected readonly NavigationItems = NavigationItems;
-  @ViewChild('groupList') groupList!: NavMenuComponent;
+  @ViewChild('groupList') groupList!: GroupListComponent;
   course: CourseModel | null = null;
   isMedium$: Observable<boolean> = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium])
+    .pipe(
+      map(result => result.matches),
+      shareReplay()
+    );
+  isHandset$: Observable<boolean> = this.breakpointObserver.observe([Breakpoints.Handset])
     .pipe(
       map(result => result.matches),
       shareReplay()

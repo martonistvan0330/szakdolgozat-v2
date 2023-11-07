@@ -29,6 +29,12 @@ public class CourseController : ControllerBase
         );
     }
 
+    [HttpGet("{courseId:int}/Exist")]
+    public async Task<ActionResult<bool>> ExistsAsync(int courseId)
+    {
+        return await _courseManager.ExistsAsync(courseId);
+    }
+
     [HttpGet("{courseId:int}")]
     public async Task<ActionResult<CourseModel?>> GetAsync(int courseId)
     {
@@ -64,6 +70,12 @@ public class CourseController : ControllerBase
         }
 
         return Ok();
+    }
+
+    [HttpGet("{courseId:int}/IsInCourse")]
+    public async Task<ActionResult<bool>> IsInCourseAsync(int courseId)
+    {
+        return await _courseManager.IsInCourseAsync(courseId, User.Identity?.Name);
     }
 
     [HttpGet("{courseId:int}/IsCreator")]

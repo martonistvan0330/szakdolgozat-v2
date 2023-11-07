@@ -5,30 +5,34 @@
     <h2>{{ course.name }}</h2>
     <span class="spacer"></span>
     <ng-container *ngIf="!isMobile">
-        <button *ngIf="isAdministrator || isTeacher" class="course-toolbar-action" mat-flat-button>
+        <a *ngIf="isAdministrator || isTeacher" [routerLink]="NavigationItems.groupCreate.navigationUrl"
+           class="course-toolbar-action"
+           mat-flat-button>
             <mat-icon>add</mat-icon>
             Add Group
-        </button>
-        <button *ngIf="isAdministrator || isCreator" [routerLink]="[NavigationItems.courseEdit.navigationUrl, course.courseId]"
-                class="course-toolbar-action" mat-flat-button>
+        </a>
+        <a *ngIf="isAdministrator || isCreator"
+           [routerLink]="[NavigationItems.courseEdit.navigationUrl, course.courseId]"
+           class="course-toolbar-action" mat-flat-button>
             <mat-icon>edit</mat-icon>
             Edit Course
-        </button>
+        </a>
     </ng-container>
     <button *ngIf="isMobile && (isAdministrator || isCreator || isTeacher)" [matMenuTriggerFor]="accountMenu"
             mat-icon-button>
         <mat-icon>more_vert</mat-icon>
     </button>
     <mat-menu #accountMenu="matMenu">
-        <button *ngIf="isAdministrator || isTeacher" mat-menu-item>
+        <a *ngIf="isAdministrator || isTeacher" [routerLink]="NavigationItems.groupCreate.navigationUrl"
+           mat-menu-item>
             <mat-icon>add</mat-icon>
             Add Group
-        </button>
-        <button *ngIf="isAdministrator || isCreator"
-                [routerLink]="[NavigationItems.courseEdit.navigationUrl, course.courseId]"
-                mat-menu-item>
+        </a>
+        <a *ngIf="isAdministrator || isCreator"
+           [routerLink]="[NavigationItems.courseEdit.navigationUrl, course.courseId]"
+           mat-menu-item>
             <mat-icon>edit</mat-icon>
             Edit Course
-        </button>
+        </a>
     </mat-menu>
 </mat-toolbar>

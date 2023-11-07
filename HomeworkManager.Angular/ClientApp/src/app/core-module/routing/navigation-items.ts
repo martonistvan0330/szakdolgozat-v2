@@ -39,7 +39,7 @@ export class NavigationItems {
   }
 
   public static userDetail: NavigationItem = {
-    routerUrlPattern: 'users/:id',
+    routerUrlPattern: 'users/:userId',
     navigationUrl: '/users',
     roles: []
   }
@@ -62,12 +62,6 @@ export class NavigationItems {
     roles: []
   }
 
-  public static groupDetails: NavigationItem = {
-    routerUrlPattern: 'groups/:groupName',
-    navigationUrl: 'groups',
-    roles: []
-  }
-
   public static courseCreate: NavigationItem = {
     routerUrlPattern: 'courses/create',
     navigationUrl: '/courses/create',
@@ -77,6 +71,24 @@ export class NavigationItems {
   public static courseEdit: NavigationItem = {
     routerUrlPattern: 'courses/edit/:courseId',
     navigationUrl: '/courses/edit',
+    roles: [Role.ADMINISTRATOR, Role.TEACHER]
+  }
+
+  public static groupDetails: NavigationItem = {
+    routerUrlPattern: 'groups/:groupName',
+    navigationUrl: 'groups',
+    roles: []
+  }
+
+  public static groupCreate: NavigationItem = {
+    routerUrlPattern: 'groups/create',
+    navigationUrl: 'groups/create',
+    roles: [Role.ADMINISTRATOR, Role.TEACHER]
+  }
+
+  public static groupEdit: NavigationItem = {
+    routerUrlPattern: 'groups/edit/:groupName',
+    navigationUrl: 'groups/edit',
     roles: [Role.ADMINISTRATOR, Role.TEACHER]
   }
 }

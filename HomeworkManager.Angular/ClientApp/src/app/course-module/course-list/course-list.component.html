@@ -1,11 +1,11 @@
 <div class="course-list-container">
     <div class="course-list-header">
         <h1 class="course-list-title">Courses</h1>
-        <button *ngIf="isTeacher" [routerLink]="[NavigationItems.courseCreate.navigationUrl]" color="accent"
-                mat-flat-button>
+        <a *ngIf="isTeacher" [routerLink]="[NavigationItems.courseCreate.navigationUrl]" color="accent"
+           mat-flat-button>
             <mat-icon>add</mat-icon>
             New Course
-        </button>
+        </a>
     </div>
     <div *ngIf="isLoadingResults"
          class="course-list-loading-shade">
@@ -13,7 +13,7 @@
     </div>
     <div class="course-cards-container">
         <mat-card *ngFor="let course of courses" class="course-card">
-            <a [routerLink]="[NavigationItems.courseDetails.navigationUrl, course.courseId, NavigationItems.groupDetails.navigationUrl, 'General']">
+            <a [routerLink]="[NavigationItems.courseDetails.navigationUrl, course.courseId]">
                 <img alt="{{ course.name }}" class="course-card-image" height="250" src="https://placehold.co/250x250"
                      width="250">
                 <mat-card-header class="course-card-header">

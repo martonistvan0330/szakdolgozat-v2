@@ -1,0 +1,14 @@
+<div class="group-details-container">
+    <div class="group-details-header">
+        <a [routerLink]="[editUrl]" mat-raised-button>
+            <mat-icon>edit</mat-icon>
+            Edit Group
+        </a>
+    </div>
+    <div class="group-details-content">
+        <div *ngIf="isLoadingResults"
+             class="group-details-loading-shade">
+            <mat-spinner/>
+        </div>
+    </div>
+</div>

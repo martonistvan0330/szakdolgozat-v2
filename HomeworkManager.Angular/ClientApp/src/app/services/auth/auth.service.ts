@@ -1,12 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { AuthorizedApiClientService } from "../api-client/authorized-api-client/authorized-api-client.service";
-import { BehaviorSubject, mergeMap, of } from "rxjs";
+import { BehaviorSubject, of, switchMap } from "rxjs";
 import {
   AuthenticationRequest,
   AuthenticationResponse,
   EmailConfirmationRequest,
   NewUser,
-  PasswordRecoveryRequest, PasswordResetRequest,
+  PasswordRecoveryRequest,
+  PasswordResetRequest,
   RevokeRequest,
   Role,
   UserModel
@@ -38,7 +39,7 @@ export class AuthService {
       'Auth/Login',
       authRequest
     ).pipe(
-      mergeMap(authResponse => {
+      switchMap(authResponse => {
         localStorage.setItem('access-token', authResponse.accessToken);
         localStorage.setItem('refresh-token', authResponse.refreshToken);
 
@@ -52,7 +53,7 @@ export class AuthService {
       'Auth/Register',
       user
     ).pipe(
-      mergeMap(authResponse => {
+      switchMap(authResponse => {
         localStorage.setItem('access-token', authResponse.accessToken);
         localStorage.setItem('refresh-token', authResponse.refreshToken);
 

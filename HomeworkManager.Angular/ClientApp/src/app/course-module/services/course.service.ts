@@ -14,8 +14,12 @@ export class CourseService {
     return this.authApiClient.get<CourseCard[]>('Course').pipe(delay(1000));
   }
 
+  existsCourse(courseId: number) {
+    return this.authApiClient.get<boolean>('Course/' + courseId + '/Exist');
+  }
+
   getCourse(courseId: number) {
-    return this.authApiClient.get<CourseModel>('Course/' + courseId);
+    return this.authApiClient.get<CourseModel | null>('Course/' + courseId);
   }
 
   createCourse(newCourse: NewCourse) {
@@ -24,6 +28,10 @@ export class CourseService {
 
   updateCourse(courseId: number, updatedCourse: UpdateCourse) {
     return this.authApiClient.put<void>('Course/' + courseId, updatedCourse);
+  }
+
+  isInCourse(courseId: number) {
+    return this.authApiClient.get<boolean>('Course/' + courseId + '/IsInCourse');
   }
 
   isCreator(courseId: number) {

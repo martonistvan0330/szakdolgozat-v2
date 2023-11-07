@@ -44,6 +44,11 @@ public class CourseManager : ICourseManager
         return Result<IEnumerable<CourseCard>, BusinessError>.Ok((await _courseRepository.GetAllByUserAsync(user.Id)).OrderBy(c => c.Name));
     }
 
+    public async Task<bool> ExistsAsync(int courseId)
+    {
+        return await _courseRepository.ExistsAsync(courseId);
+    }
+
     public async Task<Result<CourseModel?, BusinessError>> GetModelByUserAsync(int courseId, string? username)
     {
         if (username is null)
@@ -57,7 +62,7 @@ public class CourseManager : ICourseManager
         {
             return new BusinessError(AuthenticationErrorMessages.USER_NOT_FOUND);
         }
-        
+
         if (await _userManager.IsInRoleAsync(user, Roles.ADMINISTRATOR))
         {
             return Result<CourseModel?, BusinessError>.Ok(await _courseRepository.GetModelAsync(courseId));
@@ -95,9 +100,9 @@ public class CourseManager : ICourseManager
 
         var groupCreateError = await _groupRepository.CreateAsync(newGroup, courseCreateResult.Value, user);
 
-        if (groupCreateError is not null)
+        if (!groupCreateError.Success)
         {
-            return groupCreateError;
+            return groupCreateError.Error!;
         }
 
         return courseCreateResult.Value;
@@ -123,6 +128,23 @@ public class CourseManager : ICourseManager
         }
 
         return await _courseRepository.UpdateAsync(courseId, updatedCourse, user);
+    }
+
+    public async Task<bool> IsInCourseAsync(int courseId, string? username)
+    {
+        if (username is null)
+        {
+            return false;
+        }
+
+        var user = await _userManager.FindByNameAsync(username);
+
+        if (user is null)
+        {
+            return false;
+        }
+
+        return await _courseRepository.IsInCourseAsync(courseId, user.Id);
     }
 
     public async Task<bool> IsCreatorAsync(int courseId, string? username)
@@ -161,8 +183,6 @@ public class CourseManager : ICourseManager
 
     public async Task<bool> NameAvailableAsync(string name)
     {
-        var course = await _courseRepository.GetByNameOrDefaultAsync(name);
-
-        return course is null;
+        return !await _courseRepository.ExistsWithNameAsync(name);
     }
 }

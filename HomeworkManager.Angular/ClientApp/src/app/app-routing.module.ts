@@ -17,16 +17,14 @@ const routes: Routes = [
 
   // App
   {
-    path: '', component: control.LayoutComponent, children: [
+    path: '', component: control.LayoutComponent, canActivate: [AuthGuard.requireAuthenticated()], children: [
       {
         path: NavigationItems.home.routerUrlPattern,
-        component: homework_manager.DashboardComponent,
-        canActivate: [AuthGuard.requireAuthenticated]
+        component: homework_manager.DashboardComponent
       },
       {
         path: 'dashboard',
-        component: homework_manager.DashboardComponent,
-        canActivate: [AuthGuard.requireAuthenticated]
+        component: homework_manager.DashboardComponent
       },
 
       // User
@@ -41,14 +39,13 @@ const routes: Routes = [
         resolve: {
           user: user.userResolver
         },
-        canActivate: [AuthGuard.requireUserOrAdmin]
+        canActivate: [AuthGuard.requireUserExists, AuthGuard.requireIsUser()]
       },
 
       // Course
       {
         path: NavigationItems.courseList.routerUrlPattern,
-        component: course.CourseListComponent,
-        canActivate: [AuthGuard.requireAuthenticated]
+        component: course.CourseListComponent
       },
       {
         path: NavigationItems.courseEdit.routerUrlPattern,
@@ -56,7 +53,7 @@ const routes: Routes = [
         resolve: {
           course: course.courseDetailsResolver
         },
-        canActivate: [AuthGuard.requireCreatorOrAdmin]
+        canActivate: [AuthGuard.requireCourseExists(), AuthGuard.requireAnyRole(NavigationItems.courseEdit.roles), AuthGuard.requireIsCourseCreator()]
       },
       {
         path: NavigationItems.courseCreate.routerUrlPattern,
@@ -69,13 +66,31 @@ const routes: Routes = [
         resolve: {
           course: course.courseDetailsResolver
         },
-        canActivate: [AuthGuard.requireAuthenticated],
+        canActivate: [AuthGuard.requireCourseExists(), AuthGuard.requireIsInCourse()],
         children: [
+          {
+            path: NavigationItems.groupCreate.routerUrlPattern,
+            component: course.GroupCreateComponent,
+            canActivate: [AuthGuard.requireAnyRole(NavigationItems.groupCreate.roles), AuthGuard.requireIsCourseTeacher]
+          },
+          {
+            path: NavigationItems.groupEdit.routerUrlPattern,
+            component: course.GroupEditComponent,
+            resolve: {
+              group: course.groupDetailsResolver
+            },
+            canActivate: [AuthGuard.requireAnyRole(NavigationItems.groupEdit.roles), AuthGuard.requireIsGroupCreator()]
+          },
           {
             path: NavigationItems.groupDetails.routerUrlPattern,
             component: course.GroupDetailsComponent,
-            canActivate: [AuthGuard.requireAuthenticated]
-          }
+            resolve: {
+              group: course.groupDetailsResolver
+            },
+            canActivate: [AuthGuard.requireGroupExists(), AuthGuard.requireIsInGroup()]
+          },
+
+          { path: '**', redirectTo: `${NavigationItems.groupDetails.navigationUrl}/General` }
         ]
       },
 

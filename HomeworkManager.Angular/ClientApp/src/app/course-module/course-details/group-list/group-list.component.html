@@ -7,7 +7,7 @@
         <mat-divider/>
         <mat-nav-list class="group-list-nav-items">
             <a *ngFor="let group of groups"
-               [routerLink]="[courseUrl, NavigationItems.groupDetails.navigationUrl, group.name]"
+               [routerLink]="[NavigationItems.groupDetails.navigationUrl, group.name]"
                mat-list-item
                routerLinkActive="active">
                 <div class="group-list-nav-item">

@@ -47,7 +47,7 @@ export class CourseEditComponent implements OnInit {
       });
   }
 
-  edit() {
+  update() {
     if (this.courseEditForm.invalid) {
       return;
     }
@@ -61,7 +61,7 @@ export class CourseEditComponent implements OnInit {
     this.courseService.updateCourse(this.course!!.courseId, updatedCourse)
       .subscribe({
         next: success => {
-          this.router.navigate([NavigationItems.courseDetails.navigationUrl, this.course!!.courseId, NavigationItems.groupDetails.navigationUrl, 'General'])
+          this.router.navigate([NavigationItems.courseDetails.navigationUrl, this.course!!.courseId])
             .then(success => {
               if (success) {
                 this.snackBarService.success('Course updated');

@@ -2,114 +2,269 @@ import { CanActivateFn, Router } from '@angular/router';
 import { inject } from "@angular/core";
 import { AuthService } from "../../../services";
 import { map } from "rxjs/operators";
-import { catchError, mergeMap, of, switchMap } from "rxjs";
+import { catchError, Observable, of, switchMap } from "rxjs";
 import { Role } from "../../../shared-module";
 import { NavigationItems } from "../navigation-items";
 import { SnackBarService } from "../../snack-bar/snack-bar.service";
-import { CourseService } from "../../../course-module/services/course.service";
+import { UserService } from "../../../user-module";
+import { CourseService, GroupService } from "../../../course-module";
 
 export class AuthGuard {
-  static requireAuthenticated: CanActivateFn = (_route, _state) => {
-    const authService = inject(AuthService);
-    const snackBarService = inject(SnackBarService);
+  static requireAuthenticated(): CanActivateFn {
+    return (_route, _state) => {
+      const authService = inject(AuthService);
+      const router = inject(Router);
+      const snackBarService = inject(SnackBarService);
 
-    return this.authenticateUser(authService)
-      .pipe(
-        mergeMap(() => {
-          return authService.currentUser$.pipe(
-            catchError((error, caught) => {
-              snackBarService.error('Authentication Failed', error.error)
-              throw error;
-            }),
-            map(user => {
-              return !!user;
-            })
-          )
-        })
-      );
+      return authService.authenticate()
+        .pipe(
+          catchError(() => {
+            router.navigate([NavigationItems.login.navigationUrl])
+              .then(success => {
+                if (success) {
+                  snackBarService.error('Authentication Failed', 'Please log in');
+                }
+              });
+            return of();
+          }),
+          switchMap(() => {
+            return authService.currentUser$
+              .pipe(
+                map(user => {
+                  return !!user;
+                })
+              )
+          })
+        );
+    }
   }
 
   static requireAnyRole(roles: Role[]): CanActivateFn {
     return (_route, _state) => {
       const authService = inject(AuthService);
 
-      return this.authenticateUser(authService)
+      return authService.hasRole(roles);
+    }
+  }
+
+  static requireUserExists(): CanActivateFn {
+    return (route, _state) => {
+      const userService = inject(UserService);
+
+      const userId = route.paramMap.get('userId');
+
+      if (!userId) {
+        return of(false);
+      }
+
+      return userService.getUser(userId)
         .pipe(
-          switchMap(() => {
-            return authService.hasRole(roles);
+          catchError(() => {
+            return of(null);
+          }),
+          map(userModel => {
+            return !!userModel;
           })
         );
     }
   }
 
-  static requireUserOrAdmin: CanActivateFn = (route, _state) => {
-    const authService = inject(AuthService);
+  static requireIsUser(): CanActivateFn {
+    return (route, _state) => {
+      const authService = inject(AuthService);
 
-    return this.authenticateUser(authService)
-      .pipe(
-        mergeMap(() => {
-          return authService.currentUser$.pipe(
+      return this.IsAdministrator(
+        authService,
+        authService.currentUser$
+          .pipe(
             map(user => {
               if (!user) {
                 return false;
               }
 
-              const userId = route.paramMap.get('id');
+              const userId = route.paramMap.get('userId');
 
               if (!userId) {
                 return false;
               }
 
-              if (user.userId === userId) {
-                return true;
-              }
-
-              return authService.userHasRole(user, [Role.ADMINISTRATOR]);
+              return user.userId === userId
             })
           )
-        })
       );
+    }
   }
 
-  static requireCreatorOrAdmin: CanActivateFn = (route, _state) => {
-    const authService = inject(AuthService);
-    const courseService = inject(CourseService);
+  static requireCourseExists(): CanActivateFn {
+    return (route, _state) => {
+      const courseService = inject(CourseService);
+      const groupService = inject(GroupService);
 
-    return this.authenticateUser(authService)
-      .pipe(
-        mergeMap(() => {
-          return authService.currentUser$.pipe(
-            mergeMap(user => {
-              if (!user) {
-                return of(false);
-              }
+      const courseId = route.paramMap.get('courseId');
 
-              // if (authService.userHasRole(user, [Role.ADMINISTRATOR])) {
-              //   return of(true);
-              // }
+      if (!courseId) {
+        return of(false);
+      }
 
-              const courseId = route.paramMap.get('courseId');
+      groupService.courseId = parseInt(courseId);
 
-              if (!courseId) {
-                return of(false);
-              }
-
-              return courseService.isCreator(parseInt(courseId));
-            })
-          )
-        })
-      );
+      return courseService.existsCourse(parseInt(courseId));
+    }
   }
 
-  private static authenticateUser(authService: AuthService) {
-    const router = inject(Router);
+  static requireIsInCourse(): CanActivateFn {
+    return (route, _state) => {
+      const authService = inject(AuthService);
+      const courseService = inject(CourseService);
 
-    return authService.authenticate()
+      return this.IsAdministrator(
+        authService,
+        authService.currentUser$.pipe(
+          switchMap(user => {
+            if (!user) {
+              return of(false);
+            }
+
+            const courseId = route.paramMap.get('courseId');
+
+            if (!courseId) {
+              return of(false);
+            }
+
+            return courseService.isInCourse(parseInt(courseId));
+          })
+        )
+      );
+    }
+  }
+
+  static requireIsCourseCreator(): CanActivateFn {
+    return (route, _state) => {
+      const authService = inject(AuthService);
+      const courseService = inject(CourseService);
+
+      return this.IsAdministrator(
+        authService,
+        authService.currentUser$.pipe(
+          switchMap(user => {
+            if (!user) {
+              return of(false);
+            }
+
+            const courseId = route.paramMap.get('courseId');
+
+            if (!courseId) {
+              return of(false);
+            }
+
+            return courseService.isCreator(parseInt(courseId));
+          })
+        )
+      );
+    }
+  }
+
+  static requireIsCourseTeacher(): CanActivateFn {
+    return (route, _state) => {
+      const authService = inject(AuthService);
+      const courseService = inject(CourseService);
+
+      return this.IsAdministrator(
+        authService,
+        authService.currentUser$.pipe(
+          switchMap(user => {
+            if (!user) {
+              return of(false);
+            }
+
+            const courseId = route.paramMap.get('courseId');
+
+            if (!courseId) {
+              return of(false);
+            }
+
+            return courseService.isTeacher(parseInt(courseId));
+          })
+        )
+      );
+    }
+  }
+
+  static requireGroupExists(): CanActivateFn {
+    return (route, _state) => {
+      const groupService = inject(GroupService);
+
+      const groupName = route.paramMap.get('groupName');
+
+      if (!groupName) {
+        return of(false);
+      }
+
+      return groupService.existsGroup(groupName);
+    }
+  }
+
+  static requireIsInGroup(): CanActivateFn {
+    return (route, _state) => {
+      const authService = inject(AuthService);
+      const groupService = inject(GroupService);
+
+      return this.IsAdministrator(
+        authService,
+        authService.currentUser$.pipe(
+          switchMap(user => {
+            if (!user) {
+              return of(false);
+            }
+
+            const groupName = route.paramMap.get('groupName');
+
+            if (!groupName) {
+              return of(false);
+            }
+
+            return groupService.isInGroup(groupName);
+          })
+        )
+      );
+    }
+  }
+
+  static requireIsGroupCreator(): CanActivateFn {
+    return (route, _state) => {
+      const authService = inject(AuthService);
+      const groupService = inject(GroupService);
+
+      return this.IsAdministrator(
+        authService,
+        authService.currentUser$.pipe(
+          switchMap(user => {
+            if (!user) {
+              return of(false);
+            }
+
+            const groupName = route.paramMap.get('groupName');
+
+            if (!groupName) {
+              return of(false);
+            }
+
+            return groupService.isCreator(groupName);
+          })
+        )
+      );
+    }
+  }
+
+  private static IsAdministrator(authService: AuthService, observable: Observable<boolean>) {
+    return authService.hasRole([Role.ADMINISTRATOR])
       .pipe(
-        catchError(error => {
-          router.navigate([NavigationItems.login.navigationUrl]).then(_ => {
-          });
-          throw error;
+        switchMap(isAdmin => {
+          if (isAdmin) {
+            return of(true);
+          }
+
+          return observable;
         })
       );
   }

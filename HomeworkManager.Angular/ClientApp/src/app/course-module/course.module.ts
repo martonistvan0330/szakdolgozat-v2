@@ -26,10 +26,15 @@ import { CourseDetailsComponent } from './course-details/course-details.componen
 import { MatListModule } from "@angular/material/list";
 import { MatSidenavModule } from "@angular/material/sidenav";
 import { GroupListComponent } from './course-details/group-list/group-list.component';
-import { GroupDetailsComponent } from './course-details/group-details/group-details.component';
+import { GroupDetailsComponent } from './group/group-details/group-details.component';
 import { MatMenuModule } from "@angular/material/menu";
 import { MatToolbarModule } from "@angular/material/toolbar";
 import { CourseToolbarComponent } from './course-details/course-toolbar/course-toolbar.component';
+import { GroupCreateComponent } from './group/group-create/group-create.component';
+import { GroupEditComponent } from './group/group-edit/group-edit.component';
+import {
+  UniqueGroupNameAsyncValidatorDirective
+} from './validators/unique-group-name/unique-group-name-async-validator.directive';
 
 
 @NgModule({
@@ -41,7 +46,10 @@ import { CourseToolbarComponent } from './course-details/course-toolbar/course-t
     CourseDetailsComponent,
     GroupListComponent,
     GroupDetailsComponent,
-    CourseToolbarComponent
+    CourseToolbarComponent,
+    GroupCreateComponent,
+    GroupEditComponent,
+    UniqueGroupNameAsyncValidatorDirective
   ],
   imports: [
     CommonModule,
@@ -75,7 +83,9 @@ import { CourseToolbarComponent } from './course-details/course-toolbar/course-t
     CourseCreateComponent,
     CourseEditComponent,
     CourseDetailsComponent,
-    GroupDetailsComponent
+    GroupDetailsComponent,
+    GroupCreateComponent,
+    GroupEditComponent
   ]
 })
 export class CourseModule {

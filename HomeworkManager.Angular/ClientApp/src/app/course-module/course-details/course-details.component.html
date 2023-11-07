@@ -1,5 +1,7 @@
-<hwm-group-list #groupList *ngIf="course" [courseId]="course.courseId" [groups]="course.groups"
+<hwm-group-list #groupList *ngIf="course" [courseId]="course.courseId"
                 [isMobile]="isMedium$ | async">
     <hwm-course-toolbar (toggleNavbar)="toggleNavbar()" [course]="course" [isMobile]="isMedium$ | async"/>
-    <router-outlet/>
+    <div [ngClass]="(isHandset$ | async) ? 'mobile' : ''" class="course-details-content">
+        <router-outlet/>
+    </div>
 </hwm-group-list>

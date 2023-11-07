@@ -41,6 +41,7 @@ public static class HostServiceExtensions
         services.AddScoped<IAuthenticationManager, AuthenticationManager>();
         services.AddScoped<ICourseManager, CourseManager>();
         services.AddScoped<IEntityManager, EntityManager>();
+        services.AddScoped<IGroupManager, GroupManager>();
         services.AddScoped<UserManager>();
         return services;
     }

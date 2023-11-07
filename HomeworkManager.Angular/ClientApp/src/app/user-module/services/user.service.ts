@@ -11,7 +11,7 @@ export class UserService {
   private authApiClient = inject(AuthorizedApiClientService);
 
   getUser(userId: string) {
-    return this.authApiClient.get<UserModel>('User/' + userId);
+    return this.authApiClient.get<UserModel | null>('User/' + userId);
   }
 
   getUserList(sort: string, sortDirection: SortDirection, page: number, pageSize: number) {

@@ -6,7 +6,7 @@ import { UserService } from "../services/user.service";
 export const userResolver: ResolveFn<UserModel | null> = (route, _state) => {
   const userService = inject(UserService);
 
-  const userId = route.paramMap.get('id');
+  const userId = route.paramMap.get('userId');
 
   if (!userId) {
     return null;

@@ -3,7 +3,6 @@ using HomeworkManager.Model.Constants.Errors.Course;
 using HomeworkManager.Model.Contexts;
 using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.Course;
-using HomeworkManager.Model.CustomEntities.Group;
 using HomeworkManager.Model.Entities;
 using HomeworkManager.Model.ErrorEntities;
 using Microsoft.EntityFrameworkCore;
@@ -49,7 +48,12 @@ public class CourseRepository : ICourseRepository
             })
             .DistinctBy(c => c.CourseId);
     }
-    
+
+    public async Task<bool> ExistsAsync(int courseId)
+    {
+        return await _context.Courses.AnyAsync(c => c.CourseId == courseId);
+    }
+
     public async Task<CourseModel?> GetModelAsync(int courseId)
     {
         return await _context.Courses
@@ -57,12 +61,7 @@ public class CourseRepository : ICourseRepository
             {
                 CourseId = c.CourseId,
                 Name = c.Name,
-                Description = c.Description,
-                Groups = c.Groups.Select(g => new GroupListRow
-                {
-                    GroupId = g.GroupId,
-                    Name = g.Name
-                }).ToHashSet()
+                Description = c.Description
             })
             .SingleOrDefaultAsync(c => c.CourseId == courseId);
     }
@@ -81,8 +80,6 @@ public class CourseRepository : ICourseRepository
             .Where(u => u.Id == userId)
             .Where(u => u.AttendedCourses.Select(c => c.CourseId).Contains(courseId)
                         || u.ManagedCourses.Select(c => c.CourseId).Contains(courseId))
-            .Include(u => u.AttendedGroups.Where(g => g.CourseId == courseId))
-            .Include(u => u.ManagedGroups.Where(g => g.CourseId == courseId))
             .SingleOrDefaultAsync();
 
         if (user is null)
@@ -90,22 +87,11 @@ public class CourseRepository : ICourseRepository
             return null;
         }
 
-        var groups = user.AttendedGroups
-            .Concat(user.ManagedGroups)
-            .Select(g => new GroupListRow
-            {
-                GroupId = g.GroupId,
-                Name = g.Name
-            })
-            .DistinctBy(g => g.GroupId)
-            .ToHashSet();
-
         return new CourseModel
         {
             CourseId = course.CourseId,
             Name = course.Name,
-            Description = course.Description,
-            Groups = groups
+            Description = course.Description
         };
     }
 
@@ -155,16 +141,18 @@ public class CourseRepository : ICourseRepository
         return null;
     }
 
+    public async Task<bool> IsInCourseAsync(int courseId, Guid userId)
+    {
+        return await _context.Courses
+            .Where(c => c.CourseId == courseId)
+            .Where(c => c.Teachers.Select(u => u.Id).Contains(userId)
+                        || c.Students.Select(u => u.Id).Contains(userId))
+            .AnyAsync();
+    }
+
     public async Task<bool> IsCreatorAsync(int courseId, Guid userId)
     {
-        var course = await _context.Courses.SingleOrDefaultAsync(c => c.CourseId == courseId);
-
-        if (course is null)
-        {
-            return false;
-        }
-
-        return course.CreatorId == userId;
+        return await _context.Courses.AnyAsync(c => c.CourseId == courseId && c.CreatorId == userId);
     }
 
     public async Task<bool> IsTeacherAsync(int courseId, Guid userId)
@@ -175,8 +163,8 @@ public class CourseRepository : ICourseRepository
             .ContainsAsync(userId);
     }
 
-    public async Task<Course?> GetByNameOrDefaultAsync(string name)
+    public async Task<bool> ExistsWithNameAsync(string name)
     {
-        return await _context.Courses.SingleOrDefaultAsync(c => c.Name == name);
+        return await _context.Courses.AnyAsync(c => c.Name == name);
     }
 }

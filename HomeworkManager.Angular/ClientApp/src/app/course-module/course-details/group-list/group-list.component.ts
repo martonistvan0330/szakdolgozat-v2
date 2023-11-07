@@ -1,7 +1,9 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { NavigationItems } from "../../../core-module";
-import { GroupModel } from "../../../shared-module";
+import { GroupListRow } from "../../../shared-module";
 import { MatSidenav } from "@angular/material/sidenav";
+import { merge, of, switchMap } from "rxjs";
+import { GroupService } from "../../services/group.service";
 
 @Component({
   selector: 'hwm-group-list',
@@ -9,15 +11,23 @@ import { MatSidenav } from "@angular/material/sidenav";
   styleUrls: ['./group-list.component.scss']
 })
 export class GroupListComponent implements OnInit {
+  private groupService = inject(GroupService);
   protected readonly NavigationItems = NavigationItems;
   @Input() courseId!: number
-  @Input() groups: GroupModel[] = []
   @Input() isMobile: boolean | null = false;
   @ViewChild('sidenav') sidenav!: MatSidenav;
-  courseUrl = ''
+  groups: GroupListRow[] = [];
 
   ngOnInit() {
-    this.courseUrl = NavigationItems.courseDetails.navigationUrl + '/' + this.courseId;
+    merge(of({}), this.groupService.groupAdded$, this.groupService.groupUpdated$)
+      .pipe(
+        switchMap(() => {
+          return this.groupService.getGroups()
+        })
+      )
+      .subscribe(groups => {
+        this.groups = groups;
+      })
   }
 
   async toggle() {
