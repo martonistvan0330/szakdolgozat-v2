@@ -2,7 +2,7 @@ import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { NavigationItems } from "../../../core-module";
 import { GroupListRow } from "../../../shared-module";
 import { MatSidenav } from "@angular/material/sidenav";
-import { merge, of, switchMap } from "rxjs";
+import { merge, startWith, switchMap } from "rxjs";
 import { GroupService } from "../../services/group.service";
 
 @Component({
@@ -19,8 +19,9 @@ export class GroupListComponent implements OnInit {
   groups: GroupListRow[] = [];
 
   ngOnInit() {
-    merge(of({}), this.groupService.groupAdded$, this.groupService.groupUpdated$)
+    merge(this.groupService.groupAdded$, this.groupService.groupUpdated$)
       .pipe(
+        startWith({}),
         switchMap(() => {
           return this.groupService.getGroups()
         })

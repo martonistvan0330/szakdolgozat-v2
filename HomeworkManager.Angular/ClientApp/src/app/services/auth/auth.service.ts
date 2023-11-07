@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { AuthorizedApiClientService } from "../api-client/authorized-api-client/authorized-api-client.service";
-import { BehaviorSubject, of, switchMap } from "rxjs";
+import { BehaviorSubject, of, switchMap, tap } from "rxjs";
 import {
   AuthenticationRequest,
   AuthenticationResponse,
@@ -27,7 +27,7 @@ export class AuthService {
   authenticate() {
     return this.authApiClient.get<UserModel>('User/Authenticate')
       .pipe(
-        map(user => {
+        tap(user => {
           localStorage.setItem('user', JSON.stringify(user));
           this.currentUserSource.next(user);
         })
@@ -39,10 +39,11 @@ export class AuthService {
       'Auth/Login',
       authRequest
     ).pipe(
-      switchMap(authResponse => {
+      tap(authResponse => {
         localStorage.setItem('access-token', authResponse.accessToken);
         localStorage.setItem('refresh-token', authResponse.refreshToken);
-
+      }),
+      switchMap(authResponse => {
         return this.authenticate();
       })
     );
@@ -53,10 +54,11 @@ export class AuthService {
       'Auth/Register',
       user
     ).pipe(
-      switchMap(authResponse => {
+      tap(authResponse => {
         localStorage.setItem('access-token', authResponse.accessToken);
         localStorage.setItem('refresh-token', authResponse.refreshToken);
-
+      }),
+      switchMap(authResponse => {
         return this.authenticate();
       })
     );
@@ -75,7 +77,7 @@ export class AuthService {
         'Auth/Logout',
         new RevokeRequest(accessToken, refreshToken)
       ).pipe(
-        map((success) => {
+        tap((success) => {
           if (success) {
             localStorage.removeItem('user');
             localStorage.removeItem('access-token');
