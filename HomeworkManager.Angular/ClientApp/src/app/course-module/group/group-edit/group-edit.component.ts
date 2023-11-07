@@ -86,7 +86,7 @@ export class GroupEditComponent {
 
   private formSetup() {
     this.groupEditForm = new FormGroup({
-      name: new FormControl(this.group!!.name, {
+      name: new FormControl({ value: this.group!!.name, disabled: this.group?.name === 'General' }, {
         validators: [Validators.required,],
         asyncValidators: [uniqueGroupNameAsyncValidator(this.groupService, this.group?.name)],
         updateOn: 'change'

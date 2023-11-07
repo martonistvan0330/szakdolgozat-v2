@@ -7,7 +7,7 @@
             <mat-card-content class="group-edit-content">
                 <mat-form-field>
                     <mat-label>Name</mat-label>
-                    <input [disabled]="group?.name === 'General'" formControlName="name" id="name" matInput name="name"
+                    <input formControlName="name" id="name" matInput name="name"
                            required
                            type="text">
                     <mat-error [ngSwitch]="nameError">
