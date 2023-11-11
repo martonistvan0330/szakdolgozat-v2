@@ -1,0 +1,18 @@
+<div class="teacher-list-container">
+    <hwm-table (optionsSetup)="onOptionsSetup($event)"
+               (rowRemove)="onRemoveClick($event)"
+               [clickableRows]="false"
+               [columnDefs]="columnDefs"
+               [dataSource]="teachers$"
+               [pageSizeOptions]="[10, 25]"
+               [removableRows]="isAdministrator"
+               class="teacher-list-table">
+        <button (click)="onAddClick()"
+                *ngIf="isAdministrator"
+                hwm-table-actions
+                mat-flat-button>
+            <mat-icon>add</mat-icon>
+            Add Teacher
+        </button>
+    </hwm-table>
+</div>

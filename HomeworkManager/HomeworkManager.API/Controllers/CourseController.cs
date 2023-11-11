@@ -2,6 +2,7 @@
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.Model.Constants;
 using HomeworkManager.Model.CustomEntities.Course;
+using HomeworkManager.Model.CustomEntities.User;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeworkManager.API.Controllers;
@@ -46,6 +47,50 @@ public class CourseController : ControllerBase
         );
     }
 
+    [HttpGet("{courseId:int}/Teacher")]
+    public async Task<ActionResult<IEnumerable<UserListRow>>> GetTeachersAsync(int courseId)
+    {
+        var getTeachersResult = await _courseManager.GetTeachersAsync(courseId, User.Identity?.Name);
+
+        return getTeachersResult.Match<ActionResult<IEnumerable<UserListRow>>>(
+            result => Ok(result),
+            error => BadRequest(error.Message)
+        );
+    }
+
+    [HttpGet("{courseId:int}/Student")]
+    public async Task<ActionResult<IEnumerable<UserListRow>>> GetStudentsAsync(int courseId)
+    {
+        var getStudentsResult = await _courseManager.GetStudentsAsync(courseId, User.Identity?.Name);
+
+        return getStudentsResult.Match<ActionResult<IEnumerable<UserListRow>>>(
+            result => Ok(result),
+            error => BadRequest(error.Message)
+        );
+    }
+
+    [HttpGet("{courseId:int}/Teacher/Addable")]
+    public async Task<ActionResult<IEnumerable<UserListRow>>> GetAddableTeachersAsync(int courseId)
+    {
+        var getTeachersResult = await _courseManager.GetAddableTeachersAsync(courseId, User.Identity?.Name);
+
+        return getTeachersResult.Match<ActionResult<IEnumerable<UserListRow>>>(
+            result => Ok(result),
+            error => BadRequest(error.Message)
+        );
+    }
+
+    [HttpGet("{courseId:int}/Student/Addable")]
+    public async Task<ActionResult<IEnumerable<UserListRow>>> GetAddableStudentsAsync(int courseId)
+    {
+        var getStudentsResult = await _courseManager.GetAddableStudentsAsync(courseId, User.Identity?.Name);
+
+        return getStudentsResult.Match<ActionResult<IEnumerable<UserListRow>>>(
+            result => Ok(result),
+            error => BadRequest(error.Message)
+        );
+    }
+
     [HomeworkManagerAuthorize(Roles = $"{Roles.TEACHER},{Roles.ADMINISTRATOR}")]
     [HttpPost]
     public async Task<ActionResult<int>> CreateAsync(NewCourse newCourse)
@@ -65,6 +110,34 @@ public class CourseController : ControllerBase
         var updateError = await _courseManager.UpdateAsync(courseId, updatedCourse, User.Identity?.Name);
 
         if (updateError is not null)
+        {
+            return Forbid();
+        }
+
+        return Ok();
+    }
+
+    [HomeworkManagerAuthorize(Roles = $"{Roles.TEACHER},{Roles.ADMINISTRATOR}")]
+    [HttpPost("{courseId:int}/Teacher/Add")]
+    public async Task<ActionResult> AddTeachersAsync(int courseId, ICollection<Guid> userIds)
+    {
+        var addError = await _courseManager.AddTeachersAsync(courseId, User.Identity?.Name, userIds);
+
+        if (addError is not null)
+        {
+            return Forbid();
+        }
+
+        return Ok();
+    }
+
+    [HomeworkManagerAuthorize(Roles = $"{Roles.TEACHER},{Roles.ADMINISTRATOR}")]
+    [HttpPost("{courseId:int}/Student/Add")]
+    public async Task<ActionResult> AddStudentsAsync(int courseId, ICollection<Guid> userIds)
+    {
+        var addError = await _courseManager.AddStudentsAsync(courseId, User.Identity?.Name, userIds);
+
+        if (addError is not null)
         {
             return Forbid();
         }

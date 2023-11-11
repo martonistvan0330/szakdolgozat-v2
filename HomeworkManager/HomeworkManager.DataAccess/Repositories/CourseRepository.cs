@@ -3,6 +3,7 @@ using HomeworkManager.Model.Constants.Errors.Course;
 using HomeworkManager.Model.Contexts;
 using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.Course;
+using HomeworkManager.Model.CustomEntities.User;
 using HomeworkManager.Model.Entities;
 using HomeworkManager.Model.ErrorEntities;
 using Microsoft.EntityFrameworkCore;
@@ -95,6 +96,38 @@ public class CourseRepository : ICourseRepository
         };
     }
 
+    public async Task<IEnumerable<UserListRow>> GetTeachersAsync(int courseId)
+    {
+        return await _context.Courses
+            .Where(c => c.CourseId == courseId)
+            .SelectMany(c => c.Teachers)
+            .Select(u => new UserListRow
+            {
+                UserId = u.Id,
+                FullName = u.FullName,
+                Username = u.UserName!,
+                Email = u.Email!,
+                Roles = ""
+            })
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<UserListRow>> GetStudentsAsync(int courseId)
+    {
+        return await _context.Groups
+            .Where(c => c.CourseId == courseId)
+            .SelectMany(c => c.Students)
+            .Select(u => new UserListRow
+            {
+                UserId = u.Id,
+                FullName = u.FullName,
+                Username = u.UserName!,
+                Email = u.Email!,
+                Roles = ""
+            })
+            .ToListAsync();
+    }
+
     public async Task<Result<int, BusinessError>> CreateAsync(NewCourse newCourse, User user)
     {
         if (await _context.Courses.Select(c => c.Name).ContainsAsync(newCourse.Name))
@@ -139,6 +172,42 @@ public class CourseRepository : ICourseRepository
         await _context.SaveChangesAsync();
 
         return null;
+    }
+
+    public async Task AddTeachersAsync(int courseId, ICollection<Guid> userIds)
+    {
+        var course = await _context.Courses
+            .Include(c => c.Teachers)
+            .SingleOrDefaultAsync(c => c.CourseId == courseId);
+
+        if (course is not null)
+        {
+            var teachers = await _context.Users
+                .Where(u => userIds.Contains(u.Id))
+                .ToListAsync();
+
+            course.Teachers = course.Teachers.UnionBy(teachers, u => u.Id).ToHashSet();
+
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task AddStudentsAsync(int courseId, ICollection<Guid> userIds)
+    {
+        var course = await _context.Courses
+            .Include(c => c.Students)
+            .SingleOrDefaultAsync(c => c.CourseId == courseId);
+
+        if (course is not null)
+        {
+            var students = await _context.Users
+                .Where(u => userIds.Contains(u.Id))
+                .ToListAsync();
+
+            course.Students = course.Students.UnionBy(students, u => u.Id).ToHashSet();
+
+            await _context.SaveChangesAsync();
+        }
     }
 
     public async Task<bool> IsInCourseAsync(int courseId, Guid userId)

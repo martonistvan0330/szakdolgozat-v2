@@ -1,0 +1,59 @@
+.table-header {
+  display: flex;
+  align-items: center;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.table-container {
+  width: 100%;
+}
+
+.table-wrapper {
+  width: 100%;
+  position: relative;
+}
+
+.table-loading-shade {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 56px;
+  right: 0;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
+}
+
+.search-button {
+  margin-left: 10px;
+}
+
+.mat-mdc-row.clickable .mat-mdc-cell {
+  cursor: pointer;
+}
+
+.mat-mdc-row.clickable:hover .mat-mdc-cell {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+mat-form-field {
+  min-width: 300px;
+}
+
+.table-paginator {
+  display: none;
+}
+
+.table-paginator.visible {
+  display: block;
+}

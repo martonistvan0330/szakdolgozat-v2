@@ -3,6 +3,9 @@ import { NavigationItems } from "../../../core-module";
 import { CourseModel, Role } from "../../../shared-module";
 import { CourseService } from "../../services/course.service";
 import { AuthService } from "../../../services";
+import { MatDialog } from "@angular/material/dialog";
+import { CourseStudentAddDialogComponent } from "../../course-student-add-dialog/course-student-add-dialog.component";
+import { CourseTeacherAddDialogComponent } from "../../course-teacher-add-dialog/course-teacher-add-dialog.component";
 
 @Component({
   selector: 'hwm-course-toolbar',
@@ -12,6 +15,7 @@ import { AuthService } from "../../../services";
 export class CourseToolbarComponent implements OnInit {
   private courseService = inject(CourseService);
   private authService = inject(AuthService);
+  private dialog = inject(MatDialog);
   protected readonly NavigationItems = NavigationItems;
   @Input() course!: CourseModel;
   @Input() isMobile: boolean | null = false;
@@ -39,6 +43,19 @@ export class CourseToolbarComponent implements OnInit {
           this.isTeacher = isTeacher;
         }
       });
+  }
+
+  onAddTeachersClick() {
+    this.dialog.open(CourseTeacherAddDialogComponent, {
+      data: this.course.courseId
+    });
+  }
+
+  onAddStudentsClick() {
+    this.dialog.open(CourseStudentAddDialogComponent, {
+      data: this.course.courseId,
+      panelClass: 'my-class',
+    });
   }
 
   onToggle() {

@@ -1,7 +1,9 @@
 ﻿using HomeworkManager.API.Attributes;
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.Model.Constants;
+using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.Group;
+using HomeworkManager.Model.CustomEntities.User;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeworkManager.API.Controllers;
@@ -21,9 +23,9 @@ public class GroupController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GroupListRow>>> GetAllAsync(int courseId)
     {
-        var allCoursesByUserResult = await _groupManager.GetAllByUserAsync(courseId, User.Identity?.Name);
+        var allGroupsByUserResult = await _groupManager.GetAllByUserAsync(courseId, User.Identity?.Name);
 
-        return allCoursesByUserResult.Match<ActionResult<IEnumerable<GroupListRow>>>(
+        return allGroupsByUserResult.Match<ActionResult<IEnumerable<GroupListRow>>>(
             result => Ok(result),
             error => BadRequest(error.Message)
         );
@@ -41,6 +43,52 @@ public class GroupController : ControllerBase
         var getResult = await _groupManager.GetModelByUserAsync(courseId, groupName, User.Identity?.Name);
 
         return getResult.Match<ActionResult<GroupModel?>>(
+            result => Ok(result),
+            error => BadRequest(error.Message)
+        );
+    }
+
+    [HttpGet("{groupName}/Teacher")]
+    public async Task<ActionResult<Pageable<UserListRow>>> GetTeachersAsync(int courseId, string groupName,
+        [FromQuery] PageableOptions pageableOptions)
+    {
+        var getTeachersResult = await _groupManager.GetTeachersAsync(courseId, groupName, User.Identity?.Name, pageableOptions);
+
+        return getTeachersResult.Match<ActionResult<Pageable<UserListRow>>>(
+            result => Ok(result),
+            error => BadRequest(error.Message)
+        );
+    }
+
+    [HttpGet("{groupName}/Student")]
+    public async Task<ActionResult<Pageable<UserListRow>>> GetStudentsAsync(int courseId, string groupName,
+        [FromQuery] PageableOptions pageableOptions)
+    {
+        var getStudentsResult = await _groupManager.GetStudentsAsync(courseId, groupName, User.Identity?.Name, pageableOptions);
+
+        return getStudentsResult.Match<ActionResult<Pageable<UserListRow>>>(
+            result => Ok(result),
+            error => BadRequest(error.Message)
+        );
+    }
+
+    [HttpGet("{groupName}/Teacher/Addable")]
+    public async Task<ActionResult<IEnumerable<UserListRow>>> GetAddableTeachersAsync(int courseId, string groupName)
+    {
+        var getTeachersResult = await _groupManager.GetAddableTeachersAsync(courseId, groupName, User.Identity?.Name);
+
+        return getTeachersResult.Match<ActionResult<IEnumerable<UserListRow>>>(
+            result => Ok(result),
+            error => BadRequest(error.Message)
+        );
+    }
+
+    [HttpGet("{groupName}/Student/Addable")]
+    public async Task<ActionResult<IEnumerable<UserListRow>>> GetAddableStudentsAsync(int courseId, string groupName)
+    {
+        var getStudentsResult = await _groupManager.GetAddableStudentsAsync(courseId, groupName, User.Identity?.Name);
+
+        return getStudentsResult.Match<ActionResult<IEnumerable<UserListRow>>>(
             result => Ok(result),
             error => BadRequest(error.Message)
         );
@@ -65,6 +113,34 @@ public class GroupController : ControllerBase
         var updateError = await _groupManager.UpdateAsync(courseId, groupName, updatedGroup, User.Identity?.Name);
 
         if (updateError is not null)
+        {
+            return Forbid();
+        }
+
+        return Ok();
+    }
+
+    [HomeworkManagerAuthorize(Roles = $"{Roles.TEACHER},{Roles.ADMINISTRATOR}")]
+    [HttpPost("{groupName}/Teacher/Add")]
+    public async Task<ActionResult> AddTeachersAsync(int courseId, string groupName, ICollection<Guid> userIds)
+    {
+        var addError = await _groupManager.AddTeachersAsync(courseId, groupName, User.Identity?.Name, userIds);
+
+        if (addError is not null)
+        {
+            return Forbid();
+        }
+
+        return Ok();
+    }
+
+    [HomeworkManagerAuthorize(Roles = $"{Roles.TEACHER},{Roles.ADMINISTRATOR}")]
+    [HttpPost("{groupName}/Student/Add")]
+    public async Task<ActionResult> AddStudentsAsync(int courseId, string groupName, ICollection<Guid> userIds)
+    {
+        var addError = await _groupManager.AddStudentsAsync(courseId, groupName, User.Identity?.Name, userIds);
+
+        if (addError is not null)
         {
             return Forbid();
         }

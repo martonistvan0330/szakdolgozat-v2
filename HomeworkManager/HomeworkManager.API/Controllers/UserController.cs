@@ -58,9 +58,9 @@ public class UserController : ControllerBase
 
     [HomeworkManagerAuthorize(Roles = Roles.ADMINISTRATOR)]
     [HttpGet]
-    public async Task<ActionResult<Pageable<UserListRow>>> GetAllAsync([FromQuery] SortOptions sortOptions, [FromQuery] PageData pageData)
+    public async Task<ActionResult<Pageable<UserListRow>>> GetAllAsync([FromQuery] PageableOptions pageableOptions)
     {
-        return await _userManager.GetAllAsync(sortOptions, pageData);
+        return await _userManager.GetAllAsync(pageableOptions);
     }
 
     [HttpGet("Username")]

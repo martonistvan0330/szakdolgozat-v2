@@ -35,6 +35,18 @@ import { GroupEditComponent } from './group/group-edit/group-edit.component';
 import {
   UniqueGroupNameAsyncValidatorDirective
 } from './validators/unique-group-name/unique-group-name-async-validator.directive';
+import { MatTabsModule } from "@angular/material/tabs";
+import { StudentListComponent } from './group/student/student-list/student-list.component';
+import { TeacherListComponent } from './group/teacher/teacher-list/teacher-list.component';
+import { ControlModule } from "../control-module/control.module";
+import {
+  GroupTeacherAddDialogComponent
+} from './group/teacher/group-teacher-add-dialog/group-teacher-add-dialog.component';
+import { MatDialogModule } from "@angular/material/dialog";
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import { CourseTeacherAddDialogComponent } from './course-teacher-add-dialog/course-teacher-add-dialog.component';
+import { CourseStudentAddDialogComponent } from './course-student-add-dialog/course-student-add-dialog.component';
+import { GroupStudentAddDialogComponent } from './group/student/group-student-add-dialog/group-student-add-dialog.component';
 
 
 @NgModule({
@@ -49,7 +61,13 @@ import {
     CourseToolbarComponent,
     GroupCreateComponent,
     GroupEditComponent,
-    UniqueGroupNameAsyncValidatorDirective
+    UniqueGroupNameAsyncValidatorDirective,
+    StudentListComponent,
+    TeacherListComponent,
+    GroupTeacherAddDialogComponent,
+    CourseTeacherAddDialogComponent,
+    CourseStudentAddDialogComponent,
+    GroupStudentAddDialogComponent
   ],
   imports: [
     CommonModule,
@@ -77,6 +95,10 @@ import {
     RouterOutlet,
     MatMenuModule,
     MatToolbarModule,
+    MatTabsModule,
+    ControlModule,
+    MatDialogModule,
+    MatAutocompleteModule,
   ],
   exports: [
     CourseListComponent,

@@ -1,7 +1,15 @@
 import { inject, Injectable } from '@angular/core';
 import { AuthorizedApiClientService } from "../../services";
-import { GroupListRow, GroupModel, NewGroup, UpdateGroup } from "../../shared-module";
-import { Subject, tap } from "rxjs";
+import {
+  GroupListRow,
+  GroupModel,
+  NewGroup,
+  Pageable,
+  PageableOptions,
+  UpdateGroup,
+  UserListRow
+} from "../../shared-module";
+import { delay, Subject, tap } from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +40,40 @@ export class GroupService {
     return this.authApiClient.get<GroupModel | null>('Course/' + this._courseId + '/Group/' + groupName);
   }
 
+  getTeachers(groupName: string, options: PageableOptions) {
+    const requestUrl = 'Course/' + this._courseId + '/Group/' + groupName + '/Teacher'
+      + '?pageData.pageIndex=' + options.pageData?.pageIndex
+      + '&pageData.pageSize=' + options.pageData?.pageSize
+      + '&sortOptions.sort=' + options.sortOptions?.sort
+      + '&sortOptions.sortDirection=' + options.sortOptions?.sortDirection
+      + '&searchText=' + options.searchText;
+
+    return this.authApiClient.get<Pageable<UserListRow>>(requestUrl).pipe(delay(1000));
+  }
+
+  getStudents(groupName: string, options: PageableOptions) {
+    const requestUrl = 'Course/' + this._courseId + '/Group/' + groupName + '/Student'
+      + '?pageData.pageIndex=' + options.pageData?.pageIndex
+      + '&pageData.pageSize=' + options.pageData?.pageSize
+      + '&sortOptions.sort=' + options.sortOptions?.sort
+      + '&sortOptions.sortDirection=' + options.sortOptions?.sortDirection
+      + '&searchText=' + options.searchText;
+
+    return this.authApiClient.get<Pageable<UserListRow>>(requestUrl).pipe(delay(1000));
+  }
+
+  getAddableTeachers(groupName: string) {
+    const requestUrl = 'Course/' + this._courseId + '/Group/' + groupName + '/Teacher/Addable';
+
+    return this.authApiClient.get<UserListRow[]>(requestUrl).pipe(delay(1000));
+  }
+
+  getAddableStudents(groupName: string) {
+    const requestUrl = 'Course/' + this._courseId + '/Group/' + groupName + '/Student/Addable';
+
+    return this.authApiClient.get<UserListRow[]>(requestUrl).pipe(delay(1000));
+  }
+
   createGroup(newGroup: NewGroup) {
     return this.authApiClient.post<number>('Course/' + this._courseId + '/Group', newGroup).pipe(
       tap(_groupId => {
@@ -47,6 +89,18 @@ export class GroupService {
           this.groupUpdated.next();
         })
       );
+  }
+
+  addTeachers(groupName: string, teacherIds: string[]) {
+    const requestUrl = 'Course/' + this._courseId + '/Group/' + groupName + '/Teacher/Add';
+
+    return this.authApiClient.post<void>(requestUrl, teacherIds).pipe(delay(1000));
+  }
+
+  addStudents(groupName: string, studentIds: string[]) {
+    const requestUrl = 'Course/' + this._courseId + '/Group/' + groupName + '/Student/Add';
+
+    return this.authApiClient.post<void>(requestUrl, studentIds).pipe(delay(1000));
   }
 
   isInGroup(groupName: string) {

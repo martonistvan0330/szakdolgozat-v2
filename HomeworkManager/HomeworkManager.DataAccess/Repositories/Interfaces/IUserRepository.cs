@@ -9,12 +9,18 @@ public interface IUserRepository
     Task<UserModel?> GetModelByIdAsync(Guid userId);
     Task<UserModel?> GetModelByNameAsync(string username);
 
+    Task<IEnumerable<UserListRow>> GetAllModelsAsync(PageData? pageData = null)
+    {
+        return GetAllModelsAsync(pageData, u => u.UserId);
+    }
+
     Task<IEnumerable<UserListRow>> GetAllModelsAsync<TKey>
     (
-        Expression<Func<UserListRow, TKey>> orderBy,
-        SortDirection sortDirection,
-        PageData pageData
+        PageData? pageData = null,
+        Expression<Func<UserListRow, TKey>>? orderBy = null,
+        SortDirection sortDirection = SortDirection.Ascending,
+        string? searchText = null
     );
 
-    Task<int> GetCountAsync();
+    Task<int> GetCountAsync(string? searchText = null);
 }

@@ -33,10 +33,16 @@ public class UserRepository : IUserRepository
         return await CreateModelAsync(user);
     }
 
-    public async Task<IEnumerable<UserListRow>> GetAllModelsAsync<TKey>(Expression<Func<UserListRow, TKey>> orderBy, SortDirection sortDirection,
-        PageData pageData)
+    public async Task<IEnumerable<UserListRow>> GetAllModelsAsync<TKey>
+    (
+        PageData? pageData = null,
+        Expression<Func<UserListRow, TKey>>? orderBy = null,
+        SortDirection sortDirection = SortDirection.Ascending,
+        string? searchText = null
+    )
     {
         return await _context.Users
+            .FullSearch(searchText)
             .Join
             (
                 _context.UserRoles,
@@ -46,7 +52,7 @@ public class UserRepository : IUserRepository
                 {
                     UserId = u.Id,
                     Username = u.UserName,
-                    FullName = u.FullName,
+                    u.FullName,
                     u.Email,
                     ur.RoleId
                 }
@@ -79,9 +85,9 @@ public class UserRepository : IUserRepository
             .ToListAsync();
     }
 
-    public async Task<int> GetCountAsync()
+    public async Task<int> GetCountAsync(string? searchText = null)
     {
-        return await _context.Users.CountAsync();
+        return await _context.Users.FullSearch(searchText).CountAsync();
     }
 
     private async Task<UserModel?> CreateModelAsync(User? user)

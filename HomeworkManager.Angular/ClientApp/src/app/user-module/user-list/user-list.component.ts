@@ -1,56 +1,42 @@
-import { AfterViewInit, Component, inject, ViewChild } from '@angular/core';
-import { catchError, merge, Observable, of, startWith, switchMap } from "rxjs";
-import { UserListRow } from "../../shared-module";
-import { MatSort } from "@angular/material/sort";
-import { MatPaginator } from "@angular/material/paginator";
-import { map } from "rxjs/operators";
+import { Component, inject } from '@angular/core';
+import { ColumnDefinition, Pageable, PageableOptions, UserListRow } from "../../shared-module";
 import { UserService } from "../services/user.service";
 import { NavigationItems } from "../../core-module";
+import { Router } from "@angular/router";
+import { Observable, Subject, switchMap } from "rxjs";
 
 @Component({
   selector: 'hwm-user-list',
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.scss']
 })
-export class UserListComponent implements AfterViewInit {
+export class UserListComponent {
+  private router = inject(Router);
   private userService = inject(UserService);
+  private users = new Subject<Pageable<UserListRow>>();
   protected readonly NavigationItems = NavigationItems;
-  displayedColumns: string[] = ['userId', 'fullName', 'username', 'email', 'roles'];
-  dataSource: Observable<UserListRow[]> = of([]);
-  resultsLength = 0;
-  isLoadingResults = true;
-  pageSize = 25;
-  pageSizeOptions = [10, 25, 50];
-  @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  users$ = this.users.asObservable();
+  columnDefs = [
+    new ColumnDefinition('ID', 'userId', true),
+    new ColumnDefinition('Full name', 'fullName', true),
+    new ColumnDefinition('Username', 'username', true),
+    new ColumnDefinition('Email', 'email', true),
+    new ColumnDefinition('Roles', 'roles', false),
+  ]
 
-  ngAfterViewInit() {
-    this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+  onOptionsSetup(pageableOptions: Observable<PageableOptions>) {
+    pageableOptions
+      .pipe(
+        switchMap(options => {
+          return this.userService.getUserList(options);
+        })
+      )
+      .subscribe(users => {
+        this.users.next(users);
+      });
+  }
 
-    this.dataSource =
-      merge(this.sort.sortChange, this.paginator.page)
-        .pipe(
-          startWith({}),
-          switchMap(() => {
-            this.isLoadingResults = true;
-
-            return this.userService.getUserList(
-              this.sort.active,
-              this.sort.direction,
-              this.paginator.pageIndex,
-              this.paginator.pageSize
-            ).pipe(catchError(() => of(null)))
-          }),
-          map(data => {
-            this.isLoadingResults = false;
-
-            if (data === null) {
-              return []
-            }
-
-            this.resultsLength = data.totalCount;
-            return data.items;
-          })
-        );
+  async onRowClick(row: UserListRow) {
+    await this.router.navigate([NavigationItems.userDetail.navigationUrl, row.userId]);
   }
 }

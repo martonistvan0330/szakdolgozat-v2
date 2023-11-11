@@ -7,5 +7,5 @@ public interface IUserManager
 {
     Task<UserModel?> GetByIdAsync(Guid userId);
     Task<UserModel?> GetByNameAsync(string username);
-    Task<Pageable<UserListRow>> GetAllAsync(SortOptions sortOptions, PageData pageData);
+    Task<Pageable<UserListRow>> GetAllAsync(PageableOptions options);
 }

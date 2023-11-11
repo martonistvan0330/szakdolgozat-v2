@@ -5,33 +5,8 @@
   justify-content: flex-start;
   align-items: flex-start;
   padding: 50px;
-  position: relative;
 }
 
-.user-list-table-container {
+.user-list-table {
   width: 100%;
-  position: relative;
-}
-
-.user-list-loading-shade {
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 56px;
-  right: 0;
-  background: rgba(0, 0, 0, 0.15);
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-//noinspection CssUnusedSymbol
-.mat-mdc-row .mat-mdc-cell {
-  cursor: pointer;
-}
-
-//noinspection CssUnusedSymbol
-.mat-mdc-row:hover .mat-mdc-cell {
-  background: rgba(0, 0, 0, 0.15);
 }

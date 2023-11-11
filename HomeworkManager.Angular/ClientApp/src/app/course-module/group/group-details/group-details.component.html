@@ -6,9 +6,22 @@
         </a>
     </div>
     <div class="group-details-content">
-        <div *ngIf="isLoadingResults"
-             class="group-details-loading-shade">
-            <mat-spinner/>
-        </div>
+        <mat-tab-group class="group-details-tab-group">
+            <mat-tab class="group-details-tab" label="Assignments">
+                <ng-template matTabContent>
+                    <div>assignments</div>
+                </ng-template>
+            </mat-tab>
+            <mat-tab class="group-details-tab" label="Teachers">
+                <ng-template matTabContent>
+                    <hwm-teacher-list [groupName]="group.name"/>
+                </ng-template>
+            </mat-tab>
+            <mat-tab class="group-details-tab" label="Students">
+                <ng-template matTabContent>
+                    <hwm-student-list [groupName]="group.name"/>
+                </ng-template>
+            </mat-tab>
+        </mat-tab-group>
     </div>
 </div>

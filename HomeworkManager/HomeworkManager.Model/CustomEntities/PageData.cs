@@ -2,6 +2,6 @@
 
 public class PageData
 {
-    public int Page { get; set; } = 1;
+    public int PageIndex { get; set; } = 0;
     public int PageSize { get; set; } = 10;
 }

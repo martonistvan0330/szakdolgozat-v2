@@ -1,0 +1,72 @@
+<div class="table-header">
+    <h1 class="table-title">{{ title }}</h1>
+    <span class="spacer"></span>
+    <ng-content select="[hwm-table-actions]"/>
+</div>
+<div class="table-container">
+    <form *ngIf="filterable" [formGroup]="searchForm" class="search-form">
+        <div>
+            <mat-form-field class="search-field">
+                <mat-label>
+                    Search
+                </mat-label>
+                <input formControlName="search" id="search" matInput name="search">
+            </mat-form-field>
+        </div>
+        <button (click)="searchClicked.emit()" [disabled]="isLoadingResults" class="search-button" color="accent"
+                mat-flat-button>
+            <mat-icon>search</mat-icon>
+            Search
+        </button>
+    </form>
+    <div class="table-wrapper">
+        <div *ngIf="isLoadingResults"
+             class="table-loading-shade">
+            <mat-spinner/>
+        </div>
+        <mat-table [dataSource]="dataSource$" class="table mat-elevation-z8"
+                   matSort matSortActive="fullName" matSortDirection="asc" matSortDisableClear>
+            <ng-container *ngFor="let column of columnDefs" matColumnDef="{{ column.fieldName }}">
+                <ng-container *ngIf="column.isSorted">
+                    <mat-header-cell *matHeaderCellDef mat-header-cell mat-sort-header>
+                        {{ column.label }}
+                    </mat-header-cell>
+                </ng-container>
+                <ng-container *ngIf="!column.isSorted">
+                    <mat-header-cell *matHeaderCellDef mat-header-cell>
+                        {{ column.label }}
+                    </mat-header-cell>
+                </ng-container>
+                <mat-cell *matCellDef="let data" mat-cell>{{ data[column.fieldName] }}</mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="actions">
+                <mat-header-cell *matHeaderCellDef mat-header-cell/>
+                <mat-cell *matCellDef="let data">
+                    <span class="spacer"></span>
+                    <button (click)="onRemoveClick(data)" *ngIf="removableRows" mat-icon-button>
+                        <mat-icon>{{ removeIcon }}</mat-icon>
+                    </button>
+                </mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <ng-container *ngIf="clickableRows">
+                <mat-row (click)="onRowClick(row)" *matRowDef="let row; columns: displayedColumns;"
+                         [ngClass]="clickableRows ? 'clickable' : ''"
+                         matRipple></mat-row>
+            </ng-container>
+            <ng-container *ngIf="!clickableRows">
+                <mat-row *matRowDef="let row; columns: displayedColumns;"
+                         [ngClass]="clickableRows ? 'clickable' : ''"></mat-row>
+            </ng-container>
+        </mat-table>
+    </div>
+
+    <mat-divider/>
+    <mat-paginator [length]="resultsLength"
+                   [ngClass]="pageable ? 'visible' : ''"
+                   [pageSizeOptions]="pageSizeOptions"
+                   [pageSize]="pageSize"
+                   [showFirstLastButtons]="true"
+                   class="table-paginator"></mat-paginator>
+</div>

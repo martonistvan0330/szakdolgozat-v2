@@ -16,6 +16,7 @@ import {
 } from './validation/contains-upper-case/contains-upper-case-validator.directive';
 import { InfoSnackBarComponent } from './snack-bar/components/info-snack-bar/info-snack-bar.component';
 import { EqualValuesValidatorDirective } from './validation/equal-values/equal-values-validator.directive';
+import { MAT_DIALOG_DEFAULT_OPTIONS } from "@angular/material/dialog";
 
 
 @NgModule({
@@ -50,7 +51,15 @@ import { EqualValuesValidatorDirective } from './validation/equal-values/equal-v
         horizontalPosition: 'center',
         duration: 3000
       }
-    }
+    },
+    {
+      provide: MAT_DIALOG_DEFAULT_OPTIONS,
+      useValue: {
+        disableClose: true,
+        enterAnimationDuration: 100,
+        width: '50%'
+      }
+    },
   ]
 })
 export class CoreModule {

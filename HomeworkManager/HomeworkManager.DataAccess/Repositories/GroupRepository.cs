@@ -1,8 +1,11 @@
-﻿using HomeworkManager.DataAccess.Repositories.Interfaces;
+﻿using System.Linq.Expressions;
+using HomeworkManager.DataAccess.Repositories.Extensions;
+using HomeworkManager.DataAccess.Repositories.Interfaces;
 using HomeworkManager.Model.Constants.Errors.Group;
 using HomeworkManager.Model.Contexts;
 using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.Group;
+using HomeworkManager.Model.CustomEntities.User;
 using HomeworkManager.Model.Entities;
 using HomeworkManager.Model.ErrorEntities;
 using Microsoft.EntityFrameworkCore;
@@ -54,7 +57,7 @@ public class GroupRepository : IGroupRepository
             .ToListAsync();
     }
 
-    public async Task<bool> ExistsWithNameAsync(string groupName, int courseId)
+    public async Task<bool> ExistsWithNameAsync(int courseId, string groupName)
     {
         return await _context.Groups.AnyAsync(g => g.CourseId == courseId && g.Name == groupName);
     }
@@ -85,6 +88,78 @@ public class GroupRepository : IGroupRepository
             .SingleOrDefaultAsync();
     }
 
+    public async Task<int> GetTeacherCountAsync(int courseId, string groupName, string? searchText = null)
+    {
+        return await _context.Groups
+            .Where(g => g.CourseId == courseId && g.Name == groupName)
+            .SelectMany(g => g.Teachers)
+            .Search(searchText)
+            .CountAsync();
+    }
+
+    public async Task<int> GetStudentCountAsync(int courseId, string groupName, string? searchText = null)
+    {
+        return await _context.Groups
+            .Where(g => g.CourseId == courseId && g.Name == groupName)
+            .SelectMany(g => g.Students)
+            .Search(searchText)
+            .CountAsync();
+    }
+
+    public async Task<IEnumerable<UserListRow>> GetTeachersAsync<TKey>
+    (
+        int courseId,
+        string groupName,
+        PageData? pageData = null,
+        Expression<Func<UserListRow, TKey>>? orderBy = null,
+        SortDirection sortDirection = SortDirection.Ascending,
+        string? searchText = null
+    )
+    {
+        return await _context.Groups
+            .Where(g => g.CourseId == courseId && g.Name == groupName)
+            .SelectMany(g => g.Teachers)
+            .Search(searchText)
+            .Select(u => new UserListRow
+            {
+                UserId = u.Id,
+                FullName = u.FullName,
+                Username = "",
+                Email = u.Email!,
+                Roles = ""
+            })
+            .OrderByWithDirection(orderBy, sortDirection)
+            .GetPage(pageData)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<UserListRow>> GetStudentsAsync<TKey>
+    (
+        int courseId,
+        string groupName,
+        PageData? pageData = null,
+        Expression<Func<UserListRow, TKey>>? orderBy = null,
+        SortDirection sortDirection = SortDirection.Ascending,
+        string? searchText = null
+    )
+    {
+        return await _context.Groups
+            .Where(g => g.CourseId == courseId && g.Name == groupName)
+            .SelectMany(g => g.Students)
+            .Search(searchText)
+            .Select(u => new UserListRow
+            {
+                UserId = u.Id,
+                FullName = u.FullName,
+                Username = "",
+                Email = u.Email!,
+                Roles = ""
+            })
+            .OrderByWithDirection(orderBy, sortDirection)
+            .GetPage(pageData)
+            .ToListAsync();
+    }
+
     public async Task<Result<int, BusinessError>> CreateAsync(NewGroup newGroup, int courseId, User user)
     {
         if (await _context.Courses.Select(g => g.Name).ContainsAsync(newGroup.Name))
@@ -106,7 +181,7 @@ public class GroupRepository : IGroupRepository
 
         return group.GroupId;
     }
-    
+
     public async Task<BusinessError?> UpdateAsync(int courseId, string groupName, UpdateGroup updatedGroup, User? user = null)
     {
         var group = await _context.Groups.SingleOrDefaultAsync(g => g.CourseId == courseId && g.Name == groupName);
@@ -132,7 +207,45 @@ public class GroupRepository : IGroupRepository
         return null;
     }
 
-    public async Task<bool> IsInGroupAsync(string groupName, int courseId, Guid userId)
+    public async Task AddTeachersAsync(int courseId, string groupName, ICollection<Guid> userIds)
+    {
+        var group = await _context.Groups
+            .Include(g => g.Teachers)
+            .SingleOrDefaultAsync(g => g.CourseId == courseId && g.Name == groupName);
+
+        if (group is not null)
+        {
+            var teachers = await _context.Users
+                .Where(u => userIds.Contains(u.Id))
+                .Where(u => u.ManagedCourses.Select(c => c.CourseId).Contains(group.CourseId))
+                .ToListAsync();
+
+            group.Teachers = group.Teachers.UnionBy(teachers, u => u.Id).ToHashSet();
+
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task AddStudentsAsync(int courseId, string groupName, ICollection<Guid> userIds)
+    {
+        var group = await _context.Groups
+            .Include(g => g.Students)
+            .SingleOrDefaultAsync(g => g.CourseId == courseId && g.Name == groupName);
+
+        if (group is not null)
+        {
+            var students = await _context.Users
+                .Where(u => userIds.Contains(u.Id))
+                .Where(u => u.AttendedCourses.Select(c => c.CourseId).Contains(group.CourseId))
+                .ToListAsync();
+
+            group.Students = group.Students.UnionBy(students, u => u.Id).ToHashSet();
+
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task<bool> IsInGroupAsync(int courseId, string groupName, Guid userId)
     {
         return await _context.Groups
             .Where(g => g.CourseId == courseId && g.Name == groupName)
@@ -141,13 +254,13 @@ public class GroupRepository : IGroupRepository
             .AnyAsync();
     }
 
-    public async Task<bool> IsCreatorAsync(string groupName, int courseId, Guid userId)
+    public async Task<bool> IsCreatorAsync(int courseId, string groupName, Guid userId)
     {
         return await _context.Groups
             .AnyAsync(g => g.CourseId == courseId && g.Name == groupName && g.CreatorId == userId);
     }
 
-    public async Task<bool> IsTeacherAsync(string groupName, int courseId, Guid userId)
+    public async Task<bool> IsTeacherAsync(int courseId, string groupName, Guid userId)
     {
         return await _context.Groups
             .Where(g => g.CourseId == courseId && g.Name == groupName)

@@ -14,13 +14,10 @@ export class GroupDetailsComponent implements OnInit {
   private groupService = inject(GroupService);
   private snackBarService = inject(SnackBarService);
   protected readonly NavigationItems = NavigationItems;
-  group: GroupModel | null = null;
-  isLoadingResults = true;
-  editUrl!: string;
+  group!: GroupModel;
+  editUrl: string = `../../${NavigationItems.groupEdit.navigationUrl}/General`;
 
   ngOnInit() {
-    this.editUrl = `../../${NavigationItems.groupEdit.navigationUrl}/General`
-
     this.activatedRoute.data
       .subscribe(({ group }) => {
         const groupModel = group as GroupModel;

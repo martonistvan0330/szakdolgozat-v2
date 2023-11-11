@@ -51,17 +51,21 @@ public class UserManager : UserManager<User>, IUserManager
         return await _userRepository.GetModelByNameAsync(username);
     }
 
-    public async Task<Pageable<UserListRow>> GetAllAsync(SortOptions sortOptions, PageData pageData)
+    public async Task<Pageable<UserListRow>> GetAllAsync(PageableOptions options)
     {
-        var totalCount = await _userRepository.GetCountAsync();
+        var totalCount = await _userRepository.GetCountAsync(options.SearchText);
 
-        var users = sortOptions.Sort switch
+        var users = options.SortOptions?.Sort switch
         {
-            "userId" => await _userRepository.GetAllModelsAsync(u => u.UserId.ToString(), sortOptions.SortDirection.ToSortDirection(), pageData),
-            "fullName" => await _userRepository.GetAllModelsAsync(u => u.FullName, sortOptions.SortDirection.ToSortDirection(), pageData),
-            "username" => await _userRepository.GetAllModelsAsync(u => u.Username, sortOptions.SortDirection.ToSortDirection(), pageData),
-            "email" => await _userRepository.GetAllModelsAsync(u => u.Email, sortOptions.SortDirection.ToSortDirection(), pageData),
-            _ => await _userRepository.GetAllModelsAsync(u => u.UserId, sortOptions.SortDirection.ToSortDirection(), pageData)
+            "userId" => await _userRepository.GetAllModelsAsync(options.PageData, u => u.UserId, options.SortOptions.SortDirection.ToSortDirection(),
+                options.SearchText),
+            "fullName" => await _userRepository.GetAllModelsAsync(options.PageData, u => u.FullName,
+                options.SortOptions.SortDirection.ToSortDirection(), options.SearchText),
+            "username" => await _userRepository.GetAllModelsAsync(options.PageData, u => u.Username,
+                options.SortOptions.SortDirection.ToSortDirection(), options.SearchText),
+            "email" => await _userRepository.GetAllModelsAsync(options.PageData, u => u.Email, options.SortOptions.SortDirection.ToSortDirection(),
+                options.SearchText),
+            _ => await _userRepository.GetAllModelsAsync(options.PageData)
         };
 
         return new Pageable<UserListRow>

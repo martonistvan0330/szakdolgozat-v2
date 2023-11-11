@@ -1,8 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { SortDirection } from "@angular/material/sort";
-import { Pageable, UserListRow, UserModel } from "../../shared-module";
-import { delay } from "rxjs";
+import { Pageable, PageableOptions, UserListRow, UserModel } from "../../shared-module";
 import { AuthorizedApiClientService } from "../../services";
+import { delay } from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +13,18 @@ export class UserService {
     return this.authApiClient.get<UserModel | null>('User/' + userId);
   }
 
-  getUserList(sort: string, sortDirection: SortDirection, page: number, pageSize: number) {
-    const requestUrl = `User?sort=${sort}&sortDirection=${sortDirection}&page=${page}&pageSize=${pageSize}`;
+  getUserList(options: PageableOptions | null = null) {
+    let requestUrl = 'User'
+
+    if (options !== null) {
+      requestUrl = 'User'
+        + '?pageData.pageIndex=' + options.pageData?.pageIndex
+        + '&pageData.pageSize=' + options.pageData?.pageSize
+        + '&sortOptions.sort=' + options.sortOptions?.sort
+        + '&sortOptions.sortDirection=' + options.sortOptions?.sortDirection
+        + '&searchText=' + options.searchText;
+    }
+
     return this.authApiClient.get<Pageable<UserListRow>>(requestUrl).pipe(delay(1000));
   }
 
