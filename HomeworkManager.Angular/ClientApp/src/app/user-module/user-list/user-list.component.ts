@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { ColumnDefinition, Pageable, PageableOptions, UserListRow } from "../../shared-module";
+import { ColumnDefinition, Pageable, TableChangeOptions, UserListRow } from "../../shared-module";
 import { UserService } from "../services/user.service";
 import { NavigationItems } from "../../core-module";
 import { Router } from "@angular/router";
@@ -24,11 +24,11 @@ export class UserListComponent {
     new ColumnDefinition('Roles', 'roles', false),
   ]
 
-  onOptionsSetup(pageableOptions: Observable<PageableOptions>) {
-    pageableOptions
+  onOptionsSetup(options: Observable<TableChangeOptions<any>>) {
+    options
       .pipe(
         switchMap(options => {
-          return this.userService.getUserList(options);
+          return this.userService.getUserList(options.pageableOptions);
         })
       )
       .subscribe(users => {

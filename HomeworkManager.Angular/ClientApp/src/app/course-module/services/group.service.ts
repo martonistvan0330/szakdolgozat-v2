@@ -9,7 +9,7 @@ import {
   UpdateGroup,
   UserListRow
 } from "../../shared-module";
-import { delay, Subject, tap } from "rxjs";
+import { delay, distinctUntilChanged, Subject, tap } from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -18,14 +18,23 @@ export class GroupService {
   private authApiClient = inject(AuthorizedApiClientService);
   private groupAdded = new Subject<void>();
   private groupUpdated = new Subject<void>();
+  private groupChanged = new Subject<string>();
+  private teacherAdded = new Subject<string>();
+  private studentAdded = new Subject<string>();
   groupAdded$ = this.groupAdded.asObservable();
   groupUpdated$ = this.groupUpdated.asObservable();
-
+  groupChanged$ = this.groupChanged.asObservable().pipe(distinctUntilChanged());
+  teacherAdded$ = this.teacherAdded.asObservable();
+  studentAdded$ = this.studentAdded.asObservable();
 
   private _courseId!: number;
 
   set courseId(value: number) {
     this._courseId = value;
+  }
+
+  groupChange(groupName: string) {
+    this.groupChanged.next(groupName);
   }
 
   getGroups() {
@@ -94,13 +103,23 @@ export class GroupService {
   addTeachers(groupName: string, teacherIds: string[]) {
     const requestUrl = 'Course/' + this._courseId + '/Group/' + groupName + '/Teacher/Add';
 
-    return this.authApiClient.post<void>(requestUrl, teacherIds).pipe(delay(1000));
+    return this.authApiClient.post<void>(requestUrl, teacherIds).pipe(
+      tap(_groupId => {
+        this.teacherAdded.next(groupName);
+      }),
+      delay(1000)
+    );
   }
 
   addStudents(groupName: string, studentIds: string[]) {
     const requestUrl = 'Course/' + this._courseId + '/Group/' + groupName + '/Student/Add';
 
-    return this.authApiClient.post<void>(requestUrl, studentIds).pipe(delay(1000));
+    return this.authApiClient.post<void>(requestUrl, studentIds).pipe(
+      tap(_groupId => {
+        this.studentAdded.next(groupName);
+      }),
+      delay(1000)
+    );
   }
 
   isInGroup(groupName: string) {

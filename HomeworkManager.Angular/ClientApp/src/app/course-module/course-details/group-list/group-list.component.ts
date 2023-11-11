@@ -4,6 +4,7 @@ import { GroupListRow } from "../../../shared-module";
 import { MatSidenav } from "@angular/material/sidenav";
 import { merge, startWith, switchMap } from "rxjs";
 import { GroupService } from "../../services/group.service";
+import { ActivatedRoute, Router } from "@angular/router";
 
 @Component({
   selector: 'hwm-group-list',
@@ -11,6 +12,8 @@ import { GroupService } from "../../services/group.service";
   styleUrls: ['./group-list.component.scss']
 })
 export class GroupListComponent implements OnInit {
+  private activatedRoute = inject(ActivatedRoute);
+  private router = inject(Router);
   private groupService = inject(GroupService);
   protected readonly NavigationItems = NavigationItems;
   @Input() courseId!: number
@@ -29,6 +32,10 @@ export class GroupListComponent implements OnInit {
       .subscribe(groups => {
         this.groups = groups;
       })
+  }
+
+  onGroupClick(groupName: string) {
+    this.groupService.groupChange(groupName);
   }
 
   async toggle() {

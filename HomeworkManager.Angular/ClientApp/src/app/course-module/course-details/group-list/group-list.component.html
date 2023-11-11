@@ -6,7 +6,8 @@
         <h3 class="group-list-title">Groups</h3>
         <mat-divider/>
         <mat-nav-list class="group-list-nav-items">
-            <a *ngFor="let group of groups"
+            <a (click)="onGroupClick(group.name)"
+               *ngFor="let group of groups"
                [routerLink]="[NavigationItems.groupDetails.navigationUrl, group.name]"
                mat-list-item
                routerLinkActive="active">

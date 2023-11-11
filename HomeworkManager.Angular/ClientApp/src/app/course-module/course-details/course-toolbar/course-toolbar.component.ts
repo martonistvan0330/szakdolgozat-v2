@@ -6,7 +6,7 @@ import { AuthService } from "../../../services";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { CourseStudentAddDialogComponent } from "../../course-student-add-dialog/course-student-add-dialog.component";
 import { CourseTeacherAddDialogComponent } from "../../course-teacher-add-dialog/course-teacher-add-dialog.component";
-import { Subscription, switchMap } from "rxjs";
+import { filter, Subscription, switchMap } from "rxjs";
 import { map } from "rxjs/operators";
 
 @Component({
@@ -57,6 +57,12 @@ export class CourseToolbarComponent implements OnInit, OnDestroy {
 
     this.teachersAddSubscription = dialogRef.afterClosed()
       .pipe(
+        filter(selectedTeachers => {
+          if (!selectedTeachers) {
+            return false;
+          }
+          return selectedTeachers.length > 0;
+        }),
         map(selectedTeachers => {
           if (!selectedTeachers) {
             return [];
@@ -79,6 +85,12 @@ export class CourseToolbarComponent implements OnInit, OnDestroy {
 
     this.studentsAddSubscription = dialogRef.afterClosed()
       .pipe(
+        filter(selectedStudents => {
+          if (!selectedStudents) {
+            return false;
+          }
+          return selectedStudents.length > 0;
+        }),
         map(selectedStudents => {
           if (!selectedStudents) {
             return [];

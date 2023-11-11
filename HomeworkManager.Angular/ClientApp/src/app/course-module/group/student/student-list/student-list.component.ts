@@ -1,11 +1,11 @@
 import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { GroupService } from "../../../services/group.service";
-import { ColumnDefinition, Pageable, PageableOptions, Role, UserListRow } from "../../../../shared-module";
+import { ColumnDefinition, Pageable, Role, TableChangeOptions, UserListRow } from "../../../../shared-module";
 import { NavigationItems } from "../../../../core-module";
 import { AuthService } from "../../../../services";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { GroupStudentAddDialogComponent } from "../group-student-add-dialog/group-student-add-dialog.component";
-import { Observable, startWith, Subject, Subscription, switchMap } from "rxjs";
+import { filter, merge, Observable, Subject, Subscription, switchMap } from "rxjs";
 import { map } from "rxjs/operators";
 
 @Component({
@@ -22,7 +22,9 @@ export class StudentListComponent implements OnInit, OnDestroy {
   protected readonly NavigationItems = NavigationItems;
   @Input() groupName!: string;
   isAdministrator = false;
+  isTeacher = false;
   students$ = this.students.asObservable();
+  changeDataSource$!: Observable<string>;
   columnDefs = [
     new ColumnDefinition('Full name', 'fullName', true),
     new ColumnDefinition('Email', 'email', true)
@@ -33,14 +35,23 @@ export class StudentListComponent implements OnInit, OnDestroy {
       .subscribe(isAdmin => {
         this.isAdministrator = isAdmin;
       });
+
+    this.groupService.isTeacher(this.groupName)
+      .subscribe({
+        next: isTeacher => {
+          this.isTeacher = isTeacher;
+        }
+      });
+
+    this.changeDataSource$ =
+      merge(this.groupService.groupChanged$);
   }
 
-  onOptionsSetup(pageableOptions: Observable<PageableOptions>) {
-    pageableOptions
+  onOptionsSetup(options: Observable<TableChangeOptions<string>>) {
+    options
       .pipe(
-        startWith(new PageableOptions()),
         switchMap(options => {
-          return this.groupService.getStudents(this.groupName, options);
+          return this.groupService.getStudents(options.extras || '', options.pageableOptions);
         })
       )
       .subscribe(students => {
@@ -56,6 +67,12 @@ export class StudentListComponent implements OnInit, OnDestroy {
 
     this.studentsAddSubscription = dialogRef.afterClosed()
       .pipe(
+        filter(selectedStudents => {
+          if (!selectedStudents) {
+            return false;
+          }
+          return selectedStudents.length > 0;
+        }),
         map(selectedStudents => {
           if (!selectedStudents) {
             return [];

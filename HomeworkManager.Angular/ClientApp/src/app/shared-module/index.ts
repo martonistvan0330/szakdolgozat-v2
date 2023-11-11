@@ -21,5 +21,6 @@ export * from './models/pageable-options';
 export * from './models/role/role';
 export * from './models/role/role-model';
 export * from './models/sort-options';
+export * from './models/table-change-options';
 export * from './models/user/user-list-row';
 export * from './models/user/user-model';

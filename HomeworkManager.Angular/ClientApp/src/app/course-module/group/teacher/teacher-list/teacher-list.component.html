@@ -1,6 +1,8 @@
 <div class="teacher-list-container">
     <hwm-table (optionsSetup)="onOptionsSetup($event)"
                (rowRemove)="onRemoveClick($event)"
+               [changeDataSource]="changeDataSource$"
+               [changeData]="groupName"
                [clickableRows]="false"
                [columnDefs]="columnDefs"
                [dataSource]="teachers$"
@@ -8,7 +10,7 @@
                [removableRows]="isAdministrator"
                class="teacher-list-table">
         <button (click)="onAddClick()"
-                *ngIf="isAdministrator"
+                *ngIf="isAdministrator || isCreator"
                 [disabled]="groupName === 'General'"
                 hwm-table-actions
                 mat-flat-button>

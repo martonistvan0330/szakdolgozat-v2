@@ -5,13 +5,15 @@
     <h2>{{ course.name }}</h2>
     <span class="spacer"></span>
     <ng-container *ngIf="!isMobile">
-        <button (click)="onAddTeachersClick()" *ngIf="isAdministrator"
+        <button (click)="onAddTeachersClick()"
+                *ngIf="isAdministrator || isCreator"
                 class="course-toolbar-action"
                 mat-flat-button>
             <mat-icon>add</mat-icon>
             Add Teachers
         </button>
-        <button (click)="onAddStudentsClick()" *ngIf="isAdministrator"
+        <button (click)="onAddStudentsClick()"
+                *ngIf="isAdministrator || isCreator"
                 class="course-toolbar-action"
                 mat-flat-button>
             <mat-icon>add</mat-icon>
@@ -30,17 +32,17 @@
             Edit Course
         </a>
     </ng-container>
-    <button *ngIf="isMobile && (isAdministrator || isCreator || isTeacher)" [matMenuTriggerFor]="accountMenu"
+    <button *ngIf="isMobile && (isAdministrator || isTeacher)" [matMenuTriggerFor]="accountMenu"
             mat-icon-button>
         <mat-icon>more_vert</mat-icon>
     </button>
     <mat-menu #accountMenu="matMenu">
-        <button (click)="onAddTeachersClick()" *ngIf="isAdministrator"
+        <button (click)="onAddTeachersClick()" *ngIf="isAdministrator || isCreator"
                 mat-menu-item>
             <mat-icon>add</mat-icon>
             Add Teachers
         </button>
-        <button (click)="onAddStudentsClick()" *ngIf="isAdministrator"
+        <button (click)="onAddStudentsClick()" *ngIf="isAdministrator || isCreator"
                 mat-menu-item>
             <mat-icon>add</mat-icon>
             Add Students

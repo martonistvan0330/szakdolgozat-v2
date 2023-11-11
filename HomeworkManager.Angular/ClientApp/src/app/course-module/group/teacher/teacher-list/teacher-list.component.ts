@@ -1,11 +1,11 @@
 import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
-import { ColumnDefinition, Pageable, PageableOptions, Role, UserListRow } from "../../../../shared-module";
+import { ColumnDefinition, Pageable, Role, TableChangeOptions, UserListRow } from "../../../../shared-module";
 import { GroupService } from "../../../services/group.service";
 import { NavigationItems } from "../../../../core-module";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { GroupTeacherAddDialogComponent } from "../group-teacher-add-dialog/group-teacher-add-dialog.component";
 import { AuthService } from "../../../../services";
-import { Observable, startWith, Subject, Subscription, switchMap } from "rxjs";
+import { filter, merge, Observable, Subject, Subscription, switchMap } from "rxjs";
 import { map } from "rxjs/operators";
 
 @Component({
@@ -22,7 +22,9 @@ export class TeacherListComponent implements OnInit, OnDestroy {
   protected readonly NavigationItems = NavigationItems;
   @Input() groupName!: string;
   isAdministrator = false;
+  isCreator = false;
   teachers$ = this.teachers.asObservable();
+  changeDataSource$!: Observable<string>;
   columnDefs = [
     new ColumnDefinition('Full name', 'fullName', true),
     new ColumnDefinition('Email', 'email', true)
@@ -33,14 +35,26 @@ export class TeacherListComponent implements OnInit, OnDestroy {
       .subscribe(isAdmin => {
         this.isAdministrator = isAdmin;
       });
+
+    this.groupService.isCreator(this.groupName)
+      .subscribe({
+        next: isCreator => {
+          this.isCreator = isCreator;
+        }
+      });
+
+    this.changeDataSource$ =
+      merge(
+        this.groupService.groupChanged$,
+        this.groupService.teacherAdded$
+      );
   }
 
-  onOptionsSetup(pageableOptions: Observable<PageableOptions>) {
-    pageableOptions
+  onOptionsSetup(options: Observable<TableChangeOptions<string>>) {
+    options
       .pipe(
-        startWith(new PageableOptions()),
         switchMap(options => {
-          return this.groupService.getTeachers(this.groupName, options);
+          return this.groupService.getTeachers(options.extras || '', options.pageableOptions);
         })
       )
       .subscribe(teachers => {
@@ -56,6 +70,12 @@ export class TeacherListComponent implements OnInit, OnDestroy {
 
     this.teachersAddSubscription = dialogRef.afterClosed()
       .pipe(
+        filter(selectedTeachers => {
+          if (!selectedTeachers) {
+            return false;
+          }
+          return selectedTeachers.length > 0;
+        }),
         map(selectedTeachers => {
           if (!selectedTeachers) {
             return [];
