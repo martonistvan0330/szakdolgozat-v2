@@ -1,0 +1,33 @@
+<h1 mat-dialog-title>{{ title }}</h1>
+<mat-dialog-content>
+    <form [formGroup]="searchForm" class="search-form">
+        <mat-form-field class="search-field">
+            <mat-label>Search</mat-label>
+            <input [matAutocomplete]="auto"
+                   formControlName="searchText"
+                   matInput
+                   type="text">
+            <mat-autocomplete #auto="matAutocomplete"
+                              (optionSelected)="onOptionSelected($event)"
+                              [displayWith]="displayFn"
+                              autoActiveFirstOption>
+                <mat-option *ngFor="let item of (filteredItems | async)"
+                            [value]="item">
+                    {{ displayFn ? displayFn(item) : item }}
+                </mat-option>
+            </mat-autocomplete>
+        </mat-form-field>
+    </form>
+    <hwm-table (rowRemove)="onRemoveClick($event)"
+               *ngIf="(selectedItems$ | async)?.length || 0 > 0"
+               [columnDefs]="columnDefs"
+               [dataSource]="selectedItems$"
+               [filterable]="false"
+               [pageable]="false"
+               [removableRows]="true"
+               removeIcon="delete"/>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button (click)="onCancelClick()" mat-button>Cancel</button>
+    <button [mat-dialog-close]="selectedItems" mat-button>OK</button>
+</mat-dialog-actions>

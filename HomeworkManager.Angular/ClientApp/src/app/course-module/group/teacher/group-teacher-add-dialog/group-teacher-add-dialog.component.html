@@ -1,34 +1,5 @@
-<h1 mat-dialog-title>Add Teachers</h1>
-<mat-dialog-content>
-    <form [formGroup]="teacherForm" class="search-form">
-        <mat-form-field class="search-field">
-            <mat-label>Search</mat-label>
-            <input [matAutocomplete]="auto"
-                   formControlName="searchText"
-                   matInput
-                   placeholder="Name or Email"
-                   type="text">
-            <mat-autocomplete #auto="matAutocomplete"
-                              (optionSelected)="onOptionSelected($event)"
-                              [displayWith]="displayFn"
-                              autoActiveFirstOption>
-                <mat-option *ngFor="let teacher of (filteredTeachers | async)"
-                            [value]="teacher">
-                    {{ teacher.fullName + '(' + teacher.email + ')' }}
-                </mat-option>
-            </mat-autocomplete>
-        </mat-form-field>
-    </form>
-    <hwm-table (rowRemove)="onRemoveClick($event)"
-               *ngIf="(selectedTeachers$ | async)?.length || 0 > 0"
-               [columnDefs]="columnDefs"
-               [dataSource]="selectedTeachers$"
-               [filterable]="false"
-               [pageable]="false"
-               [removableRows]="true"
-               removeIcon="delete"/>
-</mat-dialog-content>
-<mat-dialog-actions align="end">
-    <button (click)="onCancelClick()" mat-button>Cancel</button>
-    <button (click)="onOkClick()" cdkFocusInitial mat-button>OK</button>
-</mat-dialog-actions>
+<hwm-list-add-dialog [columnDefs]="columnDefs"
+                     [compareFn]="UserListRow.compareFullName"
+                     [dataSource]="dataSource"
+                     [displayFn]="UserListRow.displayFn"
+                     title="Add Teachers"/>

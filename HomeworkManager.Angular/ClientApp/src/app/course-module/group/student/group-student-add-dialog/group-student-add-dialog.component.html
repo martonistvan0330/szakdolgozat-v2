@@ -1,1 +1,5 @@
-<p>group-student-add-dialog works!</p>
+<hwm-list-add-dialog [columnDefs]="columnDefs"
+                     [compareFn]="UserListRow.compareFullName"
+                     [dataSource]="dataSource"
+                     [displayFn]="UserListRow.displayFn"
+                     title="Add Students"/>

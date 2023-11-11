@@ -9,6 +9,7 @@
                class="teacher-list-table">
         <button (click)="onAddClick()"
                 *ngIf="isAdministrator"
+                [disabled]="groupName === 'General'"
                 hwm-table-actions
                 mat-flat-button>
             <mat-icon>add</mat-icon>

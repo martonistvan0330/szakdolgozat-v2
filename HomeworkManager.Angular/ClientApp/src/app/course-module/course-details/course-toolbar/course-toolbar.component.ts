@@ -1,21 +1,25 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { NavigationItems } from "../../../core-module";
-import { CourseModel, Role } from "../../../shared-module";
+import { CourseModel, Role, UserListRow } from "../../../shared-module";
 import { CourseService } from "../../services/course.service";
 import { AuthService } from "../../../services";
-import { MatDialog } from "@angular/material/dialog";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { CourseStudentAddDialogComponent } from "../../course-student-add-dialog/course-student-add-dialog.component";
 import { CourseTeacherAddDialogComponent } from "../../course-teacher-add-dialog/course-teacher-add-dialog.component";
+import { Subscription, switchMap } from "rxjs";
+import { map } from "rxjs/operators";
 
 @Component({
   selector: 'hwm-course-toolbar',
   templateUrl: './course-toolbar.component.html',
   styleUrls: ['./course-toolbar.component.scss']
 })
-export class CourseToolbarComponent implements OnInit {
+export class CourseToolbarComponent implements OnInit, OnDestroy {
   private courseService = inject(CourseService);
   private authService = inject(AuthService);
   private dialog = inject(MatDialog);
+  private teachersAddSubscription = new Subscription();
+  private studentsAddSubscription = new Subscription();
   protected readonly NavigationItems = NavigationItems;
   @Input() course!: CourseModel;
   @Input() isMobile: boolean | null = false;
@@ -46,19 +50,55 @@ export class CourseToolbarComponent implements OnInit {
   }
 
   onAddTeachersClick() {
-    this.dialog.open(CourseTeacherAddDialogComponent, {
-      data: this.course.courseId
-    });
+    const dialogRef: MatDialogRef<CourseTeacherAddDialogComponent, UserListRow[]> =
+      this.dialog.open(CourseTeacherAddDialogComponent, {
+        data: this.course.courseId
+      });
+
+    this.teachersAddSubscription = dialogRef.afterClosed()
+      .pipe(
+        map(selectedTeachers => {
+          if (!selectedTeachers) {
+            return [];
+          }
+
+          return selectedTeachers.map(teacher => teacher.userId);
+        }),
+        switchMap(selectedTeacherIds => {
+          return this.courseService.addTeachers(this.course.courseId, selectedTeacherIds)
+        })
+      )
+      .subscribe();
   }
 
   onAddStudentsClick() {
-    this.dialog.open(CourseStudentAddDialogComponent, {
-      data: this.course.courseId,
-      panelClass: 'my-class',
-    });
+    const dialogRef: MatDialogRef<CourseStudentAddDialogComponent, UserListRow[]> =
+      this.dialog.open(CourseStudentAddDialogComponent, {
+        data: this.course.courseId
+      });
+
+    this.studentsAddSubscription = dialogRef.afterClosed()
+      .pipe(
+        map(selectedStudents => {
+          if (!selectedStudents) {
+            return [];
+          }
+
+          return selectedStudents.map(student => student.userId);
+        }),
+        switchMap(selectedStudentIds => {
+          return this.courseService.addStudents(this.course.courseId, selectedStudentIds)
+        })
+      )
+      .subscribe();
   }
 
   onToggle() {
     this.toggleNavbar.emit();
+  }
+
+  ngOnDestroy() {
+    this.teachersAddSubscription.unsubscribe();
+    this.studentsAddSubscription.unsubscribe();
   }
 }

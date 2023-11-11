@@ -1,22 +1,24 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { ColumnDefinition, Pageable, PageableOptions, Role, UserListRow } from "../../../../shared-module";
 import { GroupService } from "../../../services/group.service";
 import { NavigationItems } from "../../../../core-module";
-import { MatDialog } from "@angular/material/dialog";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { GroupTeacherAddDialogComponent } from "../group-teacher-add-dialog/group-teacher-add-dialog.component";
 import { AuthService } from "../../../../services";
-import { Observable, startWith, Subject, switchMap } from "rxjs";
+import { Observable, startWith, Subject, Subscription, switchMap } from "rxjs";
+import { map } from "rxjs/operators";
 
 @Component({
   selector: 'hwm-teacher-list',
   templateUrl: './teacher-list.component.html',
   styleUrls: ['./teacher-list.component.scss']
 })
-export class TeacherListComponent implements OnInit {
+export class TeacherListComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private groupService = inject(GroupService);
   private dialog = inject(MatDialog);
   private teachers = new Subject<Pageable<UserListRow>>();
+  private teachersAddSubscription = new Subscription();
   protected readonly NavigationItems = NavigationItems;
   @Input() groupName!: string;
   isAdministrator = false;
@@ -47,12 +49,32 @@ export class TeacherListComponent implements OnInit {
   }
 
   onAddClick() {
-    this.dialog.open(GroupTeacherAddDialogComponent, {
-      data: this.groupName
-    });
+    const dialogRef: MatDialogRef<GroupTeacherAddDialogComponent, UserListRow[]> =
+      this.dialog.open(GroupTeacherAddDialogComponent, {
+        data: this.groupName
+      });
+
+    this.teachersAddSubscription = dialogRef.afterClosed()
+      .pipe(
+        map(selectedTeachers => {
+          if (!selectedTeachers) {
+            return [];
+          }
+
+          return selectedTeachers.map(teacher => teacher.userId);
+        }),
+        switchMap(selectedTeacherIds => {
+          return this.groupService.addTeachers(this.groupName, selectedTeacherIds)
+        })
+      )
+      .subscribe();
   }
 
   onRemoveClick(teacher: UserListRow) {
 
+  }
+
+  ngOnDestroy() {
+    this.teachersAddSubscription.unsubscribe();
   }
 }
