@@ -44,7 +44,10 @@ export class StudentListComponent implements OnInit, OnDestroy {
       });
 
     this.changeDataSource$ =
-      merge(this.groupService.groupChanged$);
+      merge(
+        this.groupService.groupChanged$,
+        this.groupService.studentAdded$
+      );
   }
 
   onOptionsSetup(options: Observable<TableChangeOptions<string>>) {
