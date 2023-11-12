@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from "@angular/forms";
 import { ColumnDefinition } from "../../shared-module";
 import { BehaviorSubject, Observable, startWith } from "rxjs";
@@ -11,7 +11,7 @@ import { MatDialogRef } from "@angular/material/dialog";
   templateUrl: './list-add-dialog.component.html',
   styleUrls: ['./list-add-dialog.component.scss']
 })
-export class ListAddDialogComponent<T> {
+export class ListAddDialogComponent<T> implements OnInit {
   private dialogRef = inject(MatDialogRef<ListAddDialogComponent<T>>);
   private items: T[] = [];
   @Input() title = ''
@@ -30,11 +30,11 @@ export class ListAddDialogComponent<T> {
   }
 
   ngOnInit() {
+    this.setupForm();
+
     this.dataSource.subscribe(items => {
       this.items = items;
     });
-
-    this.setupForm();
   }
 
   onOptionSelected(event: MatAutocompleteSelectedEvent) {
