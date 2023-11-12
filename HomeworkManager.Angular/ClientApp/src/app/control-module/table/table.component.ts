@@ -59,7 +59,7 @@ export class TableComponent<T, E> implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    merge(this.sort.sortChange, this.searchClicked)
+    merge(this.sort.sortChange, this.searchClicked, this.changeDataSource)
       .subscribe(() => (this.paginator.pageIndex = 0));
 
     const tableChangeOptionsObservable =
