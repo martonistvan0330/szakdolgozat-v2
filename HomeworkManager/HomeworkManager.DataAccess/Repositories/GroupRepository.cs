@@ -207,7 +207,7 @@ public class GroupRepository : IGroupRepository
         return null;
     }
 
-    public async Task AddTeachersAsync(int courseId, string groupName, ICollection<Guid> userIds)
+    public async Task AddTeachersAsync(int courseId, string groupName, IEnumerable<Guid> userIds)
     {
         var group = await _context.Groups
             .Include(g => g.Teachers)
@@ -226,7 +226,7 @@ public class GroupRepository : IGroupRepository
         }
     }
 
-    public async Task AddStudentsAsync(int courseId, string groupName, ICollection<Guid> userIds)
+    public async Task AddStudentsAsync(int courseId, string groupName, IEnumerable<Guid> userIds)
     {
         var group = await _context.Groups
             .Include(g => g.Students)

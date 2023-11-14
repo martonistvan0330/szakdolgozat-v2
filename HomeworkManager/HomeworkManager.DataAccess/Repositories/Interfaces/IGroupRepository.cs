@@ -55,8 +55,8 @@ public interface IGroupRepository
 
     Task<Result<int, BusinessError>> CreateAsync(NewGroup newGroup, int courseId, User user);
     Task<BusinessError?> UpdateAsync(int courseId, string groupName, UpdateGroup updatedGroup, User? user = null);
-    Task AddTeachersAsync(int courseId, string groupName, ICollection<Guid> userIds);
-    Task AddStudentsAsync(int courseId, string groupName, ICollection<Guid> userIds);
+    Task AddTeachersAsync(int courseId, string groupName, IEnumerable<Guid> userIds);
+    Task AddStudentsAsync(int courseId, string groupName, IEnumerable<Guid> userIds);
     Task<bool> IsInGroupAsync(int courseId, string groupName, Guid userId);
     Task<bool> IsCreatorAsync(int courseId, string groupName, Guid userId);
     Task<bool> IsTeacherAsync(int courseId, string groupName, Guid userId);

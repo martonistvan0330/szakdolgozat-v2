@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using HomeworkManager.BusinessLogic.Managers;
+using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.DataAccess.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +17,7 @@ public class HomeworkManagerAuthorizeAttribute : AuthorizeAttribute, IAsyncAutho
             return;
         }
 
-        var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager>();
+        var userRepository = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
         var accessTokenRepository = context.HttpContext.RequestServices.GetRequiredService<IAccessTokenRepository>();
 
         var bearerToken = context.HttpContext.Request.Headers["Authorization"].First()!;
@@ -27,7 +27,9 @@ public class HomeworkManagerAuthorizeAttribute : AuthorizeAttribute, IAsyncAutho
 
         if (username is not null)
         {
-            var user = await userManager.FindByNameAsync(username);
+            var cancellationToken = context.HttpContext.RequestAborted;
+
+            var user = await userRepository.GetByUsernameAsync(username, cancellationToken);
 
             if (user is not null)
             {

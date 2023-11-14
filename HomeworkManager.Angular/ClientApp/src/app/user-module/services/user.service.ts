@@ -16,7 +16,7 @@ export class UserService {
   getUserList(options: PageableOptions | null = null) {
     let requestUrl = 'User'
 
-    if (options !== null) {
+    if (options != null) {
       requestUrl = 'User'
         + '?pageData.pageIndex=' + options.pageData?.pageIndex
         + '&pageData.pageSize=' + options.pageData?.pageSize

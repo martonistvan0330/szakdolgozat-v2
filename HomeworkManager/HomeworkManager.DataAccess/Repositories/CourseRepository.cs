@@ -1,4 +1,5 @@
-﻿using HomeworkManager.DataAccess.Repositories.Interfaces;
+﻿using System.Collections;
+using HomeworkManager.DataAccess.Repositories.Interfaces;
 using HomeworkManager.Model.Constants.Errors.Course;
 using HomeworkManager.Model.Contexts;
 using HomeworkManager.Model.CustomEntities;
@@ -174,7 +175,7 @@ public class CourseRepository : ICourseRepository
         return null;
     }
 
-    public async Task AddTeachersAsync(int courseId, ICollection<Guid> userIds)
+    public async Task AddTeachersAsync(int courseId, IEnumerable<Guid> userIds)
     {
         var course = await _context.Courses
             .Include(c => c.Teachers)
@@ -192,7 +193,7 @@ public class CourseRepository : ICourseRepository
         }
     }
 
-    public async Task AddStudentsAsync(int courseId, ICollection<Guid> userIds)
+    public async Task AddStudentsAsync(int courseId, IEnumerable<Guid> userIds)
     {
         var course = await _context.Courses
             .Include(c => c.Students)

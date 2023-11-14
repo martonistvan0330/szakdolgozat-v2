@@ -16,8 +16,8 @@ public interface IGroupManager
     Task<Result<IEnumerable<UserListRow>, BusinessError>> GetAddableStudentsAsync(int courseId, string groupName, string? username);
     Task<Result<int, BusinessError>> CreateAsync(NewGroup newGroup, int courseId, string? username);
     Task<BusinessError?> UpdateAsync(int courseId, string groupName, UpdateGroup updatedGroup, string? username);
-    Task<BusinessError?> AddTeachersAsync(int courseId, string groupName, string? username, ICollection<Guid> userIds);
-    Task<BusinessError?> AddStudentsAsync(int courseId, string groupName, string? username, ICollection<Guid> userIds);
+    Task<BusinessError?> AddTeachersAsync(int courseId, string groupName, string? username, IEnumerable<Guid> userIds);
+    Task<BusinessError?> AddStudentsAsync(int courseId, string groupName, string? username, IEnumerable<Guid> userIds);
     Task<bool> IsInGroupAsync(string groupName, int courseId, string? username);
     Task<bool> IsCreatorAsync(string groupName, int courseId, string? username);
     Task<bool> IsTeacherAsync(string groupName, int courseId, string? username);

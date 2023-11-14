@@ -1,17 +1,17 @@
 ﻿using Bogus;
-using HomeworkManager.BusinessLogic.Managers;
 using HomeworkManager.BusinessLogic.Services.Seed.Interfaces;
 using HomeworkManager.Model.Constants;
 using HomeworkManager.Model.CustomEntities.User;
 using HomeworkManager.Model.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace HomeworkManager.BusinessLogic.Services.Seed;
 
 public class UserSeedService : IUserSeedService
 {
-    private readonly UserManager _userManager;
+    private readonly UserManager<User> _userManager;
 
-    public UserSeedService(UserManager userManager)
+    public UserSeedService(UserManager<User> userManager)
     {
         _userManager = userManager;
     }

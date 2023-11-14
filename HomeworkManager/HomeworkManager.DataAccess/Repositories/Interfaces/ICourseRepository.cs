@@ -18,8 +18,8 @@ public interface ICourseRepository
     Task<IEnumerable<UserListRow>> GetStudentsAsync(int courseId);
     Task<Result<int, BusinessError>> CreateAsync(NewCourse newCourse, User user);
     Task<BusinessError?> UpdateAsync(int courseId, UpdateCourse updatedCourse, User? user = null);
-    Task AddTeachersAsync(int courseId, ICollection<Guid> userIds);
-    Task AddStudentsAsync(int courseId, ICollection<Guid> userIds);
+    Task AddTeachersAsync(int courseId, IEnumerable<Guid> userIds);
+    Task AddStudentsAsync(int courseId, IEnumerable<Guid> userIds);
     Task<bool> IsInCourseAsync(int courseId, Guid userId);
     Task<bool> IsCreatorAsync(int courseId, Guid userId);
     Task<bool> IsTeacherAsync(int courseId, Guid userId);

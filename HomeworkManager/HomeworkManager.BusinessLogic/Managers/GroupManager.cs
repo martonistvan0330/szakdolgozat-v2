@@ -6,7 +6,9 @@ using HomeworkManager.Model.Constants.Errors.Group;
 using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.Group;
 using HomeworkManager.Model.CustomEntities.User;
+using HomeworkManager.Model.Entities;
 using HomeworkManager.Model.ErrorEntities;
+using Microsoft.AspNetCore.Identity;
 
 namespace HomeworkManager.BusinessLogic.Managers;
 
@@ -16,9 +18,9 @@ public class GroupManager : IGroupManager
 
     private readonly ICourseRepository _courseRepository;
     private readonly IGroupRepository _groupRepository;
-    private readonly UserManager _userManager;
+    private readonly UserManager<User> _userManager;
 
-    public GroupManager(ICourseRepository courseRepository, IGroupRepository groupRepository, UserManager userManager)
+    public GroupManager(ICourseRepository courseRepository, IGroupRepository groupRepository, UserManager<User> userManager)
     {
         _courseRepository = courseRepository;
         _groupRepository = groupRepository;
@@ -320,7 +322,7 @@ public class GroupManager : IGroupManager
         return await _groupRepository.UpdateAsync(courseId, groupName, updatedGroup, user);
     }
 
-    public async Task<BusinessError?> AddTeachersAsync(int courseId, string groupName, string? username, ICollection<Guid> userIds)
+    public async Task<BusinessError?> AddTeachersAsync(int courseId, string groupName, string? username, IEnumerable<Guid> userIds)
     {
         if (username is null)
         {
@@ -345,7 +347,7 @@ public class GroupManager : IGroupManager
         return null;
     }
 
-    public async Task<BusinessError?> AddStudentsAsync(int courseId, string groupName, string? username, ICollection<Guid> userIds)
+    public async Task<BusinessError?> AddStudentsAsync(int courseId, string groupName, string? username, IEnumerable<Guid> userIds)
     {
         if (username is null)
         {

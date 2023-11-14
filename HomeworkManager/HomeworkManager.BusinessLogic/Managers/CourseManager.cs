@@ -1,4 +1,5 @@
-﻿using HomeworkManager.BusinessLogic.Managers.Interfaces;
+﻿using System.Collections;
+using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.DataAccess.Repositories.Interfaces;
 using HomeworkManager.Model.Constants;
 using HomeworkManager.Model.Constants.Errors.Authentication;
@@ -7,7 +8,9 @@ using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.Course;
 using HomeworkManager.Model.CustomEntities.Group;
 using HomeworkManager.Model.CustomEntities.User;
+using HomeworkManager.Model.Entities;
 using HomeworkManager.Model.ErrorEntities;
+using Microsoft.AspNetCore.Identity;
 
 namespace HomeworkManager.BusinessLogic.Managers;
 
@@ -17,13 +20,13 @@ public class CourseManager : ICourseManager
 
     private readonly ICourseRepository _courseRepository;
     private readonly IGroupRepository _groupRepository;
-    private readonly UserManager _userManager;
+    private readonly UserManager<User> _userManager;
     private readonly IUserRepository _userRepository;
 
     public CourseManager(
         ICourseRepository courseRepository,
         IGroupRepository groupRepository,
-        UserManager userManager,
+        UserManager<User> userManager,
         IUserRepository userRepository
     )
     {
@@ -257,7 +260,7 @@ public class CourseManager : ICourseManager
         return await _courseRepository.UpdateAsync(courseId, updatedCourse, user);
     }
 
-    public async Task<BusinessError?> AddTeachersAsync(int courseId, string? username, ICollection<Guid> userIds)
+    public async Task<BusinessError?> AddTeachersAsync(int courseId, string? username, IEnumerable<Guid> userIds)
     {
         if (username is null)
         {
@@ -283,7 +286,7 @@ public class CourseManager : ICourseManager
         return null;
     }
 
-    public async Task<BusinessError?> AddStudentsAsync(int courseId, string? username, ICollection<Guid> userIds)
+    public async Task<BusinessError?> AddStudentsAsync(int courseId, string? username, IEnumerable<Guid> userIds)
     {
         if (username is null)
         {

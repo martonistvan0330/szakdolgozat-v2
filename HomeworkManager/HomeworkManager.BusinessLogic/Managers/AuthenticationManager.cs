@@ -17,13 +17,13 @@ public class AuthenticationManager : IAuthenticationManager
     private readonly IEmailService _emailService;
     private readonly IJwtService _jwtService;
     private readonly ITokenService _tokenService;
-    private readonly UserManager _userManager;
+    private readonly UserManager<User> _userManager;
 
     public AuthenticationManager(
         IEmailService emailService,
         IJwtService jwtService,
         ITokenService tokenService,
-        UserManager userManager
+        UserManager<User> userManager
     )
     {
         _emailService = emailService;
@@ -174,16 +174,6 @@ public class AuthenticationManager : IAuthenticationManager
         }
     }
 
-    private async Task SendEmailConfirmationAsync(User user)
-    {
-        var confirmationToken = await _tokenService.CreateEmailConfirmationTokenAsync(user.Id);
-
-        if (confirmationToken is not null)
-        {
-            await _emailService.SendConfirmationEmailAsync(user, confirmationToken);
-        }
-    }
-    
     public async Task ResetPasswordAsync(string password, string passwordRecoveryToken)
     {
         var userId = await _tokenService.GetUserIdByPasswordRecoveryTokenAsync(passwordRecoveryToken);
@@ -200,6 +190,16 @@ public class AuthenticationManager : IAuthenticationManager
 
                 await _tokenService.RevokePasswordRecoveryTokenAsync(passwordRecoveryToken);
             }
+        }
+    }
+
+    private async Task SendEmailConfirmationAsync(User user)
+    {
+        var confirmationToken = await _tokenService.CreateEmailConfirmationTokenAsync(user.Id);
+
+        if (confirmationToken is not null)
+        {
+            await _emailService.SendConfirmationEmailAsync(user, confirmationToken);
         }
     }
 }

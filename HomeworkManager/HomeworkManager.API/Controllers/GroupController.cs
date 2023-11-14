@@ -122,7 +122,7 @@ public class GroupController : ControllerBase
 
     [HomeworkManagerAuthorize(Roles = $"{Roles.TEACHER},{Roles.ADMINISTRATOR}")]
     [HttpPost("{groupName}/Teacher/Add")]
-    public async Task<ActionResult> AddTeachersAsync(int courseId, string groupName, ICollection<Guid> userIds)
+    public async Task<ActionResult> AddTeachersAsync(int courseId, string groupName, IEnumerable<Guid> userIds)
     {
         var addError = await _groupManager.AddTeachersAsync(courseId, groupName, User.Identity?.Name, userIds);
 
@@ -136,7 +136,7 @@ public class GroupController : ControllerBase
 
     [HomeworkManagerAuthorize(Roles = $"{Roles.TEACHER},{Roles.ADMINISTRATOR}")]
     [HttpPost("{groupName}/Student/Add")]
-    public async Task<ActionResult> AddStudentsAsync(int courseId, string groupName, ICollection<Guid> userIds)
+    public async Task<ActionResult> AddStudentsAsync(int courseId, string groupName, IEnumerable<Guid> userIds)
     {
         var addError = await _groupManager.AddStudentsAsync(courseId, groupName, User.Identity?.Name, userIds);
 

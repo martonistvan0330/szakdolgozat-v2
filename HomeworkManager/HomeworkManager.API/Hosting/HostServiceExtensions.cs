@@ -1,4 +1,5 @@
-﻿using HomeworkManager.BusinessLogic.Managers;
+﻿using HomeworkManager.API.Validation;
+using HomeworkManager.BusinessLogic.Managers;
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.BusinessLogic.Services.Authentication;
 using HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
@@ -32,6 +33,7 @@ public static class HostServiceExtensions
         services.AddScoped<IEntityRepository, EntityRepository>();
         services.AddScoped<IPasswordRecoveryTokenRepository, PasswordRecoveryTokenRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         return services;
     }
@@ -42,18 +44,28 @@ public static class HostServiceExtensions
         services.AddScoped<ICourseManager, CourseManager>();
         services.AddScoped<IEntityManager, EntityManager>();
         services.AddScoped<IGroupManager, GroupManager>();
-        services.AddScoped<UserManager>();
+        services.AddScoped<IRoleManager, RoleManager>();
+        services.AddScoped<IUserManager, UserManager>();
         return services;
     }
 
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
+        services.AddTransient<ICurrentUserService, CurrentUserService>();
         services.AddTransient<IEmailService, EmailService>();
         services.AddTransient<IHashingService, HashingService>();
         services.AddTransient<IJwtService, JwtService>();
         services.AddTransient<IRoleSeedService, RoleSeedService>();
         services.AddTransient<ITokenService, TokenService>();
         services.AddTransient<IUserSeedService, UserSeedService>();
+        return services;
+    }
+
+    public static IServiceCollection AddValidators(this IServiceCollection services)
+    {
+        services.AddScoped<EmailValidator>();
+        services.AddScoped<RoleValidator>();
+        services.AddScoped<UserIdValidator>();
         return services;
     }
 }
