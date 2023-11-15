@@ -1,4 +1,6 @@
-﻿using HomeworkManager.API.Validation;
+﻿using FluentValidation;
+using HomeworkManager.API.Validation;
+using HomeworkManager.API.Validation.Authentication;
 using HomeworkManager.BusinessLogic.Managers;
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.BusinessLogic.Services.Authentication;
@@ -10,6 +12,8 @@ using HomeworkManager.BusinessLogic.Services.Seed.Interfaces;
 using HomeworkManager.DataAccess.Repositories;
 using HomeworkManager.DataAccess.Repositories.Interfaces;
 using HomeworkManager.Model.Configurations;
+using HomeworkManager.Model.CustomEntities.Authentication;
+using HomeworkManager.Model.CustomEntities.User;
 using HomeworkManager.Shared.Services;
 using HomeworkManager.Shared.Services.Interfaces;
 
@@ -63,7 +67,15 @@ public static class HostServiceExtensions
 
     public static IServiceCollection AddValidators(this IServiceCollection services)
     {
+        services.AddScoped<AbstractValidator<EmailConfirmationRequest>, EmailConfirmationRequestValidator>();
+        services.AddScoped<AbstractValidator<NewUser>, NewUserValidator>();
+        services.AddScoped<AbstractValidator<PasswordRecoveryRequest>, PasswordRecoveryRequestValidator>();
+        services.AddScoped<AbstractValidator<PasswordResetRequest>, PasswordResetRequestValidator>();
+        services.AddScoped<AbstractValidator<RefreshRequest>, RefreshRequestValidator>();
+        services.AddScoped<AbstractValidator<RevokeRequest>, RevokeRequestValidator>();
+
         services.AddScoped<EmailValidator>();
+        services.AddScoped<PasswordValidator>();
         services.AddScoped<RoleValidator>();
         services.AddScoped<UserIdValidator>();
         return services;

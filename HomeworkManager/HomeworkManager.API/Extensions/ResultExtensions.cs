@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using FluentResults;
+﻿using FluentResults;
 using HomeworkManager.Model.Constants.Errors;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeworkManager.API.Extensions;
@@ -17,7 +15,7 @@ public static class ResultExtensions
 
         return result.Errors.ToActionResult();
     }
-    
+
     public static ActionResult<T> ToActionResult<T>(this Result<T> result)
     {
         if (result.IsSuccess)
@@ -38,6 +36,11 @@ public static class ResultExtensions
             })
             .ToHashSet();
 
+        if (errorCodes.Contains(ErrorCodes.APPLICATION_ERROR))
+        {
+            throw new ApplicationException(errors.ToMessage());
+        }
+
         if (errorCodes.Contains(ErrorCodes.FORBIDDEN))
         {
             return new ForbidResult();
@@ -50,9 +53,14 @@ public static class ResultExtensions
 
         return new BadRequestObjectResult(errors.ToMessages());
     }
-    
+
     private static IEnumerable<string> ToMessages(this IEnumerable<IError> errors)
     {
         return errors.Select(e => e.Message).ToList();
+    }
+
+    private static string ToMessage(this IEnumerable<IError> errors, string separator = "\n")
+    {
+        return string.Join(separator, errors.ToMessages());
     }
 }

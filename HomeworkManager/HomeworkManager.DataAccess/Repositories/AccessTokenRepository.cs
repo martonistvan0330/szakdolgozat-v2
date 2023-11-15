@@ -17,47 +17,42 @@ public class AccessTokenRepository : IAccessTokenRepository
         _hashingService = hashingService;
     }
 
-    public async Task<AccessToken?> GetAsync(string accessToken, Guid userId)
+    public async Task<AccessToken?> GetAsync(string accessToken, Guid userId, CancellationToken cancellationToken = default)
     {
         var accessTokenHash = await _hashingService.GetHashString(accessToken);
 
         return await _context.AccessTokens
             .Where(rt => rt.TokenHash == accessTokenHash
                          && rt.UserId == userId)
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
     }
 
-    public async Task CreateAsync(string accessToken, string refreshToken, Guid userId)
+    public async Task<AccessToken> CreateAsync(string accessToken, Guid userId, CancellationToken cancellationToken = default)
     {
         var accessTokenHash = await _hashingService.GetHashString(accessToken);
-        var refreshTokenHash = await _hashingService.GetHashString(refreshToken);
-
+        
         AccessToken dbAccessToken = new()
         {
             TokenHash = accessTokenHash,
             UserId = userId
         };
 
-        dbAccessToken.RefreshToken = new RefreshToken
-        {
-            TokenHash = refreshTokenHash,
-            AccessToken = dbAccessToken
-        };
-
         _context.AccessTokens.Add(dbAccessToken);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return dbAccessToken;
     }
 
-    public async Task<AccessToken?> RevokeAsync(string accessToken, Guid userId)
+    public async Task<AccessToken?> RevokeAsync(string accessToken, Guid userId, CancellationToken cancellationToken = default)
     {
-        var dbAccessToken = await GetAsync(accessToken, userId);
+        var dbAccessToken = await GetAsync(accessToken, userId, cancellationToken);
 
         if (dbAccessToken is not null)
         {
             dbAccessToken.IsActive = false;
         }
 
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         return dbAccessToken;
     }

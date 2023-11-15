@@ -1,8 +1,10 @@
 ﻿using System.Net;
 using System.Net.Mail;
 using System.Text;
+using FluentResults;
 using HomeworkManager.BusinessLogic.Services.Email.Interfaces;
 using HomeworkManager.Model.Configurations;
+using HomeworkManager.Model.CustomEntities.User;
 using HomeworkManager.Model.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -29,28 +31,28 @@ public class EmailService : IEmailService
         };
     }
 
-    public async Task SendConfirmationEmailAsync(User user, string token)
+    public async Task<Result> SendConfirmationEmailAsync(UserModel userModel, string token, CancellationToken cancellationToken = default)
     {
         var subject = "Confirm Email";
         var body = $"""
                     <a href="{_configuration["WebApiUrl"]}/email-confirmation?token={token}">Confirm</a> your email.
                     """;
-        await SendEmailAsync(user, subject, body);
+        return await SendEmailAsync(userModel, subject, body, cancellationToken);
     }
 
-    public async Task SendPasswordRecoveryEmailAsync(User user, string token)
+    public async Task<Result> SendPasswordRecoveryEmailAsync(UserModel userModel, string token, CancellationToken cancellationToken = default)
     {
         var subject = "Password Recovery";
         var body = $"""
                     <a href="{_configuration["WebApiUrl"]}/password-reset?token={token}">Recover your password.</a>
                     """;
-        await SendEmailAsync(user, subject, body);
+        return await SendEmailAsync(userModel, subject, body, cancellationToken);
     }
 
-    private async Task SendEmailAsync(User user, string subject, string body)
+    private async Task<Result> SendEmailAsync(UserModel userModel, string subject, string body, CancellationToken cancellationToken = default)
     {
         MailAddress from = new(_smtpConfiguration.SenderAddress, _smtpConfiguration.SenderName, Encoding.UTF8);
-        MailAddress to = new(user.Email!);
+        MailAddress to = new(userModel.Email);
 
         MailMessage message = new(from, to);
         message.Subject = subject;
@@ -59,6 +61,8 @@ public class EmailService : IEmailService
         message.IsBodyHtml = true;
         message.BodyEncoding = Encoding.UTF8;
 
-        await _smtpClient.SendMailAsync(message);
+        await _smtpClient.SendMailAsync(message, cancellationToken);
+
+        return Result.Ok();
     }
 }

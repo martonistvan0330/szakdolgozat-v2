@@ -18,9 +18,9 @@ public class GroupManager : IGroupManager
 
     private readonly ICourseRepository _courseRepository;
     private readonly IGroupRepository _groupRepository;
-    private readonly UserManager<User> _userManager;
+    private readonly IUserManager _userManager;
 
-    public GroupManager(ICourseRepository courseRepository, IGroupRepository groupRepository, UserManager<User> userManager)
+    public GroupManager(ICourseRepository courseRepository, IGroupRepository groupRepository, IUserManager userManager)
     {
         _courseRepository = courseRepository;
         _groupRepository = groupRepository;

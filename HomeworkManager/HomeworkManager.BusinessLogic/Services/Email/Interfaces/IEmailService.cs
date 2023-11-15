@@ -1,9 +1,11 @@
-﻿using HomeworkManager.Model.Entities;
+﻿using FluentResults;
+using HomeworkManager.Model.CustomEntities.User;
+using HomeworkManager.Model.Entities;
 
 namespace HomeworkManager.BusinessLogic.Services.Email.Interfaces;
 
 public interface IEmailService
 {
-    Task SendConfirmationEmailAsync(User user, string token);
-    Task SendPasswordRecoveryEmailAsync(User user, string token);
+    Task<Result> SendConfirmationEmailAsync(UserModel userModel, string token, CancellationToken cancellationToken = default);
+    Task<Result> SendPasswordRecoveryEmailAsync(UserModel userModel, string token, CancellationToken cancellationToken = default);
 }

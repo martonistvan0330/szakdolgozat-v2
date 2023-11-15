@@ -34,4 +34,5 @@ public interface IUserRepository
 
     Task<IEnumerable<string>> GetRoleNamesToAdd(Guid userId, IEnumerable<int> roleIds, CancellationToken cancellationToken = default);
     Task<IEnumerable<string>> GetRoleNamesToRemove(Guid userId, IEnumerable<int> roleIds, CancellationToken cancellationToken = default);
+    Task<bool> ConfirmEmailAsync(Guid userId, CancellationToken cancellationToken = default);
 }

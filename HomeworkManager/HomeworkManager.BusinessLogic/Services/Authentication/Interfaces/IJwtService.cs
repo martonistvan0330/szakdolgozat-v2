@@ -1,12 +1,12 @@
-﻿using HomeworkManager.Model.CustomEntities;
+﻿using FluentResults;
 using HomeworkManager.Model.CustomEntities.Authentication;
+using HomeworkManager.Model.CustomEntities.User;
 using HomeworkManager.Model.Entities;
-using HomeworkManager.Model.ErrorEntities;
 
 namespace HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
 
 public interface IJwtService
 {
-    Task<AuthenticationResponse> CreateTokensAsync(User user);
-    Task<Result<AuthenticationResponse, BusinessError>> RefreshTokensAsync(string accessToken, string refreshToken);
+    Task<Result<AuthenticationResponse>> CreateTokensAsync(UserModel userModel, CancellationToken cancellationToken = default);
+    Task<Result<AuthenticationResponse>> RefreshTokensAsync(RefreshRequest refreshRequest, CancellationToken cancellationToken = default);
 }

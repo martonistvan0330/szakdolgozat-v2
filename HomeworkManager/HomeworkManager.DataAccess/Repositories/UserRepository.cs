@@ -143,6 +143,21 @@ public class UserRepository : IUserRepository
         var roleNames = await GetRoleNames(roleIds, cancellationToken);
         return currentRoleNames.Except(roleNames);
     }
+    
+    public async Task<bool> ConfirmEmailAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var user = await GetByIdAsync(userId, cancellationToken);
+
+        if (user is null || user.EmailConfirmed)
+        {
+            return false;
+        }
+
+        user.EmailConfirmed = true;
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return true;
+    }
 
     private async Task<IEnumerable<string>> GetCurrentRoleNames(Guid userId, CancellationToken cancellationToken = default)
     {

@@ -38,7 +38,7 @@ public class UserController : ControllerBase
     [HttpGet("Authenticate")]
     public async Task<ActionResult<UserModel>> Authenticate(CancellationToken cancellationToken = default)
     {
-        return await _userManager.GetCurrentUserModelAsync(cancellationToken);
+        return await _userManager.GetCurrentModelAsync(cancellationToken);
     }
 
     [HttpGet("{userId:guid}")]
@@ -56,7 +56,7 @@ public class UserController : ControllerBase
             return validationResult.ToActionResult();
         }
 
-        var userModelResult = await _userManager.GetByIdAsync(userId, cancellationToken);
+        var userModelResult = await _userManager.GetModelByIdAsync(userId, cancellationToken);
 
         return userModelResult.ToActionResult();
     }

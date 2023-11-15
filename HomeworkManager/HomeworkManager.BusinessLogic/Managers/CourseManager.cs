@@ -20,13 +20,13 @@ public class CourseManager : ICourseManager
 
     private readonly ICourseRepository _courseRepository;
     private readonly IGroupRepository _groupRepository;
-    private readonly UserManager<User> _userManager;
+    private readonly IUserManager _userManager;
     private readonly IUserRepository _userRepository;
 
     public CourseManager(
         ICourseRepository courseRepository,
         IGroupRepository groupRepository,
-        UserManager<User> userManager,
+        IUserManager userManager,
         IUserRepository userRepository
     )
     {
