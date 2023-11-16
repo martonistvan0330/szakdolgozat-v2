@@ -130,6 +130,27 @@ public class UserRepository : IUserRepository
         return await GetModelAsync(u => u.UserName == username, cancellationToken);
     }
 
+    public async Task<bool> HasRoleByIdAsync(string roleName, Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Users
+            .Where(u => u.Id == userId)
+            .Join
+            (
+                _context.UserRoles,
+                u => u.Id,
+                ur => ur.UserId,
+                (u, ur) => ur.RoleId
+            )
+            .Join
+            (
+                _context.Roles,
+                roleId => roleId,
+                r => r.Id,
+                (roleId, r) => r.Name
+            )
+            .ContainsAsync(roleName, cancellationToken);
+    }
+
     public async Task<IEnumerable<string>> GetRoleNamesToAdd(Guid userId, IEnumerable<int> roleIds, CancellationToken cancellationToken = default)
     {
         var currentRoleNames = await GetCurrentRoleNames(userId, cancellationToken);

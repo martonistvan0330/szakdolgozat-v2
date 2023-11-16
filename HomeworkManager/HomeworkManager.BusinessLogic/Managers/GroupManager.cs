@@ -55,7 +55,7 @@ public class GroupManager : IGroupManager
     {
         IEnumerable<GroupListRow> groups;
 
-        if (await _userManager.CurrentUserHasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
+        if (await _currentUserService.HasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
         {
             groups = await _groupRepository.GetAllAsync(courseId, cancellationToken);
         }
@@ -78,7 +78,7 @@ public class GroupManager : IGroupManager
     {
         GroupModel? group;
 
-        if (await _userManager.CurrentUserHasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
+        if (await _currentUserService.HasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
         {
             group = await _groupRepository.GetModelAsync(courseId, groupName, cancellationToken);
         }
@@ -225,7 +225,7 @@ public class GroupManager : IGroupManager
 
     public async Task<Result> UpdateAsync(int courseId, string groupName, UpdatedGroup updatedGroup, CancellationToken cancellationToken = default)
     {
-        if (await _userManager.CurrentUserHasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
+        if (await _currentUserService.HasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
         {
             return await _groupRepository.UpdateAsync(courseId, groupName, updatedGroup, cancellationToken);
         }

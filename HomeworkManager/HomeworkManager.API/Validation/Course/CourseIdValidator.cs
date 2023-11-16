@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
+using HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
 using HomeworkManager.Model.Constants;
 using HomeworkManager.Model.Constants.Errors;
 using HomeworkManager.Model.Constants.Errors.Course;
@@ -8,7 +9,7 @@ namespace HomeworkManager.API.Validation.Course;
 
 public class CourseIdValidator : AbstractValidator<int>
 {
-    public CourseIdValidator(ICourseManager courseManager, IUserManager userManager)
+    public CourseIdValidator(ICourseManager courseManager, ICurrentUserService currentUserService)
     {
         RuleFor(x => x)
             .MustAsync(async (userId, cancellationToken) =>
@@ -18,7 +19,7 @@ public class CourseIdValidator : AbstractValidator<int>
         RuleFor(x => x)
             .MustAsync(async (courseId, cancellationToken) =>
             {
-                if (await userManager.CurrentUserHasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
+                if (await currentUserService.HasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
                 {
                     return true;
                 }
@@ -32,7 +33,7 @@ public class CourseIdValidator : AbstractValidator<int>
             RuleFor(x => x)
                 .MustAsync(async (courseId, cancellationToken) =>
                 {
-                    if (await userManager.CurrentUserHasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
+                    if (await currentUserService.HasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
                     {
                         return true;
                     }
@@ -47,7 +48,7 @@ public class CourseIdValidator : AbstractValidator<int>
             RuleFor(x => x)
                 .MustAsync(async (courseId, cancellationToken) =>
                 {
-                    if (await userManager.CurrentUserHasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
+                    if (await currentUserService.HasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
                     {
                         return true;
                     }

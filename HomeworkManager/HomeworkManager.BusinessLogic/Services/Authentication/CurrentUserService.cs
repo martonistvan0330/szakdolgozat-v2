@@ -59,6 +59,13 @@ public class CurrentUserService : ICurrentUserService
         return userModel;
     }
 
+    public async Task<bool> HasRoleAsync(string roleName, CancellationToken cancellationToken = default)
+    {
+        var userId = await GetIdAsync(cancellationToken);
+
+        return await _userRepository.HasRoleByIdAsync(roleName, userId, cancellationToken);
+    }
+    
     private string GetUsername()
     {
         var username = _httpContextAccessor.HttpContext.User.Identity?.Name;

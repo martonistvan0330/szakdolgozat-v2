@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
+using HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
 using HomeworkManager.Model.Constants;
 using HomeworkManager.Model.Constants.Errors;
 using HomeworkManager.Model.Constants.Errors.Group;
@@ -8,7 +9,7 @@ namespace HomeworkManager.API.Validation.Group;
 
 public class GroupNameValidator : AbstractValidator<string>
 {
-    public GroupNameValidator(int courseId, IGroupManager groupManager, IUserManager userManager)
+    public GroupNameValidator(int courseId, IGroupManager groupManager, ICurrentUserService currentUserService)
     {
         RuleFor(x => x)
             .MustAsync(async (groupName, cancellationToken) =>
@@ -18,7 +19,7 @@ public class GroupNameValidator : AbstractValidator<string>
         RuleFor(x => x)
             .MustAsync(async (groupName, cancellationToken) =>
             {
-                if (await userManager.CurrentUserHasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
+                if (await currentUserService.HasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
                 {
                     return true;
                 }
@@ -32,7 +33,7 @@ public class GroupNameValidator : AbstractValidator<string>
             RuleFor(x => x)
                 .MustAsync(async (groupName, cancellationToken) =>
                 {
-                    if (await userManager.CurrentUserHasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
+                    if (await currentUserService.HasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
                     {
                         return true;
                     }
@@ -47,7 +48,7 @@ public class GroupNameValidator : AbstractValidator<string>
             RuleFor(x => x)
                 .MustAsync(async (groupName, cancellationToken) =>
                 {
-                    if (await userManager.CurrentUserHasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
+                    if (await currentUserService.HasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
                     {
                         return true;
                     }

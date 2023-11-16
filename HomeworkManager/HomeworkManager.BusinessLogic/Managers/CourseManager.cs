@@ -62,7 +62,7 @@ public class CourseManager : ICourseManager
     {
         CourseModel? courseModel;
         
-        if (await _userManager.CurrentUserHasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
+        if (await _currentUserService.HasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
         {
             courseModel = await _courseRepository.GetModelAsync(courseId, cancellationToken);
         }
@@ -85,7 +85,7 @@ public class CourseManager : ICourseManager
     {
         IEnumerable<CourseCard> courseCards;
 
-        if (await _userManager.CurrentUserHasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
+        if (await _currentUserService.HasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
         {
             courseCards = await _courseRepository.GetAllAsync(cancellationToken);
         }
@@ -169,7 +169,7 @@ public class CourseManager : ICourseManager
 
     public async Task<Result> UpdateAsync(int courseId, UpdatedCourse updatedCourse, CancellationToken cancellationToken = default)
     {
-        if (await _userManager.CurrentUserHasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
+        if (await _currentUserService.HasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
         {
             return await _courseRepository.UpdateAsync(courseId, updatedCourse, cancellationToken);
         }
