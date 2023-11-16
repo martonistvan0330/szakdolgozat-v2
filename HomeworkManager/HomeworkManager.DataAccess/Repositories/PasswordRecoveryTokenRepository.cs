@@ -40,9 +40,9 @@ public class PasswordRecoveryTokenRepository : IPasswordRecoveryTokenRepository
         _context.PasswordRecoveryTokens.Add(newPasswordRecoveryToken);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return dbPasswordRecoveryToken;
+        return newPasswordRecoveryToken;
     }
-    
+
     public async Task RevokeAsync(string passwordRecoveryToken, CancellationToken cancellationToken = default)
     {
         var dbPasswordRecoveryToken = await _context.PasswordRecoveryTokens
@@ -52,10 +52,10 @@ public class PasswordRecoveryTokenRepository : IPasswordRecoveryTokenRepository
         if (dbPasswordRecoveryToken is not null)
         {
             dbPasswordRecoveryToken.IsActive = false;
-            await _context.SaveChangesAsync(cancellationToken);            
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
-    
+
     private async Task<PasswordRecoveryToken?> GetActiveByUserAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.PasswordRecoveryTokens

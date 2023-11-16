@@ -48,16 +48,11 @@ public class UserManager : IUserManager
         return !await _userRepository.ExistsByEmailAsync(email, cancellationToken);
     }
 
-    public async Task<Guid> GetCurrentUserIdAsync(CancellationToken cancellationToken = default)
-    {
-        return await _currentUserService.GetIdAsync(cancellationToken);
-    }
-
     public async Task<UserModel> GetCurrentModelAsync(CancellationToken cancellationToken = default)
     {
         return await _currentUserService.GetModelAsync(cancellationToken);
     }
-    
+
     public async Task<Result<UserModel>> GetModelByIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         var userModel = await _userRepository.GetModelByIdAsync(userId, cancellationToken);
@@ -76,11 +71,13 @@ public class UserManager : IUserManager
             : userModel;
     }
 
-    public async Task<bool> CurrentUserHasRoleAsync(string role, CancellationToken cancellationToken = default)
+    public async Task<Result<UserModel>> GetModelByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
-        var currentUser = await _currentUserService.GetAsync(cancellationToken);
+        var userModel = await _userRepository.GetModelByEmailAsync(email, cancellationToken);
 
-        return await _identityUserManager.IsInRoleAsync(currentUser, role);
+        return userModel is null
+            ? new NotFoundError(UserErrorMessages.USER_WITH_NAME_NOT_FOUND)
+            : userModel;
     }
 
     public async Task<Pageable<UserListRow>> GetAllAsync(PageableOptions options, CancellationToken cancellationToken = default)
@@ -107,7 +104,8 @@ public class UserManager : IUserManager
         };
     }
 
-    public async Task<Result<UserModel>> CheckPasswordAsync(AuthenticationRequest authenticationRequest, CancellationToken cancellationToken = default)
+    public async Task<Result<UserModel>> CheckPasswordAsync(AuthenticationRequest authenticationRequest,
+        CancellationToken cancellationToken = default)
     {
         var user = await _userRepository.GetByUsernameAsync(authenticationRequest.Username, cancellationToken);
 
@@ -127,10 +125,10 @@ public class UserManager : IUserManager
         {
             return new ApplicationError(UserErrorMessages.USER_WITH_ID_NOT_FOUND);
         }
-            
+
         return userModel;
     }
-    
+
     public async Task<Result<UserModel>> CreateAsync(NewUser newUser, CancellationToken cancellationToken = default)
     {
         User user = new()
@@ -141,7 +139,7 @@ public class UserManager : IUserManager
             UserName = newUser.Username,
             Email = newUser.Email
         };
-        
+
         using (var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
             var createResult = await _identityUserManager.CreateAsync(user, newUser.Password);
@@ -157,17 +155,17 @@ public class UserManager : IUserManager
             {
                 return new ApplicationError(UserErrorMessages.ROLE_ADD_FAILED);
             }
-        
-            transactionScope.Complete();            
+
+            transactionScope.Complete();
         }
-        
+
         var userModel = await _userRepository.GetModelByIdAsync(user.Id, cancellationToken);
 
         if (userModel is null)
         {
             return new ApplicationError(UserErrorMessages.CREATE_FAILED);
         }
-        
+
         return userModel;
     }
 
@@ -179,7 +177,7 @@ public class UserManager : IUserManager
         {
             return new NotFoundError(UserErrorMessages.USER_WITH_ID_NOT_FOUND);
         }
-        
+
         var passwordHash = _identityUserManager.PasswordHasher.HashPassword(user, password);
         user.PasswordHash = passwordHash;
         var passwordUpdateResult = await _identityUserManager.UpdateAsync(user);
@@ -203,7 +201,7 @@ public class UserManager : IUserManager
 
         return Result.Ok();
     }
-    
+
     public async Task<Result> UpdateRoles(Guid userId, ICollection<int> roleIds, CancellationToken cancellationToken = default)
     {
         var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
@@ -217,14 +215,26 @@ public class UserManager : IUserManager
         var rolesToAdd = await _userRepository.GetRoleNamesToAdd(userId, roleIds, cancellationToken);
 
         using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        
+
         await _identityUserManager.RemoveFromRolesAsync(user, rolesToRemove);
         await _identityUserManager.AddToRolesAsync(user, rolesToAdd);
 
         await _userRepository.RevokeAccessTokensAsync(userId, cancellationToken);
-        
+
         transactionScope.Complete();
 
         return Result.Ok();
+    }
+
+    public async Task<Guid> GetCurrentUserIdAsync(CancellationToken cancellationToken = default)
+    {
+        return await _currentUserService.GetIdAsync(cancellationToken);
+    }
+
+    public async Task<bool> CurrentUserHasRoleAsync(string role, CancellationToken cancellationToken = default)
+    {
+        var currentUser = await _currentUserService.GetAsync(cancellationToken);
+
+        return await _identityUserManager.IsInRoleAsync(currentUser, role);
     }
 }

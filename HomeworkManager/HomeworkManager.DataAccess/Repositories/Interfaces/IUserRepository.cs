@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.User;
 using HomeworkManager.Model.Entities;
@@ -17,6 +16,7 @@ public interface IUserRepository
     Task<Guid?> GetIdByUsernameAsync(string username, CancellationToken cancellationToken = default);
     Task<UserModel?> GetModelByIdAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<UserModel?> GetModelByUsernameAsync(string username, CancellationToken cancellationToken = default);
+    Task<UserModel?> GetModelByEmailAsync(string email, CancellationToken cancellationToken = default);
 
     Task<IEnumerable<UserListRow>> GetAllModelsAsync(PageData? pageData = null, CancellationToken cancellationToken = default)
     {

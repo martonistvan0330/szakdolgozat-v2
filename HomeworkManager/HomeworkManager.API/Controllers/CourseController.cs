@@ -17,14 +17,14 @@ public class CourseController : ControllerBase
 {
     private readonly CourseIdValidator _courseIdValidator;
     private readonly ICourseManager _courseManager;
-    private readonly NewCourseValidator _newCourseValidator;
+    private readonly AbstractValidator<NewCourse> _newCourseValidator;
     private readonly UpdatedCourseValidator _updatedCourseValidator;
 
     public CourseController
     (
         CourseIdValidator courseIdValidator,
         ICourseManager courseManager,
-        NewCourseValidator newCourseValidator,
+        AbstractValidator<NewCourse> newCourseValidator,
         UpdatedCourseValidator updatedCourseValidator
     )
     {
@@ -57,7 +57,7 @@ public class CourseController : ControllerBase
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         var getResult = await _courseManager.GetModelAsync(courseId, cancellationToken);
 
         return getResult.ToActionResult();
@@ -72,7 +72,7 @@ public class CourseController : ControllerBase
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         var getTeachersResult = await _courseManager.GetTeachersAsync(courseId, cancellationToken);
 
         return getTeachersResult.ToActionResult();
@@ -87,12 +87,12 @@ public class CourseController : ControllerBase
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         var getStudentsResult = await _courseManager.GetStudentsAsync(courseId, cancellationToken);
 
         return getStudentsResult.ToActionResult();
     }
-    
+
     [HomeworkManagerAuthorize(Roles = $"{Roles.TEACHER},{Roles.ADMINISTRATOR}")]
     [HttpGet("{courseId:int}/Teacher/Addable")]
     public async Task<ActionResult<IEnumerable<UserListRow>>> GetAddableTeachersAsync(int courseId, CancellationToken cancellationToken)
@@ -108,7 +108,7 @@ public class CourseController : ControllerBase
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         var getTeachersResult = await _courseManager.GetAddableTeachersAsync(courseId, cancellationToken);
 
         return getTeachersResult.ToActionResult();
@@ -122,12 +122,12 @@ public class CourseController : ControllerBase
             courseId,
             options => { options.IncludeRuleSets("Default", "IsTeacher"); },
             cancellationToken);
-        
+
         if (!courseIdValidationResult.IsValid)
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         var getStudentsResult = await _courseManager.GetAddableStudentsAsync(courseId, cancellationToken);
 
         return getStudentsResult.ToActionResult();
@@ -143,7 +143,7 @@ public class CourseController : ControllerBase
         {
             return newCourseValidationResult.ToActionResult();
         }
-        
+
         var createResult = await _courseManager.CreateAsync(newCourse, cancellationToken);
 
         return createResult.ToActionResult();
@@ -157,21 +157,21 @@ public class CourseController : ControllerBase
             courseId,
             options => { options.IncludeRuleSets("Default", "IsCreator"); },
             cancellationToken);
-        
+
         if (!courseIdValidationResult.IsValid)
         {
             return courseIdValidationResult.ToActionResult();
         }
 
         _updatedCourseValidator.CourseId = courseId;
-        
+
         var updatedCourseValidationResult = await _updatedCourseValidator.ValidateAsync(updatedCourse, cancellationToken);
 
         if (!updatedCourseValidationResult.IsValid)
         {
             return updatedCourseValidationResult.ToActionResult();
         }
-        
+
         var updateResult = await _courseManager.UpdateAsync(courseId, updatedCourse, cancellationToken);
 
         return updateResult.ToActionResult();
@@ -185,12 +185,12 @@ public class CourseController : ControllerBase
             courseId,
             options => { options.IncludeRuleSets("Default", "IsCreator"); },
             cancellationToken);
-        
+
         if (!courseIdValidationResult.IsValid)
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         var addResult = await _courseManager.AddTeachersAsync(courseId, userIds, cancellationToken);
 
         return addResult.ToActionResult();
@@ -204,12 +204,12 @@ public class CourseController : ControllerBase
             courseId,
             options => { options.IncludeRuleSets("Default", "IsTeacher"); },
             cancellationToken);
-        
+
         if (!courseIdValidationResult.IsValid)
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         var addResult = await _courseManager.AddStudentsAsync(courseId, userIds, cancellationToken);
 
         return addResult.ToActionResult();

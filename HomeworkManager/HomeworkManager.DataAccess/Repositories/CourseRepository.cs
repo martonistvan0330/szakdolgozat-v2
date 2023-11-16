@@ -18,14 +18,14 @@ public class CourseRepository : ICourseRepository
     {
         _context = context;
     }
-    
+
     public async Task<bool> ExistsWithIdAsync(int courseId, CancellationToken cancellationToken = default)
     {
         return await _context.Courses
             .Where(c => c.CourseId == courseId)
             .AnyAsync(cancellationToken);
     }
-    
+
     public async Task<bool> ExistsWithNameAsync(string name, CancellationToken cancellationToken = default)
     {
         return await _context.Courses
@@ -40,14 +40,14 @@ public class CourseRepository : ICourseRepository
             .Select(c => c.Name)
             .SingleOrDefaultAsync(cancellationToken);
     }
-    
+
     public async Task<Course?> GetByIdAsync(int courseId, CancellationToken cancellationToken = default)
     {
         return await _context.Courses
             .Where(c => c.CourseId == courseId)
             .SingleOrDefaultAsync(cancellationToken);
     }
-    
+
     public async Task<CourseModel?> GetModelAsync(int courseId, CancellationToken cancellationToken = default)
     {
         return await _context.Courses
@@ -65,7 +65,7 @@ public class CourseRepository : ICourseRepository
     {
         return await _context.Courses
             .Where(c => c.CourseId == courseId)
-            .Where(c => c.Teachers.Select(u => u.Id).Contains(userId) 
+            .Where(c => c.Teachers.Select(u => u.Id).Contains(userId)
                         || c.Students.Select(u => u.Id).Contains(userId))
             .Select(c => new CourseModel
             {
@@ -89,16 +89,27 @@ public class CourseRepository : ICourseRepository
 
     public async Task<IEnumerable<CourseCard>> GetAllAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        return await _context.Courses
-            .Where(c => c.Teachers.Select(u => u.Id).Contains(userId)
-                        || c.Students.Select(u => u.Id).Contains(userId))
+        var managedCourses = await _context.Users
+            .Where(u => u.Id == userId)
+            .SelectMany(u => u.ManagedCourses)
             .Select(c => new CourseCard
             {
                 CourseId = c.CourseId,
                 Name = c.Name
             })
-            .DistinctBy(c => c.CourseId)
             .ToListAsync(cancellationToken);
+        
+        var attendedCourses = await _context.Users
+            .Where(u => u.Id == userId)
+            .SelectMany(u => u.AttendedCourses)
+            .Select(c => new CourseCard
+            {
+                CourseId = c.CourseId,
+                Name = c.Name
+            })
+            .ToListAsync(cancellationToken);
+
+        return managedCourses.UnionBy(attendedCourses, c => c.CourseId);
     }
 
     public async Task<IEnumerable<UserListRow>> GetTeachersAsync(int courseId, CancellationToken cancellationToken = default)
@@ -157,7 +168,7 @@ public class CourseRepository : ICourseRepository
         {
             return new BusinessError(CourseErrorMessages.COURSE_NOT_FOUND);
         }
-        
+
         return await UpdateAsync(course, updatedCourse, cancellationToken);
     }
 
@@ -169,23 +180,13 @@ public class CourseRepository : ICourseRepository
         {
             return new BusinessError(CourseErrorMessages.COURSE_NOT_FOUND);
         }
-        
+
         if (course.CreatorId != userId)
         {
             return new ForbiddenError();
         }
 
         return await UpdateAsync(course, updatedCourse, cancellationToken);
-    }
-
-    private async Task<Result> UpdateAsync(Course course, UpdatedCourse updatedCourse,CancellationToken cancellationToken = default)
-    {
-        course.Name = updatedCourse.Name;
-        course.Description = updatedCourse.Description;
-
-        await _context.SaveChangesAsync(cancellationToken);
-
-        return Result.Ok();
     }
 
     public async Task<Result> AddTeachersAsync(int courseId, IEnumerable<Guid> userIds, CancellationToken cancellationToken = default)
@@ -222,7 +223,7 @@ public class CourseRepository : ICourseRepository
         {
             return new NotFoundError(CourseErrorMessages.COURSE_NOT_FOUND);
         }
-        
+
         var students = await _context.Users
             .Where(u => userIds.Contains(u.Id))
             .ToListAsync(cancellationToken);
@@ -256,5 +257,15 @@ public class CourseRepository : ICourseRepository
             .Where(c => c.CourseId == courseId)
             .SelectMany(c => c.Teachers.Select(u => u.Id))
             .ContainsAsync(userId, cancellationToken);
+    }
+
+    private async Task<Result> UpdateAsync(Course course, UpdatedCourse updatedCourse, CancellationToken cancellationToken = default)
+    {
+        course.Name = updatedCourse.Name;
+        course.Description = updatedCourse.Description;
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Result.Ok();
     }
 }

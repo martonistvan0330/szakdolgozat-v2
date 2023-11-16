@@ -71,7 +71,7 @@ public class AuthenticationManager : IAuthenticationManager
         CancellationToken cancellationToken = default)
     {
         var userResult = await _userManager.CheckPasswordAsync(authenticationRequest, cancellationToken);
-        
+
         if (!userResult.IsSuccess)
         {
             return userResult.ToResult();
@@ -91,7 +91,6 @@ public class AuthenticationManager : IAuthenticationManager
 
     public async Task<Result> Logout(RevokeRequest tokens, CancellationToken cancellationToken = default)
     {
-
         var userId = await _currentUserService.GetIdAsync(cancellationToken);
 
         return await _tokenService.RevokeTokensAsync(tokens.AccessToken, tokens.RefreshToken, userId, cancellationToken);
@@ -100,7 +99,7 @@ public class AuthenticationManager : IAuthenticationManager
     public async Task<Result> ResendEmailConfirmationAsync(CancellationToken cancellationToken = default)
     {
         var userModel = await _currentUserService.GetModelAsync(cancellationToken);
-        
+
         if (userModel.EmailConfirmed)
         {
             return new BusinessError(AuthenticationErrorMessages.USER_EMAIL_ALREADY_CONFIRMED);
@@ -112,15 +111,22 @@ public class AuthenticationManager : IAuthenticationManager
     public async Task<Result> SendPasswordRecoveryEmailAsync(PasswordRecoveryRequest passwordRecoveryRequest,
         CancellationToken cancellationToken = default)
     {
-        var userModel = await _currentUserService.GetModelAsync(cancellationToken);
-        
+        var userModelResult = await _userManager.GetModelByEmailAsync(passwordRecoveryRequest.Email, cancellationToken);
+
+        if (!userModelResult.IsSuccess)
+        {
+            return Result.Ok();
+        }
+
+        var userModel = userModelResult.Value;
+
         var createPasswordRecoveryTokenResult = await _tokenService.CreatePasswordRecoveryTokenAsync(userModel.UserId, cancellationToken);
 
         if (!createPasswordRecoveryTokenResult.IsSuccess)
         {
             return createPasswordRecoveryTokenResult.ToResult();
         }
-        
+
         return await _emailService.SendPasswordRecoveryEmailAsync(userModel, createPasswordRecoveryTokenResult.Value, cancellationToken);
     }
 
@@ -128,24 +134,26 @@ public class AuthenticationManager : IAuthenticationManager
         CancellationToken cancellationToken = default)
     {
         using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        
+
         var userIdResult = await _tokenService.GetUserIdByPasswordRecoveryTokenAsync(passwordResetRequest.Token, cancellationToken);
 
         if (!userIdResult.IsSuccess)
         {
             return userIdResult.ToResult();
         }
-            
+
         var passwordUpdateResult = await _userManager.UpdatePasswordAsync(userIdResult.Value, passwordResetRequest.Password, cancellationToken);
 
         if (!passwordUpdateResult.IsSuccess)
         {
             return passwordUpdateResult;
         }
-            
+
+        var passwordRecoveryTokenRevokeResult = await _tokenService.RevokePasswordRecoveryTokenAsync(passwordResetRequest.Token, cancellationToken);
+
         transactionScope.Complete();
-            
-        return await _tokenService.RevokePasswordRecoveryTokenAsync(passwordResetRequest.Token, cancellationToken);
+
+        return passwordRecoveryTokenRevokeResult;
     }
 
     private async Task<Result> SendEmailConfirmationAsync(UserModel userModel, CancellationToken cancellationToken = default)

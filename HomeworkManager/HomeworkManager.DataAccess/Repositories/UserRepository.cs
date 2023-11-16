@@ -109,7 +109,7 @@ public class UserRepository : IUserRepository
             .Where(u => u.Id == userId)
             .SingleOrDefaultAsync(cancellationToken);
     }
-    
+
     public async Task<User?> GetByUsernameAsync(string username, CancellationToken cancellationToken = default)
     {
         return await _context.Users
@@ -128,6 +128,11 @@ public class UserRepository : IUserRepository
     public async Task<UserModel?> GetModelByUsernameAsync(string username, CancellationToken cancellationToken = default)
     {
         return await GetModelAsync(u => u.UserName == username, cancellationToken);
+    }
+
+    public async Task<UserModel?> GetModelByEmailAsync(string email, CancellationToken cancellationToken = default)
+    {
+        return await GetModelAsync(u => u.Email == email, cancellationToken);
     }
 
     public async Task<bool> HasRoleByIdAsync(string roleName, Guid userId, CancellationToken cancellationToken = default)
@@ -157,14 +162,14 @@ public class UserRepository : IUserRepository
         var roleNames = await GetRoleNames(roleIds, cancellationToken);
         return roleNames.Except(currentRoleNames);
     }
-    
+
     public async Task<IEnumerable<string>> GetRoleNamesToRemove(Guid userId, IEnumerable<int> roleIds, CancellationToken cancellationToken = default)
     {
         var currentRoleNames = await GetCurrentRoleNames(userId, cancellationToken);
         var roleNames = await GetRoleNames(roleIds, cancellationToken);
         return currentRoleNames.Except(roleNames);
     }
-    
+
     public async Task<bool> ConfirmEmailAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         var user = await GetByIdAsync(userId, cancellationToken);
@@ -219,7 +224,7 @@ public class UserRepository : IUserRepository
             .Distinct()
             .ToListAsync(cancellationToken);
     }
-    
+
     private async Task<IEnumerable<string>> GetRoleNames(IEnumerable<int> roleIds, CancellationToken cancellationToken = default)
     {
         return await _context.Roles
