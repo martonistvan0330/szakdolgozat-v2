@@ -1,9 +1,10 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { NavigationItems, SnackBarService } from "../../../core-module";
 import { GroupService } from "../../services/group.service";
-import { GroupModel } from "../../../shared-module";
+import { GroupModel, Role } from "../../../shared-module";
 import { ActivatedRoute } from "@angular/router";
 import { Subject } from "rxjs";
+import { AuthService } from "../../../services";
 
 @Component({
   selector: 'hwm-group-details',
@@ -12,12 +13,15 @@ import { Subject } from "rxjs";
 })
 export class GroupDetailsComponent implements OnInit, OnDestroy {
   private activatedRoute = inject(ActivatedRoute);
+  private authService = inject(AuthService);
   private groupService = inject(GroupService);
   private snackBarService = inject(SnackBarService);
   private destroy$ = new Subject<void>();
   protected readonly NavigationItems = NavigationItems;
   group!: GroupModel;
   editUrl: string = `../../${NavigationItems.groupEdit.navigationUrl}/General`;
+  isAdministrator = false
+  isCreator = false;
 
   ngOnInit() {
     this.activatedRoute.data
@@ -34,6 +38,21 @@ export class GroupDetailsComponent implements OnInit, OnDestroy {
 
   private setUp(groupModel: GroupModel) {
     this.group = groupModel;
+
+    this.authService.hasRole([Role.ADMINISTRATOR])
+      .subscribe(isAdmin => {
+        this.isAdministrator = isAdmin;
+      });
+
+    this.groupService.isCreator(this.group.name)
+      .subscribe({
+        next: isCreator => {
+          this.isCreator = isCreator;
+        },
+        error: err => {
+          console.log("NOT GOOD");
+        }
+      });
 
     if (groupModel) {
       this.editUrl = `../../${NavigationItems.groupEdit.navigationUrl}/${this.group.name}`

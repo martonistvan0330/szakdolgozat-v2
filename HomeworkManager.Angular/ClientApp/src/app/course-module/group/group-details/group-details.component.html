@@ -1,6 +1,6 @@
 <div class="group-details-container">
     <div class="group-details-header">
-        <a [routerLink]="editUrl" mat-raised-button>
+        <a *ngIf="isAdministrator || isCreator" [routerLink]="editUrl" mat-raised-button>
             <mat-icon>edit</mat-icon>
             Edit Group
         </a>

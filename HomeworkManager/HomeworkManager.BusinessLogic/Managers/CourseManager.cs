@@ -112,15 +112,17 @@ public class CourseManager : ICourseManager
 
     public async Task<Result<IEnumerable<UserListRow>>> GetAddableTeachersAsync(int courseId, CancellationToken cancellationToken = default)
     {
-        var users = await _userRepository.GetAllModelsAsync(cancellationToken: cancellationToken);
+        var teachers = await _userRepository.GetAllModelByRoleAsync(Roles.TEACHER, cancellationToken);
         var courseTeachers = await _courseRepository.GetTeachersAsync(courseId, cancellationToken);
         var courseStudents = await _courseRepository.GetStudentsAsync(courseId, cancellationToken);
 
-        var addableTeachers = users
+        var addableTeachers = teachers
             .ExceptBy(
                 courseTeachers.Select(u => u.UserId),
                 u => u.UserId
-            ).ExceptBy(
+            )
+            .ExceptBy
+            (
                 courseStudents.Select(u => u.UserId),
                 u => u.UserId
             );
@@ -130,11 +132,11 @@ public class CourseManager : ICourseManager
 
     public async Task<Result<IEnumerable<UserListRow>>> GetAddableStudentsAsync(int courseId, CancellationToken cancellationToken = default)
     {
-        var users = await _userRepository.GetAllModelsAsync(cancellationToken: cancellationToken);
+        var students = await _userRepository.GetAllModelByRoleAsync(Roles.STUDENT, cancellationToken: cancellationToken);
         var courseStudents = await _courseRepository.GetStudentsAsync(courseId, cancellationToken);
         var courseTeachers = await _courseRepository.GetTeachersAsync(courseId, cancellationToken);
 
-        var addableStudents = users
+        var addableStudents = students
             .ExceptBy(
                 courseStudents.Select(u => u.UserId),
                 u => u.UserId

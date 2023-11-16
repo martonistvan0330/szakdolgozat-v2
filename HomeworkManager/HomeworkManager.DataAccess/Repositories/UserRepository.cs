@@ -135,6 +135,34 @@ public class UserRepository : IUserRepository
         return await GetModelAsync(u => u.Email == email, cancellationToken);
     }
 
+    public async Task<IEnumerable<UserListRow>> GetAllModelByRoleAsync(string roleName, CancellationToken cancellationToken = default)
+    {
+        return await _context.Roles
+            .Where(r => r.Name == roleName)
+            .Join
+            (
+                _context.UserRoles,
+                r => r.Id,
+                ur => ur.RoleId,
+                (r, ur) => ur.UserId
+            )
+            .Join
+            (
+                _context.Users,
+                userId => userId,
+                u => u.Id,
+                (userId, u) => new UserListRow
+                {
+                    UserId = u.Id,
+                    FullName = u.FullName,
+                    Username = u.UserName!,
+                    Email = u.Email!,
+                    Roles = roleName
+                }
+            )
+            .ToListAsync(cancellationToken);
+    }
+    
     public async Task<bool> HasRoleByIdAsync(string roleName, Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.Users
