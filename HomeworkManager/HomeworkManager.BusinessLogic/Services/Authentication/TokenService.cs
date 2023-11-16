@@ -33,7 +33,7 @@ public class TokenService : ITokenService
     {
         var dbAccessToken = await _accessTokenRepository.GetAsync(accessToken, userId, cancellationToken);
 
-        if (dbAccessToken is null || !dbAccessToken.IsActive)
+        if (dbAccessToken is null)
         {
             return new BusinessError(AuthenticationErrorMessages.INVALID_ACCESS_TOKEN);
         }

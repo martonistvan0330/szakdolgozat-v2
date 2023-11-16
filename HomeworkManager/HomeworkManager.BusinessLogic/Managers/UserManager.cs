@@ -216,8 +216,14 @@ public class UserManager : IUserManager
         var rolesToRemove = await _userRepository.GetRoleNamesToRemove(userId, roleIds, cancellationToken);
         var rolesToAdd = await _userRepository.GetRoleNamesToAdd(userId, roleIds, cancellationToken);
 
+        using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        
         await _identityUserManager.RemoveFromRolesAsync(user, rolesToRemove);
         await _identityUserManager.AddToRolesAsync(user, rolesToAdd);
+
+        await _userRepository.RevokeAccessTokensAsync(userId, cancellationToken);
+        
+        transactionScope.Complete();
 
         return Result.Ok();
     }

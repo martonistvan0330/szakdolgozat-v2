@@ -180,6 +180,21 @@ public class UserRepository : IUserRepository
         return true;
     }
 
+    public async Task RevokeAccessTokensAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var accessTokens = _context.Users
+            .Where(u => u.Id == userId)
+            .SelectMany(u => u.AccessTokens)
+            .Where(at => at.IsActive);
+
+        foreach (var accessToken in accessTokens)
+        {
+            accessToken.IsActive = false;
+        }
+
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
     private async Task<IEnumerable<string>> GetCurrentRoleNames(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.Users
