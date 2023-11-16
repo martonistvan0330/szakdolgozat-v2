@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Transactions;
 using FluentResults;
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
@@ -99,9 +100,15 @@ public class JwtService : IJwtService
             return checkTokensResult.ToResult<AuthenticationResponse>();
         }
 
+        using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
         await _tokenService.RevokeTokensAsync(refreshRequest.AccessToken, refreshRequest.RefreshToken, userModel.UserId, cancellationToken);
 
-        return await CreateTokensAsync(userModel, cancellationToken);
+        var tokenResult = await CreateTokensAsync(userModel, cancellationToken);
+
+        transactionScope.Complete();
+
+        return tokenResult;
     }
 
     private JwtSecurityToken CreateJwtAccessToken(Claim[] claims, SigningCredentials credentials, DateTime expiration)

@@ -127,7 +127,7 @@ public class AuthenticationManager : IAuthenticationManager
     public async Task<Result> ResetPasswordAsync(PasswordResetRequest passwordResetRequest,
         CancellationToken cancellationToken = default)
     {
-        using var transactionScope = new TransactionScope();
+        using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         
         var userIdResult = await _tokenService.GetUserIdByPasswordRecoveryTokenAsync(passwordResetRequest.Token, cancellationToken);
 

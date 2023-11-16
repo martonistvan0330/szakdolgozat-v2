@@ -142,7 +142,7 @@ public class UserManager : IUserManager
             Email = newUser.Email
         };
         
-        using (var transactionScope = new TransactionScope())
+        using (var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
             var createResult = await _identityUserManager.CreateAsync(user, newUser.Password);
 

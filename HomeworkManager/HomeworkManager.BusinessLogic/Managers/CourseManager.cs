@@ -150,7 +150,7 @@ public class CourseManager : ICourseManager
     {
         var user = await _currentUserService.GetAsync(cancellationToken);
 
-        using var transactionScope = new TransactionScope();
+        using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
             
         var courseId = await _courseRepository.CreateAsync(newCourse, user, cancellationToken);
 
@@ -181,7 +181,7 @@ public class CourseManager : ICourseManager
 
     public async Task<Result> AddTeachersAsync(int courseId, ICollection<Guid> userIds, CancellationToken cancellationToken = default)
     {
-        using var transactionScope = new TransactionScope();
+        using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
             
         var courseAddResult = await _courseRepository.AddTeachersAsync(courseId, userIds, cancellationToken);
 
@@ -204,7 +204,7 @@ public class CourseManager : ICourseManager
 
     public async Task<Result> AddStudentsAsync(int courseId, ICollection<Guid> userIds, CancellationToken cancellationToken = default)
     {
-        using var transactionScope = new TransactionScope();
+        using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
             
         var courseAddResult = await _courseRepository.AddStudentsAsync(courseId, userIds, cancellationToken);
 

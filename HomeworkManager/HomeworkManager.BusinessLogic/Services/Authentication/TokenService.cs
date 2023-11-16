@@ -53,13 +53,14 @@ public class TokenService : ITokenService
     {
         try
         {
-            using var transactionScope = new TransactionScope();
-            
+            using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
             var dbAccessToken = await _accessTokenRepository.CreateAsync(accessToken, userId, cancellationToken);
+
             await _refreshTokenRepository.CreateAsync(refreshToken, dbAccessToken.AccessTokenId, cancellationToken);
 
             transactionScope.Complete();
-            
+
             return Result.Ok();
         }
         catch
@@ -70,17 +71,19 @@ public class TokenService : ITokenService
 
     public async Task<Result> RevokeTokensAsync(string accessToken, string refreshToken, Guid userId, CancellationToken cancellationToken = default)
     {
-        using var transactionScope = new TransactionScope();
-        
+        using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
         var dbAccessToken = await _accessTokenRepository.RevokeAsync(accessToken, userId, cancellationToken);
+
         if (dbAccessToken is null)
         {
             return new ApplicationError(AuthenticationErrorMessages.TOKEN_REVOCATION_FAILED);
         }
-        
+
         await _refreshTokenRepository.RevokeAsync(refreshToken, dbAccessToken, cancellationToken);
+
         transactionScope.Complete();
-        
+
         return Result.Ok();
     }
 
@@ -94,7 +97,7 @@ public class TokenService : ITokenService
     public async Task<Result<string>> CreatePasswordRecoveryTokenAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         var passwordRecoveryToken = GenerateToken();
-        var dbPasswordRecoveryToken =  await _passwordRecoveryTokenRepository.CreateAsync(userId, passwordRecoveryToken, cancellationToken);
+        var dbPasswordRecoveryToken = await _passwordRecoveryTokenRepository.CreateAsync(userId, passwordRecoveryToken, cancellationToken);
 
         return dbPasswordRecoveryToken is null
             ? new BusinessError(AuthenticationErrorMessages.TOKEN_CREATION_FAILED)
