@@ -18,7 +18,6 @@ using HomeworkManager.DataAccess.Repositories.Interfaces;
 using HomeworkManager.Model.Configurations;
 using HomeworkManager.Model.CustomEntities.Authentication;
 using HomeworkManager.Model.CustomEntities.Course;
-using HomeworkManager.Model.CustomEntities.Group;
 using HomeworkManager.Model.CustomEntities.User;
 using HomeworkManager.Shared.Services;
 using HomeworkManager.Shared.Services.Interfaces;
@@ -80,8 +79,12 @@ public static class HostServiceExtensions
 
         services.AddScoped<CourseIdValidator>();
         services.AddScoped<EmailValidator>();
+        services.AddScoped<GroupNameValidator>();
+        services.AddScoped<NewGroupValidator>();
         services.AddScoped<PasswordValidator>();
         services.AddScoped<RoleValidator>();
+        services.AddScoped<UpdatedCourseValidator>();
+        services.AddScoped<UpdatedGroupValidator>();
         services.AddScoped<UserIdValidator>();
         return services;
     }

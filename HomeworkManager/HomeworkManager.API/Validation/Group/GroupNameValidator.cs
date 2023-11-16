@@ -9,11 +9,13 @@ namespace HomeworkManager.API.Validation.Group;
 
 public class GroupNameValidator : AbstractValidator<string>
 {
-    public GroupNameValidator(int courseId, IGroupManager groupManager, ICurrentUserService currentUserService)
+    public int CourseId { get; set; }
+    
+    public GroupNameValidator(IGroupManager groupManager, ICurrentUserService currentUserService)
     {
         RuleFor(x => x)
             .MustAsync(async (groupName, cancellationToken) =>
-                await groupManager.ExistsWithNameAsync(courseId, groupName, cancellationToken))
+                await groupManager.ExistsWithNameAsync(CourseId, groupName, cancellationToken))
             .WithMessage(GroupErrorMessages.GROUP_WITH_NAME_NOT_FOUND);
         
         RuleFor(x => x)
@@ -24,7 +26,7 @@ public class GroupNameValidator : AbstractValidator<string>
                     return true;
                 }
 
-                return await groupManager.IsInGroupAsync(courseId, groupName, cancellationToken);
+                return await groupManager.IsInGroupAsync(CourseId, groupName, cancellationToken);
             })
             .WithErrorCode(ErrorCodes.FORBIDDEN);
         
@@ -38,7 +40,7 @@ public class GroupNameValidator : AbstractValidator<string>
                         return true;
                     }
 
-                    return await groupManager.IsTeacherAsync(courseId, groupName, cancellationToken);
+                    return await groupManager.IsTeacherAsync(CourseId, groupName, cancellationToken);
                 })
                 .WithErrorCode(ErrorCodes.FORBIDDEN);
         });
@@ -53,7 +55,7 @@ public class GroupNameValidator : AbstractValidator<string>
                         return true;
                     }
 
-                    return await groupManager.IsCreatorAsync(courseId, groupName, cancellationToken);
+                    return await groupManager.IsCreatorAsync(CourseId, groupName, cancellationToken);
                 })
                 .WithErrorCode(ErrorCodes.FORBIDDEN);
         });

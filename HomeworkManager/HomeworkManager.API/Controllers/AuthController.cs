@@ -15,29 +15,20 @@ public class AuthController : ControllerBase
     private readonly IAuthenticationManager _authenticationManager;
     private readonly AbstractValidator<EmailConfirmationRequest> _emailConfirmationRequestValidator;
     private readonly AbstractValidator<NewUser> _newUserValidator;
-    private readonly AbstractValidator<PasswordRecoveryRequest> _passwordRecoveryRequestValidator;
     private readonly AbstractValidator<PasswordResetRequest> _passwordResetRequestValidator;
-    private readonly AbstractValidator<RefreshRequest> _refreshRequestValidator;
-    private readonly AbstractValidator<RevokeRequest> _revokeRequestValidator;
 
     public AuthController
     (
         IAuthenticationManager authenticationManager,
         AbstractValidator<EmailConfirmationRequest> emailConfirmationRequestValidator,
         AbstractValidator<NewUser> newUserValidator,
-        AbstractValidator<PasswordRecoveryRequest> passwordRecoveryRequestValidator,
-        AbstractValidator<PasswordResetRequest> passwordResetRequestValidator,
-        AbstractValidator<RefreshRequest> refreshRequestValidator,
-        AbstractValidator<RevokeRequest> revokeRequestValidator
+        AbstractValidator<PasswordResetRequest> passwordResetRequestValidator
     )
     {
         _authenticationManager = authenticationManager;
         _emailConfirmationRequestValidator = emailConfirmationRequestValidator;
         _newUserValidator = newUserValidator;
-        _passwordRecoveryRequestValidator = passwordRecoveryRequestValidator;
         _passwordResetRequestValidator = passwordResetRequestValidator;
-        _refreshRequestValidator = refreshRequestValidator;
-        _revokeRequestValidator = revokeRequestValidator;
     }
 
     [HttpPost("Register")]

@@ -18,17 +18,20 @@ public class CourseController : ControllerBase
     private readonly CourseIdValidator _courseIdValidator;
     private readonly ICourseManager _courseManager;
     private readonly NewCourseValidator _newCourseValidator;
+    private readonly UpdatedCourseValidator _updatedCourseValidator;
 
     public CourseController
     (
         CourseIdValidator courseIdValidator,
         ICourseManager courseManager,
-        NewCourseValidator newCourseValidator
+        NewCourseValidator newCourseValidator,
+        UpdatedCourseValidator updatedCourseValidator
     )
     {
         _courseIdValidator = courseIdValidator;
         _courseManager = courseManager;
         _newCourseValidator = newCourseValidator;
+        _updatedCourseValidator = updatedCourseValidator;
     }
 
     [HttpGet]
@@ -160,9 +163,9 @@ public class CourseController : ControllerBase
             return courseIdValidationResult.ToActionResult();
         }
 
-        var updatedCourseValidator = new UpdatedCourseValidator(courseId, _courseManager);
+        _updatedCourseValidator.CourseId = courseId;
         
-        var updatedCourseValidationResult = await updatedCourseValidator.ValidateAsync(updatedCourse, cancellationToken);
+        var updatedCourseValidationResult = await _updatedCourseValidator.ValidateAsync(updatedCourse, cancellationToken);
 
         if (!updatedCourseValidationResult.IsValid)
         {

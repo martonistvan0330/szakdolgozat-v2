@@ -6,7 +6,9 @@ namespace HomeworkManager.API.Validation.Course;
 
 public class UpdatedCourseValidator : AbstractValidator<UpdatedCourse>
 {
-    public UpdatedCourseValidator(int courseId, ICourseManager courseManager)
+    public int CourseId { get; set; }
+    
+    public UpdatedCourseValidator(ICourseManager courseManager)
     {
         RuleFor(x => x.Name)
             .NotNull()
@@ -14,6 +16,6 @@ public class UpdatedCourseValidator : AbstractValidator<UpdatedCourse>
             
         RuleFor(x => x)
             .MustAsync(async (updatedCourse, cancellationToken) =>
-                await courseManager.NameAvailableAsync(courseId, updatedCourse.Name, cancellationToken));
+                await courseManager.NameAvailableAsync(CourseId, updatedCourse.Name, cancellationToken));
     }
 }
