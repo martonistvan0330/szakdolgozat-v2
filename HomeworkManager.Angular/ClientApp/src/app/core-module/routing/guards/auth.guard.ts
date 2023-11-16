@@ -22,7 +22,9 @@ export class AuthGuard {
             router.navigate([NavigationItems.login.navigationUrl])
               .then(success => {
                 if (success) {
-                  snackBarService.error('Authentication Failed', 'Please log in');
+                  if (localStorage.getItem('logged-in') !== null) {
+                    snackBarService.error('Authentication Failed', 'Please log in');
+                  }
                 }
               });
             return of();

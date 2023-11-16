@@ -40,6 +40,7 @@ export class AuthService {
       authRequest
     ).pipe(
       tap(authResponse => {
+        localStorage.setItem('logged-in', 'true');
         localStorage.setItem('access-token', authResponse.accessToken);
         localStorage.setItem('refresh-token', authResponse.refreshToken);
       }),
@@ -55,6 +56,7 @@ export class AuthService {
       user
     ).pipe(
       tap(authResponse => {
+        localStorage.setItem('logged-in', 'true');
         localStorage.setItem('access-token', authResponse.accessToken);
         localStorage.setItem('refresh-token', authResponse.refreshToken);
       }),
@@ -79,6 +81,7 @@ export class AuthService {
       ).pipe(
         tap((success) => {
           if (success) {
+            localStorage.removeItem('logged-in');
             localStorage.removeItem('user');
             localStorage.removeItem('access-token');
             localStorage.removeItem('refresh-token');
