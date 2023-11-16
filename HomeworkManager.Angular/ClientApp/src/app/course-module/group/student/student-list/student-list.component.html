@@ -6,7 +6,7 @@
                [columnDefs]="columnDefs"
                [dataSource]="students$"
                [pageSizeOptions]="[10, 25]"
-               [removableRows]="isAdministrator"
+               [removableRows]="isAdministrator || isTeacher"
                class="student-list-table">
         <button (click)="onAddClick()"
                 *ngIf="isAdministrator || isTeacher"

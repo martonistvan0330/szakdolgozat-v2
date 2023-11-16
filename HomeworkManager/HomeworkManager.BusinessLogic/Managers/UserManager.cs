@@ -94,7 +94,7 @@ public class UserManager : IUserManager
                 options.SortOptions.SortDirection.ToSortDirection(), options.SearchText, cancellationToken),
             "email" => await _userRepository.GetAllModelsAsync(options.PageData, u => u.Email,
                 options.SortOptions.SortDirection.ToSortDirection(), options.SearchText, cancellationToken),
-            _ => await _userRepository.GetAllModelsAsync(options.PageData, cancellationToken)
+            _ => await _userRepository.GetAllModelsAsync(options.PageData, options.SearchText, cancellationToken)
         };
 
         return new Pageable<UserListRow>

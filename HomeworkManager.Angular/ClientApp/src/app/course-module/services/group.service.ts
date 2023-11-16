@@ -20,12 +20,16 @@ export class GroupService {
   private groupUpdated = new Subject<void>();
   private groupChanged = new Subject<string>();
   private teacherAdded = new Subject<string>();
+  private teacherRemoved = new Subject<string>();
   private studentAdded = new Subject<string>();
+  private studentRemoved = new Subject<string>();
   groupAdded$ = this.groupAdded.asObservable();
   groupUpdated$ = this.groupUpdated.asObservable();
   groupChanged$ = this.groupChanged.asObservable().pipe(distinctUntilChanged());
   teacherAdded$ = this.teacherAdded.asObservable();
+  teacherRemoved$ = this.teacherRemoved.asObservable();
   studentAdded$ = this.studentAdded.asObservable();
+  studentRemoved$ = this.studentRemoved.asObservable();
 
   private _courseId!: number;
 
@@ -119,6 +123,26 @@ export class GroupService {
         this.studentAdded.next(groupName);
       }),
       delay(1000)
+    );
+  }
+
+  removeTeacher(groupName: string, teacherId: string) {
+    const requestUrl = 'Course/' + this._courseId + '/Group/' + groupName + '/Teacher/' + teacherId + '/Remove';
+
+    return this.authApiClient.delete<void>(requestUrl).pipe(
+      tap(_groupId => {
+        this.teacherRemoved.next(groupName);
+      }),
+    );
+  }
+
+  removeStudent(groupName: string, studentId: string) {
+    const requestUrl = 'Course/' + this._courseId + '/Group/' + groupName + '/Student/' + studentId + '/Remove';
+
+    return this.authApiClient.delete<void>(requestUrl).pipe(
+      tap(_groupId => {
+        this.studentRemoved.next(groupName);
+      }),
     );
   }
 

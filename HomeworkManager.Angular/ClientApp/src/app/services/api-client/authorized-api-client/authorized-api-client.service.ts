@@ -30,6 +30,10 @@ export class AuthorizedApiClientService {
     return this.httpRequest(() => this.http.put<T>(this.apiUrl + route, body));
   }
 
+  delete<T>(route: string) {
+    return this.httpRequest(() => this.http.delete<T>(this.apiUrl + route));
+  }
+
   private httpRequest<T>(request: () => Observable<T>) {
     return request().pipe(
       catchError((error, caught) => {

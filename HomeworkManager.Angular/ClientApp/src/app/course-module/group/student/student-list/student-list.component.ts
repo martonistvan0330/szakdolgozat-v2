@@ -46,7 +46,8 @@ export class StudentListComponent implements OnInit, OnDestroy {
     this.changeDataSource$ =
       merge(
         this.groupService.groupChanged$,
-        this.groupService.studentAdded$
+        this.groupService.studentAdded$,
+        this.groupService.studentRemoved$
       );
   }
 
@@ -91,7 +92,7 @@ export class StudentListComponent implements OnInit, OnDestroy {
   }
 
   onRowRemove(student: UserListRow) {
-
+    this.groupService.removeStudent(this.groupName, student.userId).subscribe();
   }
 
   ngOnDestroy() {

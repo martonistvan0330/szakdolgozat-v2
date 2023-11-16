@@ -46,7 +46,8 @@ export class TeacherListComponent implements OnInit, OnDestroy {
     this.changeDataSource$ =
       merge(
         this.groupService.groupChanged$,
-        this.groupService.teacherAdded$
+        this.groupService.teacherAdded$,
+        this.groupService.teacherRemoved$
       );
   }
 
@@ -54,7 +55,13 @@ export class TeacherListComponent implements OnInit, OnDestroy {
     options
       .pipe(
         switchMap(options => {
-          return this.groupService.getTeachers(options.extras || '', options.pageableOptions);
+          const groupName = options.extras;
+
+          if (groupName && this.groupName === groupName) {
+            return this.groupService.getTeachers(options.extras || '', options.pageableOptions);
+          }
+
+          throw '';
         })
       )
       .subscribe(teachers => {
@@ -85,13 +92,13 @@ export class TeacherListComponent implements OnInit, OnDestroy {
         }),
         switchMap(selectedTeacherIds => {
           return this.groupService.addTeachers(this.groupName, selectedTeacherIds)
-        })
+        }),
       )
       .subscribe();
   }
 
   onRemoveClick(teacher: UserListRow) {
-
+    this.groupService.removeTeacher(this.groupName, teacher.userId).subscribe();
   }
 
   ngOnDestroy() {

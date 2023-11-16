@@ -18,9 +18,9 @@ public interface IUserRepository
     Task<UserModel?> GetModelByUsernameAsync(string username, CancellationToken cancellationToken = default);
     Task<UserModel?> GetModelByEmailAsync(string email, CancellationToken cancellationToken = default);
 
-    Task<IEnumerable<UserListRow>> GetAllModelsAsync(PageData? pageData = null, CancellationToken cancellationToken = default)
+    Task<IEnumerable<UserListRow>> GetAllModelsAsync(PageData? pageData = null, string? searchText = null, CancellationToken cancellationToken = default)
     {
-        return GetAllModelsAsync(pageData, u => u.UserId, cancellationToken: cancellationToken);
+        return GetAllModelsAsync(pageData, u => u.UserId, searchText: searchText, cancellationToken: cancellationToken);
     }
 
     Task<IEnumerable<UserListRow>> GetAllModelsAsync<TKey>

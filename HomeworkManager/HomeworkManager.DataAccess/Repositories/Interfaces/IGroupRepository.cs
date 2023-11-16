@@ -22,10 +22,11 @@ public interface IGroupRepository
         int courseId,
         string groupName,
         PageData? pageData = null,
+        string? searchText = null,
         CancellationToken cancellationToken = default
     )
     {
-        return GetTeachersAsync(courseId, groupName, pageData, u => u.UserId, cancellationToken: cancellationToken);
+        return GetTeachersAsync(courseId, groupName, pageData, u => u.UserId, searchText: searchText, cancellationToken: cancellationToken);
     }
 
     Task<IEnumerable<UserListRow>> GetTeachersAsync<TKey>(
@@ -42,10 +43,11 @@ public interface IGroupRepository
         int courseId,
         string groupName,
         PageData? pageData = null,
+        string? searchText = null,
         CancellationToken cancellationToken = default
     )
     {
-        return GetStudentsAsync(courseId, groupName, pageData, u => u.UserId, cancellationToken: cancellationToken);
+        return GetStudentsAsync(courseId, groupName, pageData, u => u.UserId, searchText: searchText, cancellationToken: cancellationToken);
     }
 
     Task<IEnumerable<UserListRow>> GetStudentsAsync<TKey>(
@@ -63,6 +65,8 @@ public interface IGroupRepository
     Task<Result> UpdateAsync(int courseId, string groupName, UpdatedGroup updatedGroup, Guid userId, CancellationToken cancellationToken = default);
     Task<Result> AddTeachersAsync(int courseId, string groupName, IEnumerable<Guid> userIds, CancellationToken cancellationToken = default);
     Task<Result> AddStudentsAsync(int courseId, string groupName, IEnumerable<Guid> userIds, CancellationToken cancellationToken = default);
+    Task<Result> RemoveTeacherAsync(int courseId, string groupName, Guid teacherId, CancellationToken cancellationToken = default);
+    Task<Result> RemoveStudentAsync(int courseId, string groupName, Guid studentId, CancellationToken cancellationToken = default);
     Task<bool> IsInGroupAsync(int courseId, string groupName, Guid userId, CancellationToken cancellationToken = default);
     Task<bool> IsCreatorAsync(int courseId, string groupName, Guid userId, CancellationToken cancellationToken = default);
     Task<bool> IsTeacherAsync(int courseId, string groupName, Guid userId, CancellationToken cancellationToken = default);

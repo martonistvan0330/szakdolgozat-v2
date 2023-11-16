@@ -3,6 +3,7 @@ using HomeworkManager.API.Attributes;
 using HomeworkManager.API.Extensions;
 using HomeworkManager.API.Validation.Course;
 using HomeworkManager.API.Validation.Group;
+using HomeworkManager.API.Validation.User;
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.Model.Constants;
 using HomeworkManager.Model.CustomEntities;
@@ -22,14 +23,16 @@ public class GroupController : ControllerBase
     private readonly GroupNameValidator _groupNameValidator;
     private readonly NewGroupValidator _newGroupValidator;
     private readonly UpdatedGroupValidator _updatedGroupValidator;
-    
+    private readonly UserIdValidator _userIdValidator;
+
     public GroupController
     (
         CourseIdValidator courseIdValidator,
         IGroupManager groupManager,
         GroupNameValidator groupNameValidator,
         NewGroupValidator newGroupValidator,
-        UpdatedGroupValidator updatedGroupValidator
+        UpdatedGroupValidator updatedGroupValidator,
+        UserIdValidator userIdValidator
     )
     {
         _courseIdValidator = courseIdValidator;
@@ -37,6 +40,7 @@ public class GroupController : ControllerBase
         _groupNameValidator = groupNameValidator;
         _newGroupValidator = newGroupValidator;
         _updatedGroupValidator = updatedGroupValidator;
+        _userIdValidator = userIdValidator;
     }
 
     [HttpGet]
@@ -48,7 +52,7 @@ public class GroupController : ControllerBase
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         var allGroupsByUserResult = await _groupManager.GetAllAsync(courseId, cancellationToken);
 
         return allGroupsByUserResult.ToActionResult();
@@ -65,14 +69,14 @@ public class GroupController : ControllerBase
         }
 
         _groupNameValidator.CourseId = courseId;
-        
+
         var groupNameValidationResult = await _groupNameValidator.ValidateAsync(groupName, cancellationToken);
 
         if (!groupNameValidationResult.IsValid)
         {
             return groupNameValidationResult.ToActionResult();
         }
-        
+
         return await _groupManager.ExistsWithNameAsync(courseId, groupName, cancellationToken);
     }
 
@@ -85,16 +89,16 @@ public class GroupController : ControllerBase
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         _groupNameValidator.CourseId = courseId;
-        
+
         var groupNameValidationResult = await _groupNameValidator.ValidateAsync(groupName, cancellationToken);
 
         if (!groupNameValidationResult.IsValid)
         {
             return groupNameValidationResult.ToActionResult();
         }
-        
+
         var getResult = await _groupManager.GetModelAsync(courseId, groupName, cancellationToken);
 
         return getResult.ToActionResult();
@@ -110,16 +114,16 @@ public class GroupController : ControllerBase
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         _groupNameValidator.CourseId = courseId;
-        
+
         var groupNameValidationResult = await _groupNameValidator.ValidateAsync(groupName, cancellationToken);
 
         if (!groupNameValidationResult.IsValid)
         {
             return groupNameValidationResult.ToActionResult();
         }
-        
+
         var getTeachersResult = await _groupManager.GetTeachersAsync(courseId, groupName, pageableOptions, cancellationToken);
 
         return getTeachersResult.ToActionResult();
@@ -135,23 +139,24 @@ public class GroupController : ControllerBase
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         _groupNameValidator.CourseId = courseId;
-        
+
         var groupNameValidationResult = await _groupNameValidator.ValidateAsync(groupName, cancellationToken);
 
         if (!groupNameValidationResult.IsValid)
         {
             return groupNameValidationResult.ToActionResult();
         }
-        
+
         var getStudentsResult = await _groupManager.GetStudentsAsync(courseId, groupName, pageableOptions, cancellationToken);
 
         return getStudentsResult.ToActionResult();
     }
 
     [HttpGet("{groupName}/Teacher/Addable")]
-    public async Task<ActionResult<IEnumerable<UserListRow>>> GetAddableTeachersAsync(int courseId, string groupName, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<UserListRow>>> GetAddableTeachersAsync(int courseId, string groupName,
+        CancellationToken cancellationToken)
     {
         var courseIdValidationResult = await _courseIdValidator.ValidateAsync(courseId, cancellationToken);
 
@@ -159,9 +164,9 @@ public class GroupController : ControllerBase
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         _groupNameValidator.CourseId = courseId;
-        
+
         var groupNameValidationResult = await _groupNameValidator.ValidateAsync
         (
             groupName,
@@ -173,14 +178,15 @@ public class GroupController : ControllerBase
         {
             return groupNameValidationResult.ToActionResult();
         }
-        
+
         var getTeachersResult = await _groupManager.GetAddableTeachersAsync(courseId, groupName, cancellationToken);
 
         return getTeachersResult.ToActionResult();
     }
 
     [HttpGet("{groupName}/Student/Addable")]
-    public async Task<ActionResult<IEnumerable<UserListRow>>> GetAddableStudentsAsync(int courseId, string groupName, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<UserListRow>>> GetAddableStudentsAsync(int courseId, string groupName,
+        CancellationToken cancellationToken)
     {
         var courseIdValidationResult = await _courseIdValidator.ValidateAsync(courseId, cancellationToken);
 
@@ -188,9 +194,9 @@ public class GroupController : ControllerBase
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         _groupNameValidator.CourseId = courseId;
-        
+
         var groupNameValidationResult = await _groupNameValidator.ValidateAsync
         (
             groupName,
@@ -202,7 +208,7 @@ public class GroupController : ControllerBase
         {
             return groupNameValidationResult.ToActionResult();
         }
-        
+
         var getStudentsResult = await _groupManager.GetAddableStudentsAsync(courseId, groupName, cancellationToken);
 
         return getStudentsResult.ToActionResult();
@@ -232,7 +238,7 @@ public class GroupController : ControllerBase
         {
             return newGroupValidationResult.ToActionResult();
         }
-        
+
         var createResult = await _groupManager.CreateAsync(newGroup, courseId, cancellationToken);
 
         return createResult.ToActionResult();
@@ -248,9 +254,9 @@ public class GroupController : ControllerBase
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         _groupNameValidator.CourseId = courseId;
-        
+
         var groupNameValidationResult = await _groupNameValidator.ValidateAsync
         (
             groupName,
@@ -264,14 +270,14 @@ public class GroupController : ControllerBase
         }
 
         _updatedGroupValidator.CourseId = courseId;
-        
+
         var updatedGroupValidationResult = await _updatedGroupValidator.ValidateAsync(updatedGroup, cancellationToken);
 
         if (!updatedGroupValidationResult.IsValid)
         {
             return updatedGroupValidationResult.ToActionResult();
         }
-        
+
         var updateResult = await _groupManager.UpdateAsync(courseId, groupName, updatedGroup, cancellationToken);
 
         return updateResult.ToActionResult();
@@ -287,9 +293,9 @@ public class GroupController : ControllerBase
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         _groupNameValidator.CourseId = courseId;
-        
+
         var groupNameValidationResult = await _groupNameValidator.ValidateAsync
         (
             groupName,
@@ -301,7 +307,7 @@ public class GroupController : ControllerBase
         {
             return groupNameValidationResult.ToActionResult();
         }
-        
+
         var addResult = await _groupManager.AddTeachersAsync(courseId, groupName, userIds, cancellationToken);
 
         return addResult.ToActionResult();
@@ -317,9 +323,9 @@ public class GroupController : ControllerBase
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         _groupNameValidator.CourseId = courseId;
-        
+
         var groupNameValidationResult = await _groupNameValidator.ValidateAsync
         (
             groupName,
@@ -331,8 +337,82 @@ public class GroupController : ControllerBase
         {
             return groupNameValidationResult.ToActionResult();
         }
-        
+
         var addResult = await _groupManager.AddStudentsAsync(courseId, groupName, userIds, cancellationToken);
+
+        return addResult.ToActionResult();
+    }
+
+    [HomeworkManagerAuthorize(Roles = $"{Roles.TEACHER},{Roles.ADMINISTRATOR}")]
+    [HttpDelete("{groupName}/Teacher/{teacherId:guid}/Remove")]
+    public async Task<ActionResult> RemoveTeacherAsync(int courseId, string groupName, Guid teacherId, CancellationToken cancellationToken)
+    {
+        var courseIdValidationResult = await _courseIdValidator.ValidateAsync(courseId, cancellationToken);
+
+        if (!courseIdValidationResult.IsValid)
+        {
+            return courseIdValidationResult.ToActionResult();
+        }
+
+        var teacherIdValidationResult = await _userIdValidator.ValidateAsync(teacherId, cancellationToken);
+
+        if (!teacherIdValidationResult.IsValid)
+        {
+            return teacherIdValidationResult.ToActionResult();
+        }
+
+        _groupNameValidator.CourseId = courseId;
+
+        var groupNameValidationResult = await _groupNameValidator.ValidateAsync
+        (
+            groupName,
+            options => { options.IncludeRuleSets("Default", "IsCreator"); },
+            cancellationToken
+        );
+
+        if (!groupNameValidationResult.IsValid)
+        {
+            return groupNameValidationResult.ToActionResult();
+        }
+
+        var addResult = await _groupManager.RemoveTeacherAsync(courseId, groupName, teacherId, cancellationToken);
+
+        return addResult.ToActionResult();
+    }
+
+    [HomeworkManagerAuthorize(Roles = $"{Roles.TEACHER},{Roles.ADMINISTRATOR}")]
+    [HttpDelete("{groupName}/Student/{studentId:guid}/Remove")]
+    public async Task<ActionResult> RemoveStudentAsync(int courseId, string groupName, Guid studentId, CancellationToken cancellationToken)
+    {
+        var courseIdValidationResult = await _courseIdValidator.ValidateAsync(courseId, cancellationToken);
+
+        if (!courseIdValidationResult.IsValid)
+        {
+            return courseIdValidationResult.ToActionResult();
+        }
+
+        var studentIdValidationResult = await _userIdValidator.ValidateAsync(studentId, cancellationToken);
+
+        if (!studentIdValidationResult.IsValid)
+        {
+            return studentIdValidationResult.ToActionResult();
+        }
+
+        _groupNameValidator.CourseId = courseId;
+
+        var groupNameValidationResult = await _groupNameValidator.ValidateAsync
+        (
+            groupName,
+            options => { options.IncludeRuleSets("Default", "IsTeacher"); },
+            cancellationToken
+        );
+
+        if (!groupNameValidationResult.IsValid)
+        {
+            return groupNameValidationResult.ToActionResult();
+        }
+
+        var addResult = await _groupManager.RemoveStudentAsync(courseId, groupName, studentId, cancellationToken);
 
         return addResult.ToActionResult();
     }
@@ -346,7 +426,7 @@ public class GroupController : ControllerBase
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         return await _groupManager.IsInGroupAsync(courseId, groupName, cancellationToken);
     }
 
@@ -359,7 +439,7 @@ public class GroupController : ControllerBase
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         return await _groupManager.IsCreatorAsync(courseId, groupName, cancellationToken);
     }
 
@@ -372,7 +452,7 @@ public class GroupController : ControllerBase
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         return await _groupManager.IsTeacherAsync(courseId, groupName, cancellationToken);
     }
 
@@ -385,7 +465,7 @@ public class GroupController : ControllerBase
         {
             return courseIdValidationResult.ToActionResult();
         }
-        
+
         return await _groupManager.NameAvailableAsync(courseId, name, cancellationToken);
     }
 }

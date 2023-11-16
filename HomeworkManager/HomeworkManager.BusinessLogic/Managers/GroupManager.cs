@@ -15,42 +15,39 @@ public class GroupManager : IGroupManager
     private readonly ICourseRepository _courseRepository;
     private readonly ICurrentUserService _currentUserService;
     private readonly IGroupRepository _groupRepository;
-    private readonly IUserManager _userManager;
 
     public GroupManager
     (
         ICourseRepository courseRepository,
         ICurrentUserService currentUserService,
-        IGroupRepository groupRepository,
-        IUserManager userManager
+        IGroupRepository groupRepository
     )
     {
         _courseRepository = courseRepository;
         _currentUserService = currentUserService;
         _groupRepository = groupRepository;
-        _userManager = userManager;
     }
 
     public async Task<bool> ExistsWithNameAsync(int courseId, string groupName, CancellationToken cancellationToken = default)
     {
         return await _groupRepository.ExistsWithNameAsync(courseId, groupName, cancellationToken);
     }
-    
+
     public async Task<bool> NameAvailableAsync(int courseId, string name, CancellationToken cancellationToken = default)
     {
         return !await _groupRepository.ExistsWithNameAsync(courseId, name, cancellationToken);
     }
-    
+
     public async Task<bool> NameAvailableAsync(int courseId, string groupName, string name, CancellationToken cancellationToken = default)
     {
         if (groupName == name)
         {
             return true;
         }
-        
+
         return !await _groupRepository.ExistsWithNameAsync(courseId, name, cancellationToken);
     }
-    
+
     public async Task<Result<IEnumerable<GroupListRow>>> GetAllAsync(int courseId, CancellationToken cancellationToken = default)
     {
         IEnumerable<GroupListRow> groups;
@@ -62,7 +59,7 @@ public class GroupManager : IGroupManager
         else
         {
             var userId = await _currentUserService.GetIdAsync(cancellationToken);
-            
+
             groups = await _groupRepository.GetAllAsync(courseId, userId, cancellationToken);
         }
 
@@ -70,7 +67,7 @@ public class GroupManager : IGroupManager
             .OrderBy(g => g.Name == Constants.GENERAL_GROUP_NAME ? 0 : 1)
             .ThenBy(g => g.Name)
             .ToList();
-        
+
         return orderedGroups;
     }
 
@@ -85,7 +82,7 @@ public class GroupManager : IGroupManager
         else
         {
             var userId = await _currentUserService.GetIdAsync(cancellationToken);
-            
+
             group = await _groupRepository.GetModelAsync(courseId, groupName, userId, cancellationToken);
         }
 
@@ -132,7 +129,7 @@ public class GroupManager : IGroupManager
                 options.SortOptions.SortDirection.ToSortDirection(),
                 options.SearchText,
                 cancellationToken),
-            _ => await _groupRepository.GetTeachersAsync(courseId, groupName, options.PageData, cancellationToken: cancellationToken)
+            _ => await _groupRepository.GetTeachersAsync(courseId, groupName, options.PageData, options.SearchText, cancellationToken)
         };
 
         return new Pageable<UserListRow>
@@ -182,17 +179,18 @@ public class GroupManager : IGroupManager
                 options.SortOptions.SortDirection.ToSortDirection(),
                 options.SearchText,
                 cancellationToken),
-            _ => await _groupRepository.GetStudentsAsync(courseId, groupName, options.PageData, cancellationToken)
+            _ => await _groupRepository.GetStudentsAsync(courseId, groupName, options.PageData, options.SearchText, cancellationToken)
         };
 
         return new Pageable<UserListRow>
         {
             Items = students,
-            TotalCount = studentCount,
+            TotalCount = studentCount
         };
     }
 
-    public async Task<Result<IEnumerable<UserListRow>>> GetAddableTeachersAsync(int courseId, string groupName, CancellationToken cancellationToken = default)
+    public async Task<Result<IEnumerable<UserListRow>>> GetAddableTeachersAsync(int courseId, string groupName,
+        CancellationToken cancellationToken = default)
     {
         var courseTeachers = await _courseRepository.GetTeachersAsync(courseId, cancellationToken);
         var groupTeachers = await _groupRepository.GetTeachersAsync(courseId, groupName, cancellationToken: cancellationToken);
@@ -204,7 +202,8 @@ public class GroupManager : IGroupManager
         return Result.Ok(addableTeachers);
     }
 
-    public async Task<Result<IEnumerable<UserListRow>>> GetAddableStudentsAsync(int courseId, string groupName, CancellationToken cancellationToken = default)
+    public async Task<Result<IEnumerable<UserListRow>>> GetAddableStudentsAsync(int courseId, string groupName,
+        CancellationToken cancellationToken = default)
     {
         var courseStudents = await _courseRepository.GetStudentsAsync(courseId, cancellationToken);
         var groupStudents = await _groupRepository.GetStudentsAsync(courseId, groupName, cancellationToken: cancellationToken);
@@ -219,7 +218,7 @@ public class GroupManager : IGroupManager
     public async Task<Result<int>> CreateAsync(NewGroup newGroup, int courseId, CancellationToken cancellationToken = default)
     {
         var user = await _currentUserService.GetAsync(cancellationToken);
-        
+
         return await _groupRepository.CreateAsync(newGroup, courseId, user, cancellationToken);
     }
 
@@ -229,26 +228,38 @@ public class GroupManager : IGroupManager
         {
             return await _groupRepository.UpdateAsync(courseId, groupName, updatedGroup, cancellationToken);
         }
-        
+
         var userId = await _currentUserService.GetIdAsync(cancellationToken);
 
         return await _groupRepository.UpdateAsync(courseId, groupName, updatedGroup, userId, cancellationToken);
     }
 
-    public async Task<Result> AddTeachersAsync(int courseId, string groupName, IEnumerable<Guid> userIds, CancellationToken cancellationToken = default)
+    public async Task<Result> AddTeachersAsync(int courseId, string groupName, IEnumerable<Guid> userIds,
+        CancellationToken cancellationToken = default)
     {
         return await _groupRepository.AddTeachersAsync(courseId, groupName, userIds, cancellationToken);
     }
 
-    public async Task<Result> AddStudentsAsync(int courseId, string groupName, IEnumerable<Guid> userIds, CancellationToken cancellationToken = default)
+    public async Task<Result> AddStudentsAsync(int courseId, string groupName, IEnumerable<Guid> userIds,
+        CancellationToken cancellationToken = default)
     {
         return await _groupRepository.AddStudentsAsync(courseId, groupName, userIds, cancellationToken);
+    }
+
+    public async Task<Result> RemoveTeacherAsync(int courseId, string groupName, Guid teacherId, CancellationToken cancellationToken = default)
+    {
+        return await _groupRepository.RemoveTeacherAsync(courseId, groupName, teacherId, cancellationToken);
+    }
+
+    public async Task<Result> RemoveStudentAsync(int courseId, string groupName, Guid studentId, CancellationToken cancellationToken = default)
+    {
+        return await _groupRepository.RemoveStudentAsync(courseId, groupName, studentId, cancellationToken);
     }
 
     public async Task<bool> IsInGroupAsync(int courseId, string groupName, CancellationToken cancellationToken = default)
     {
         var userId = await _currentUserService.GetIdAsync(cancellationToken);
-        
+
         return await _groupRepository.IsInGroupAsync(courseId, groupName, userId, cancellationToken);
     }
 
