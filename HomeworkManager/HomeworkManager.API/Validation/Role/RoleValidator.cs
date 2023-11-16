@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 
-namespace HomeworkManager.API.Validation;
+namespace HomeworkManager.API.Validation.Role;
 
 public class RoleValidator : AbstractValidator<IEnumerable<int>>
 {

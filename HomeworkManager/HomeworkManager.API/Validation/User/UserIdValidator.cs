@@ -4,7 +4,7 @@ using HomeworkManager.Model.Constants;
 using HomeworkManager.Model.Constants.Errors;
 using HomeworkManager.Model.Constants.Errors.User;
 
-namespace HomeworkManager.API.Validation;
+namespace HomeworkManager.API.Validation.User;
 
 public class UserIdValidator : AbstractValidator<Guid>
 {

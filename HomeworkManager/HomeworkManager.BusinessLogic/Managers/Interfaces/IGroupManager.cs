@@ -1,25 +1,26 @@
-﻿using HomeworkManager.Model.CustomEntities;
+﻿using FluentResults;
+using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.Group;
 using HomeworkManager.Model.CustomEntities.User;
-using HomeworkManager.Model.ErrorEntities;
 
 namespace HomeworkManager.BusinessLogic.Managers.Interfaces;
 
 public interface IGroupManager
 {
-    Task<Result<IEnumerable<GroupListRow>, BusinessError>> GetAllByUserAsync(int courseId, string? username);
-    Task<bool> ExistsAsync(string groupName, int courseId);
-    Task<Result<GroupModel?, BusinessError>> GetModelByUserAsync(int courseId, string groupName, string? username);
-    Task<Result<Pageable<UserListRow>, BusinessError>> GetTeachersAsync(int courseId, string groupName, string? username, PageableOptions options);
-    Task<Result<Pageable<UserListRow>, BusinessError>> GetStudentsAsync(int courseId, string groupName, string? username, PageableOptions options);
-    Task<Result<IEnumerable<UserListRow>, BusinessError>> GetAddableTeachersAsync(int courseId, string groupName, string? username);
-    Task<Result<IEnumerable<UserListRow>, BusinessError>> GetAddableStudentsAsync(int courseId, string groupName, string? username);
-    Task<Result<int, BusinessError>> CreateAsync(NewGroup newGroup, int courseId, string? username);
-    Task<BusinessError?> UpdateAsync(int courseId, string groupName, UpdateGroup updatedGroup, string? username);
-    Task<BusinessError?> AddTeachersAsync(int courseId, string groupName, string? username, IEnumerable<Guid> userIds);
-    Task<BusinessError?> AddStudentsAsync(int courseId, string groupName, string? username, IEnumerable<Guid> userIds);
-    Task<bool> IsInGroupAsync(string groupName, int courseId, string? username);
-    Task<bool> IsCreatorAsync(string groupName, int courseId, string? username);
-    Task<bool> IsTeacherAsync(string groupName, int courseId, string? username);
-    Task<bool> NameAvailableAsync(string name, int courseId);
+    Task<bool> ExistsWithNameAsync(int courseId, string groupName,CancellationToken cancellationToken = default);
+    Task<bool> NameAvailableAsync(int courseId, string name,CancellationToken cancellationToken = default);
+    Task<bool> NameAvailableAsync(int courseId, string groupName, string name, CancellationToken cancellationToken = default);
+    Task<Result<IEnumerable<GroupListRow>>> GetAllAsync(int courseId, CancellationToken cancellationToken = default);
+    Task<Result<GroupModel?>> GetModelAsync(int courseId, string groupName, CancellationToken cancellationToken = default);
+    Task<Result<Pageable<UserListRow>>> GetTeachersAsync(int courseId, string groupName, PageableOptions options, CancellationToken cancellationToken = default);
+    Task<Result<Pageable<UserListRow>>> GetStudentsAsync(int courseId, string groupName, PageableOptions options, CancellationToken cancellationToken = default);
+    Task<Result<IEnumerable<UserListRow>>> GetAddableTeachersAsync(int courseId, string groupName, CancellationToken cancellationToken = default);
+    Task<Result<IEnumerable<UserListRow>>> GetAddableStudentsAsync(int courseId, string groupName, CancellationToken cancellationToken = default);
+    Task<Result<int>> CreateAsync(NewGroup newGroup, int courseId, CancellationToken cancellationToken = default);
+    Task<Result> UpdateAsync(int courseId, string groupName, UpdatedGroup updatedGroup, CancellationToken cancellationToken = default);
+    Task<Result> AddTeachersAsync(int courseId, string groupName, IEnumerable<Guid> userIds, CancellationToken cancellationToken = default);
+    Task<Result> AddStudentsAsync(int courseId, string groupName, IEnumerable<Guid> userIds, CancellationToken cancellationToken = default);
+    Task<bool> IsInGroupAsync(int courseId, string groupName, CancellationToken cancellationToken = default);
+    Task<bool> IsCreatorAsync(int courseId, string groupName, CancellationToken cancellationToken = default);
+    Task<bool> IsTeacherAsync(int courseId, string groupName, CancellationToken cancellationToken = default);
 }

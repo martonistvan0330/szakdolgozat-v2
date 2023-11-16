@@ -1,4 +1,7 @@
-﻿using HomeworkManager.API.Attributes;
+﻿using FluentValidation;
+using HomeworkManager.API.Attributes;
+using HomeworkManager.API.Extensions;
+using HomeworkManager.API.Validation.Course;
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.Model.Constants;
 using HomeworkManager.Model.CustomEntities.Course;
@@ -12,160 +15,224 @@ namespace HomeworkManager.API.Controllers;
 [Route("api/Course")]
 public class CourseController : ControllerBase
 {
+    private readonly CourseIdValidator _courseIdValidator;
     private readonly ICourseManager _courseManager;
+    private readonly NewCourseValidator _newCourseValidator;
 
-    public CourseController(ICourseManager courseManager)
+    public CourseController
+    (
+        CourseIdValidator courseIdValidator,
+        ICourseManager courseManager,
+        NewCourseValidator newCourseValidator
+    )
     {
+        _courseIdValidator = courseIdValidator;
         _courseManager = courseManager;
+        _newCourseValidator = newCourseValidator;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<CourseCard>>> GetAllAsync()
+    public async Task<ActionResult<IEnumerable<CourseCard>>> GetAllAsync(CancellationToken cancellationToken)
     {
-        var allCoursesByUserResult = await _courseManager.GetAllCoursesByUserAsync(User.Identity?.Name);
+        var allCoursesByUserResult = await _courseManager.GetAllAsync(cancellationToken);
 
-        return allCoursesByUserResult.Match<ActionResult<IEnumerable<CourseCard>>>(
-            result => Ok(result),
-            error => BadRequest(error.Message)
-        );
+        return allCoursesByUserResult.ToActionResult();
     }
 
     [HttpGet("{courseId:int}/Exist")]
-    public async Task<ActionResult<bool>> ExistsAsync(int courseId)
+    public async Task<ActionResult<bool>> ExistsAsync(int courseId, CancellationToken cancellationToken)
     {
-        return await _courseManager.ExistsAsync(courseId);
+        return await _courseManager.ExistsWithIdAsync(courseId, cancellationToken);
     }
 
     [HttpGet("{courseId:int}")]
-    public async Task<ActionResult<CourseModel?>> GetAsync(int courseId)
+    public async Task<ActionResult<CourseModel>> GetAsync(int courseId, CancellationToken cancellationToken)
     {
-        var getResult = await _courseManager.GetModelByUserAsync(courseId, User.Identity?.Name);
+        var courseIdValidationResult = await _courseIdValidator.ValidateAsync(courseId, cancellationToken);
 
-        return getResult.Match<ActionResult<CourseModel?>>(
-            result => Ok(result),
-            error => BadRequest(error.Message)
-        );
+        if (!courseIdValidationResult.IsValid)
+        {
+            return courseIdValidationResult.ToActionResult();
+        }
+        
+        var getResult = await _courseManager.GetModelAsync(courseId, cancellationToken);
+
+        return getResult.ToActionResult();
     }
 
     [HttpGet("{courseId:int}/Teacher")]
-    public async Task<ActionResult<IEnumerable<UserListRow>>> GetTeachersAsync(int courseId)
+    public async Task<ActionResult<IEnumerable<UserListRow>>> GetTeachersAsync(int courseId, CancellationToken cancellationToken)
     {
-        var getTeachersResult = await _courseManager.GetTeachersAsync(courseId, User.Identity?.Name);
+        var courseIdValidationResult = await _courseIdValidator.ValidateAsync(courseId, cancellationToken);
 
-        return getTeachersResult.Match<ActionResult<IEnumerable<UserListRow>>>(
-            result => Ok(result),
-            error => BadRequest(error.Message)
-        );
+        if (!courseIdValidationResult.IsValid)
+        {
+            return courseIdValidationResult.ToActionResult();
+        }
+        
+        var getTeachersResult = await _courseManager.GetTeachersAsync(courseId, cancellationToken);
+
+        return getTeachersResult.ToActionResult();
     }
 
     [HttpGet("{courseId:int}/Student")]
-    public async Task<ActionResult<IEnumerable<UserListRow>>> GetStudentsAsync(int courseId)
+    public async Task<ActionResult<IEnumerable<UserListRow>>> GetStudentsAsync(int courseId, CancellationToken cancellationToken)
     {
-        var getStudentsResult = await _courseManager.GetStudentsAsync(courseId, User.Identity?.Name);
+        var courseIdValidationResult = await _courseIdValidator.ValidateAsync(courseId, cancellationToken);
 
-        return getStudentsResult.Match<ActionResult<IEnumerable<UserListRow>>>(
-            result => Ok(result),
-            error => BadRequest(error.Message)
-        );
+        if (!courseIdValidationResult.IsValid)
+        {
+            return courseIdValidationResult.ToActionResult();
+        }
+        
+        var getStudentsResult = await _courseManager.GetStudentsAsync(courseId, cancellationToken);
+
+        return getStudentsResult.ToActionResult();
     }
-
+    
+    [HomeworkManagerAuthorize(Roles = $"{Roles.TEACHER},{Roles.ADMINISTRATOR}")]
     [HttpGet("{courseId:int}/Teacher/Addable")]
-    public async Task<ActionResult<IEnumerable<UserListRow>>> GetAddableTeachersAsync(int courseId)
+    public async Task<ActionResult<IEnumerable<UserListRow>>> GetAddableTeachersAsync(int courseId, CancellationToken cancellationToken)
     {
-        var getTeachersResult = await _courseManager.GetAddableTeachersAsync(courseId, User.Identity?.Name);
-
-        return getTeachersResult.Match<ActionResult<IEnumerable<UserListRow>>>(
-            result => Ok(result),
-            error => BadRequest(error.Message)
+        var courseIdValidationResult = await _courseIdValidator.ValidateAsync
+        (
+            courseId,
+            options => { options.IncludeRuleSets("Default", "IsCreator"); },
+            cancellationToken
         );
+
+        if (!courseIdValidationResult.IsValid)
+        {
+            return courseIdValidationResult.ToActionResult();
+        }
+        
+        var getTeachersResult = await _courseManager.GetAddableTeachersAsync(courseId, cancellationToken);
+
+        return getTeachersResult.ToActionResult();
     }
 
+    [HomeworkManagerAuthorize(Roles = $"{Roles.TEACHER},{Roles.ADMINISTRATOR}")]
     [HttpGet("{courseId:int}/Student/Addable")]
-    public async Task<ActionResult<IEnumerable<UserListRow>>> GetAddableStudentsAsync(int courseId)
+    public async Task<ActionResult<IEnumerable<UserListRow>>> GetAddableStudentsAsync(int courseId, CancellationToken cancellationToken)
     {
-        var getStudentsResult = await _courseManager.GetAddableStudentsAsync(courseId, User.Identity?.Name);
+        var courseIdValidationResult = await _courseIdValidator.ValidateAsync(
+            courseId,
+            options => { options.IncludeRuleSets("Default", "IsTeacher"); },
+            cancellationToken);
+        
+        if (!courseIdValidationResult.IsValid)
+        {
+            return courseIdValidationResult.ToActionResult();
+        }
+        
+        var getStudentsResult = await _courseManager.GetAddableStudentsAsync(courseId, cancellationToken);
 
-        return getStudentsResult.Match<ActionResult<IEnumerable<UserListRow>>>(
-            result => Ok(result),
-            error => BadRequest(error.Message)
-        );
+        return getStudentsResult.ToActionResult();
     }
 
     [HomeworkManagerAuthorize(Roles = $"{Roles.TEACHER},{Roles.ADMINISTRATOR}")]
     [HttpPost]
-    public async Task<ActionResult<int>> CreateAsync(NewCourse newCourse)
+    public async Task<ActionResult<int>> CreateAsync(NewCourse newCourse, CancellationToken cancellationToken)
     {
-        var createResult = await _courseManager.CreateAsync(newCourse, User.Identity?.Name);
+        var newCourseValidationResult = await _newCourseValidator.ValidateAsync(newCourse, cancellationToken);
 
-        return createResult.Match<ActionResult<int>>(
-            result => Ok(result),
-            error => BadRequest(error.Message)
-        );
+        if (!newCourseValidationResult.IsValid)
+        {
+            return newCourseValidationResult.ToActionResult();
+        }
+        
+        var createResult = await _courseManager.CreateAsync(newCourse, cancellationToken);
+
+        return createResult.ToActionResult();
     }
 
     [HomeworkManagerAuthorize(Roles = $"{Roles.TEACHER},{Roles.ADMINISTRATOR}")]
     [HttpPut("{courseId:int}")]
-    public async Task<ActionResult> UpdateAsync(int courseId, UpdateCourse updatedCourse)
+    public async Task<ActionResult> UpdateAsync(int courseId, UpdatedCourse updatedCourse, CancellationToken cancellationToken)
     {
-        var updateError = await _courseManager.UpdateAsync(courseId, updatedCourse, User.Identity?.Name);
-
-        if (updateError is not null)
+        var courseIdValidationResult = await _courseIdValidator.ValidateAsync(
+            courseId,
+            options => { options.IncludeRuleSets("Default", "IsCreator"); },
+            cancellationToken);
+        
+        if (!courseIdValidationResult.IsValid)
         {
-            return Forbid();
+            return courseIdValidationResult.ToActionResult();
         }
 
-        return Ok();
+        var updatedCourseValidator = new UpdatedCourseValidator(courseId, _courseManager);
+        
+        var updatedCourseValidationResult = await updatedCourseValidator.ValidateAsync(updatedCourse, cancellationToken);
+
+        if (!updatedCourseValidationResult.IsValid)
+        {
+            return updatedCourseValidationResult.ToActionResult();
+        }
+        
+        var updateResult = await _courseManager.UpdateAsync(courseId, updatedCourse, cancellationToken);
+
+        return updateResult.ToActionResult();
     }
 
     [HomeworkManagerAuthorize(Roles = $"{Roles.TEACHER},{Roles.ADMINISTRATOR}")]
     [HttpPost("{courseId:int}/Teacher/Add")]
-    public async Task<ActionResult> AddTeachersAsync(int courseId, IEnumerable<Guid> userIds)
+    public async Task<ActionResult> AddTeachersAsync(int courseId, ICollection<Guid> userIds, CancellationToken cancellationToken)
     {
-        var addError = await _courseManager.AddTeachersAsync(courseId, User.Identity?.Name, userIds);
-
-        if (addError is not null)
+        var courseIdValidationResult = await _courseIdValidator.ValidateAsync(
+            courseId,
+            options => { options.IncludeRuleSets("Default", "IsCreator"); },
+            cancellationToken);
+        
+        if (!courseIdValidationResult.IsValid)
         {
-            return Forbid();
+            return courseIdValidationResult.ToActionResult();
         }
+        
+        var addResult = await _courseManager.AddTeachersAsync(courseId, userIds, cancellationToken);
 
-        return Ok();
+        return addResult.ToActionResult();
     }
 
     [HomeworkManagerAuthorize(Roles = $"{Roles.TEACHER},{Roles.ADMINISTRATOR}")]
     [HttpPost("{courseId:int}/Student/Add")]
-    public async Task<ActionResult> AddStudentsAsync(int courseId, IEnumerable<Guid> userIds)
+    public async Task<ActionResult> AddStudentsAsync(int courseId, ICollection<Guid> userIds, CancellationToken cancellationToken)
     {
-        var addError = await _courseManager.AddStudentsAsync(courseId, User.Identity?.Name, userIds);
-
-        if (addError is not null)
+        var courseIdValidationResult = await _courseIdValidator.ValidateAsync(
+            courseId,
+            options => { options.IncludeRuleSets("Default", "IsTeacher"); },
+            cancellationToken);
+        
+        if (!courseIdValidationResult.IsValid)
         {
-            return Forbid();
+            return courseIdValidationResult.ToActionResult();
         }
+        
+        var addResult = await _courseManager.AddStudentsAsync(courseId, userIds, cancellationToken);
 
-        return Ok();
+        return addResult.ToActionResult();
     }
 
     [HttpGet("{courseId:int}/IsInCourse")]
-    public async Task<ActionResult<bool>> IsInCourseAsync(int courseId)
+    public async Task<ActionResult<bool>> IsInCourseAsync(int courseId, CancellationToken cancellationToken)
     {
-        return await _courseManager.IsInCourseAsync(courseId, User.Identity?.Name);
+        return await _courseManager.IsInCourseAsync(courseId, cancellationToken);
     }
 
     [HttpGet("{courseId:int}/IsCreator")]
-    public async Task<ActionResult<bool>> IsCreatorAsync(int courseId)
+    public async Task<ActionResult<bool>> IsCreatorAsync(int courseId, CancellationToken cancellationToken)
     {
-        return await _courseManager.IsCreatorAsync(courseId, User.Identity?.Name);
+        return await _courseManager.IsCreatorAsync(courseId, cancellationToken);
     }
 
     [HttpGet("{courseId:int}/IsTeacher")]
-    public async Task<ActionResult<bool>> IsTeacherAsync(int courseId)
+    public async Task<ActionResult<bool>> IsTeacherAsync(int courseId, CancellationToken cancellationToken)
     {
-        return await _courseManager.IsTeacherAsync(courseId, User.Identity?.Name);
+        return await _courseManager.IsTeacherAsync(courseId, cancellationToken);
     }
 
     [HttpGet("NameAvailable")]
-    public async Task<ActionResult<bool>> NameAvailableAsync(string name)
+    public async Task<ActionResult<bool>> NameAvailableAsync(string name, CancellationToken cancellationToken)
     {
-        return await _courseManager.NameAvailableAsync(name);
+        return await _courseManager.NameAvailableAsync(name, cancellationToken);
     }
 }
