@@ -35,10 +35,13 @@ builder.Services.AddIdentityCore<User>(options =>
 
 builder.AddJwtAuthentication();
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services
     .AddRepositories()
     .AddServices()
     .AddManagers()
+    .AddValidators()
     .AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

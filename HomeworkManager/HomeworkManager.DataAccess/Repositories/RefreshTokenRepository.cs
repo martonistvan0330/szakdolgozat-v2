@@ -17,25 +17,43 @@ public class RefreshTokenRepository : IRefreshTokenRepository
         _hashingService = hashingService;
     }
 
-    public async Task<RefreshToken?> GetAsync(string refreshToken, AccessToken accessToken)
+    public async Task<RefreshToken?> GetAsync(string refreshToken, AccessToken accessToken, CancellationToken cancellationToken = default)
     {
         var refreshTokenHash = await _hashingService.GetHashString(refreshToken);
 
         return await _context.RefreshTokens
             .Where(rt => rt.TokenHash == refreshTokenHash
                          && rt.AccessTokenId == accessToken.AccessTokenId)
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
     }
 
-    public async Task RevokeAsync(string refreshToken, AccessToken accessToken)
+    public async Task<RefreshToken> CreateAsync(string refreshToken, int accessTokenId, CancellationToken cancellationToken = default)
     {
-        var dbRefreshToken = await GetAsync(refreshToken, accessToken);
+        var refreshTokenHash = await _hashingService.GetHashString(refreshToken);
+
+        RefreshToken dbRefreshToken = new RefreshToken
+        {
+            TokenHash = refreshTokenHash,
+            AccessTokenId = accessTokenId
+        };
+
+        _context.RefreshTokens.Add(dbRefreshToken);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return dbRefreshToken;
+    }
+    
+    public async Task<RefreshToken?> RevokeAsync(string refreshToken, AccessToken accessToken, CancellationToken cancellationToken = default)
+    {
+        var dbRefreshToken = await GetAsync(refreshToken, accessToken, cancellationToken);
 
         if (dbRefreshToken is not null)
         {
             dbRefreshToken.IsActive = false;
         }
 
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return dbRefreshToken;
     }
 }

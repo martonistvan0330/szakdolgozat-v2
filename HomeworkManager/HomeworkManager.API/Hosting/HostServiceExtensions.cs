@@ -1,4 +1,11 @@
-﻿using HomeworkManager.BusinessLogic.Managers;
+﻿using FluentValidation;
+using HomeworkManager.API.Validation;
+using HomeworkManager.API.Validation.Authentication;
+using HomeworkManager.API.Validation.Course;
+using HomeworkManager.API.Validation.Group;
+using HomeworkManager.API.Validation.Role;
+using HomeworkManager.API.Validation.User;
+using HomeworkManager.BusinessLogic.Managers;
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.BusinessLogic.Services.Authentication;
 using HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
@@ -9,6 +16,9 @@ using HomeworkManager.BusinessLogic.Services.Seed.Interfaces;
 using HomeworkManager.DataAccess.Repositories;
 using HomeworkManager.DataAccess.Repositories.Interfaces;
 using HomeworkManager.Model.Configurations;
+using HomeworkManager.Model.CustomEntities.Authentication;
+using HomeworkManager.Model.CustomEntities.Course;
+using HomeworkManager.Model.CustomEntities.User;
 using HomeworkManager.Shared.Services;
 using HomeworkManager.Shared.Services.Interfaces;
 
@@ -32,6 +42,7 @@ public static class HostServiceExtensions
         services.AddScoped<IEntityRepository, EntityRepository>();
         services.AddScoped<IPasswordRecoveryTokenRepository, PasswordRecoveryTokenRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         return services;
     }
@@ -42,18 +53,39 @@ public static class HostServiceExtensions
         services.AddScoped<ICourseManager, CourseManager>();
         services.AddScoped<IEntityManager, EntityManager>();
         services.AddScoped<IGroupManager, GroupManager>();
-        services.AddScoped<UserManager>();
+        services.AddScoped<IRoleManager, RoleManager>();
+        services.AddScoped<IUserManager, UserManager>();
         return services;
     }
 
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
+        services.AddTransient<ICurrentUserService, CurrentUserService>();
         services.AddTransient<IEmailService, EmailService>();
         services.AddTransient<IHashingService, HashingService>();
         services.AddTransient<IJwtService, JwtService>();
         services.AddTransient<IRoleSeedService, RoleSeedService>();
         services.AddTransient<ITokenService, TokenService>();
         services.AddTransient<IUserSeedService, UserSeedService>();
+        return services;
+    }
+
+    public static IServiceCollection AddValidators(this IServiceCollection services)
+    {
+        services.AddScoped<AbstractValidator<EmailConfirmationRequest>, EmailConfirmationRequestValidator>();
+        services.AddScoped<AbstractValidator<NewCourse>, NewCourseValidator>();
+        services.AddScoped<AbstractValidator<NewUser>, NewUserValidator>();
+        services.AddScoped<AbstractValidator<PasswordResetRequest>, PasswordResetRequestValidator>();
+
+        services.AddScoped<CourseIdValidator>();
+        services.AddScoped<EmailValidator>();
+        services.AddScoped<GroupNameValidator>();
+        services.AddScoped<NewGroupValidator>();
+        services.AddScoped<PasswordValidator>();
+        services.AddScoped<RoleValidator>();
+        services.AddScoped<UpdatedCourseValidator>();
+        services.AddScoped<UpdatedGroupValidator>();
+        services.AddScoped<UserIdValidator>();
         return services;
     }
 }

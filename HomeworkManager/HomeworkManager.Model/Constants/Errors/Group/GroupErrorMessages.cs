@@ -6,4 +6,5 @@ public static class GroupErrorMessages
     public const string GROUP_NOT_FOUND = "Group not found!";
     public const string GENERAL_GROUP_NAME_CHANGED = "Changing the name of the general group is not allowed!";
     public const string NOT_IN_GROUP = "You are not a member of this group!";
+    public const string GROUP_WITH_NAME_NOT_FOUND = "Group with the specified name does not exist.";
 }

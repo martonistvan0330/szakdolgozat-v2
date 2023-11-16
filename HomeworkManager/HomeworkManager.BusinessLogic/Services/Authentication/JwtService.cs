@@ -3,14 +3,15 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using HomeworkManager.BusinessLogic.Managers;
+using System.Transactions;
+using FluentResults;
+using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
 using HomeworkManager.Model.Configurations;
 using HomeworkManager.Model.Constants.Errors.Authentication;
-using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.Authentication;
-using HomeworkManager.Model.Entities;
-using HomeworkManager.Model.ErrorEntities;
+using HomeworkManager.Model.CustomEntities.Errors;
+using HomeworkManager.Model.CustomEntities.User;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -20,12 +21,12 @@ public class JwtService : IJwtService
 {
     private readonly JwtConfiguration _jwtConfiguration;
     private readonly ITokenService _tokenService;
-    private readonly UserManager _userManager;
+    private readonly IUserManager _userManager;
 
     public JwtService(
         IOptions<JwtConfiguration> jwtConfiguration,
         ITokenService tokenService,
-        UserManager userManager
+        IUserManager userManager
     )
     {
         _jwtConfiguration = jwtConfiguration.Value;
@@ -34,12 +35,12 @@ public class JwtService : IJwtService
     }
 
 
-    public async Task<AuthenticationResponse> CreateTokensAsync(User user)
+    public async Task<Result<AuthenticationResponse>> CreateTokensAsync(UserModel userModel, CancellationToken cancellationToken = default)
     {
         var expiration = DateTime.UtcNow.AddMinutes(_jwtConfiguration.ExpirationMinutes);
 
         var accessJwt = CreateJwtAccessToken(
-            await CreateClaimsAsync(user),
+            CreateClaimsAsync(userModel),
             CreateSigningCredentials(),
             expiration
         );
@@ -50,7 +51,7 @@ public class JwtService : IJwtService
 
         var accessToken = tokenHandler.WriteToken(accessJwt);
 
-        await _tokenService.AddTokensToUserAsync(accessToken, refreshToken, user.Id);
+        await _tokenService.AddTokensToUserAsync(accessToken, refreshToken, userModel.UserId, cancellationToken);
 
         return new AuthenticationResponse
         {
@@ -60,7 +61,7 @@ public class JwtService : IJwtService
         };
     }
 
-    public async Task<Result<AuthenticationResponse, BusinessError>> RefreshTokensAsync(string accessToken, string refreshToken)
+    public async Task<Result<AuthenticationResponse>> RefreshTokensAsync(RefreshRequest refreshRequest, CancellationToken cancellationToken = default)
     {
         var tokenValidationParameters = new TokenValidationParameters
         {
@@ -73,32 +74,41 @@ public class JwtService : IJwtService
 
         var tokenHandler = new JwtSecurityTokenHandler();
 
-        var principal = tokenHandler.ValidateToken(accessToken, tokenValidationParameters, out var securityToken);
+        var principal = tokenHandler.ValidateToken(refreshRequest.AccessToken, tokenValidationParameters, out var securityToken);
 
         if (principal?.Identity?.Name is null ||
             securityToken is not JwtSecurityToken jwtSecurityToken ||
             !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
         {
-            return new BusinessError(AuthenticationErrorMessages.INVALID_ACCESS_TOKEN);
+            return Result.Fail(new BusinessError(AuthenticationErrorMessages.INVALID_ACCESS_TOKEN));
         }
 
-        var user = await _userManager.FindByNameAsync(principal.Identity.Name);
+        var userModelResult = await _userManager.GetModelByUsernameAsync(principal.Identity.Name, cancellationToken);
 
-        if (user is null)
+        if (!userModelResult.IsSuccess)
         {
             return new BusinessError(AuthenticationErrorMessages.INVALID_REFRESH_TOKEN);
         }
 
-        var checkTokensResult = await _tokenService.CheckTokensAsync(accessToken, refreshToken, user.Id);
+        var userModel = userModelResult.Value;
 
-        if (!checkTokensResult.Success)
+        var checkTokensResult =
+            await _tokenService.CheckTokensAsync(refreshRequest.AccessToken, refreshRequest.RefreshToken, userModel.UserId, cancellationToken);
+
+        if (!checkTokensResult.IsSuccess)
         {
-            return checkTokensResult.Error!;
+            return checkTokensResult.ToResult<AuthenticationResponse>();
         }
 
-        await _tokenService.RevokeTokensAsync(accessToken, refreshToken, user.Id);
+        using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        return await CreateTokensAsync(user);
+        await _tokenService.RevokeTokensAsync(refreshRequest.AccessToken, refreshRequest.RefreshToken, userModel.UserId, cancellationToken);
+
+        var tokenResult = await CreateTokensAsync(userModel, cancellationToken);
+
+        transactionScope.Complete();
+
+        return tokenResult;
     }
 
     private JwtSecurityToken CreateJwtAccessToken(Claim[] claims, SigningCredentials credentials, DateTime expiration)
@@ -112,21 +122,21 @@ public class JwtService : IJwtService
         );
     }
 
-    private async Task<Claim[]> CreateClaimsAsync(User user)
+    private Claim[] CreateClaimsAsync(UserModel userModel)
     {
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub, _jwtConfiguration.Subject),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)),
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Name, user.UserName!),
-            new(ClaimTypes.Email, user.Email!)
+            new(ClaimTypes.NameIdentifier, userModel.UserId.ToString()),
+            new(ClaimTypes.Name, userModel.Username),
+            new(ClaimTypes.Email, userModel.Email)
         };
 
-        foreach (var role in await _userManager.GetRolesAsync(user))
+        foreach (var role in userModel.Roles)
         {
-            claims.Add(new Claim(ClaimTypes.Role, role));
+            claims.Add(new Claim(ClaimTypes.Role, role.Name));
         }
 
         return claims.ToArray();

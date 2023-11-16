@@ -1,13 +1,14 @@
 ﻿using System.Linq.Expressions;
+using FluentResults;
 using HomeworkManager.DataAccess.Repositories.Extensions;
 using HomeworkManager.DataAccess.Repositories.Interfaces;
 using HomeworkManager.Model.Constants.Errors.Group;
 using HomeworkManager.Model.Contexts;
 using HomeworkManager.Model.CustomEntities;
+using HomeworkManager.Model.CustomEntities.Errors;
 using HomeworkManager.Model.CustomEntities.Group;
 using HomeworkManager.Model.CustomEntities.User;
 using HomeworkManager.Model.Entities;
-using HomeworkManager.Model.ErrorEntities;
 using Microsoft.EntityFrameworkCore;
 
 namespace HomeworkManager.DataAccess.Repositories;
@@ -20,49 +21,22 @@ public class GroupRepository : IGroupRepository
     {
         _context = context;
     }
-
-    public async Task<IEnumerable<GroupListRow>> GetAllAsync(int courseId)
+    
+    public async Task<bool> ExistsWithNameAsync(int courseId, string groupName, CancellationToken cancellationToken = default)
     {
         return await _context.Groups
-            .Where(g => g.CourseId == courseId)
-            .Select(g => new GroupListRow
-            {
-                GroupId = g.GroupId,
-                Name = g.Name
-            })
-            .ToListAsync();
+            .Where(g => g.CourseId == courseId && g.Name == groupName)
+            .AnyAsync(cancellationToken);
     }
-
-    public async Task<IEnumerable<GroupListRow>> GetAllByUserAsync(int courseId, Guid userId)
+    
+    public async Task<Group?> GetByNameAsync(int courseId, string groupName, CancellationToken cancellationToken = default)
     {
-        var user = await _context.Users
-            .Include(u => u.AttendedCourses)
-            .Include(u => u.ManagedCourses)
-            .SingleOrDefaultAsync(u => u.Id == userId);
-
-        if (user is null)
-        {
-            return new HashSet<GroupListRow>();
-        }
-
         return await _context.Groups
-            .Where(g => g.CourseId == courseId)
-            .Where(g => g.Teachers.Select(u => u.Id).Contains(userId)
-                        || g.Students.Select(u => u.Id).Contains(userId))
-            .Select(g => new GroupListRow
-            {
-                GroupId = g.GroupId,
-                Name = g.Name
-            })
-            .ToListAsync();
+            .Where(g => g.CourseId == courseId && g.Name == groupName)
+            .SingleOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<bool> ExistsWithNameAsync(int courseId, string groupName)
-    {
-        return await _context.Groups.AnyAsync(g => g.CourseId == courseId && g.Name == groupName);
-    }
-
-    public async Task<GroupModel?> GetModelAsync(int courseId, string groupName)
+    public async Task<GroupModel?> GetModelAsync(int courseId, string groupName, CancellationToken cancellationToken = default)
     {
         return await _context.Groups
             .Where(g => g.CourseId == courseId && g.Name == groupName)
@@ -71,10 +45,10 @@ public class GroupRepository : IGroupRepository
                 Name = g.Name,
                 Description = g.Description
             })
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<GroupModel?> GetModelByUserAsync(int courseId, string groupName, Guid userId)
+    public async Task<GroupModel?> GetModelAsync(int courseId, string groupName, Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.Groups
             .Where(g => g.CourseId == courseId && g.Name == groupName)
@@ -85,25 +59,51 @@ public class GroupRepository : IGroupRepository
                 Name = g.Name,
                 Description = g.Description
             })
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
+    }
+    
+    public async Task<IEnumerable<GroupListRow>> GetAllAsync(int courseId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Groups
+            .Where(g => g.CourseId == courseId)
+            .Select(g => new GroupListRow
+            {
+                GroupId = g.GroupId,
+                Name = g.Name
+            })
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<int> GetTeacherCountAsync(int courseId, string groupName, string? searchText = null)
+    public async Task<IEnumerable<GroupListRow>> GetAllAsync(int courseId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Groups
+            .Where(g => g.CourseId == courseId)
+            .Where(g => g.Teachers.Select(u => u.Id).Contains(userId)
+                        || g.Students.Select(u => u.Id).Contains(userId))
+            .Select(g => new GroupListRow
+            {
+                GroupId = g.GroupId,
+                Name = g.Name
+            })
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> GetTeacherCountAsync(int courseId, string groupName, string? searchText = null, CancellationToken cancellationToken = default)
     {
         return await _context.Groups
             .Where(g => g.CourseId == courseId && g.Name == groupName)
             .SelectMany(g => g.Teachers)
             .Search(searchText)
-            .CountAsync();
+            .CountAsync(cancellationToken);
     }
 
-    public async Task<int> GetStudentCountAsync(int courseId, string groupName, string? searchText = null)
+    public async Task<int> GetStudentCountAsync(int courseId, string groupName, string? searchText = null, CancellationToken cancellationToken = default)
     {
         return await _context.Groups
             .Where(g => g.CourseId == courseId && g.Name == groupName)
             .SelectMany(g => g.Students)
             .Search(searchText)
-            .CountAsync();
+            .CountAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<UserListRow>> GetTeachersAsync<TKey>
@@ -113,7 +113,8 @@ public class GroupRepository : IGroupRepository
         PageData? pageData = null,
         Expression<Func<UserListRow, TKey>>? orderBy = null,
         SortDirection sortDirection = SortDirection.Ascending,
-        string? searchText = null
+        string? searchText = null,
+        CancellationToken cancellationToken = default
     )
     {
         return await _context.Groups
@@ -130,7 +131,7 @@ public class GroupRepository : IGroupRepository
             })
             .OrderByWithDirection(orderBy, sortDirection)
             .GetPage(pageData)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<UserListRow>> GetStudentsAsync<TKey>
@@ -140,7 +141,8 @@ public class GroupRepository : IGroupRepository
         PageData? pageData = null,
         Expression<Func<UserListRow, TKey>>? orderBy = null,
         SortDirection sortDirection = SortDirection.Ascending,
-        string? searchText = null
+        string? searchText = null,
+        CancellationToken cancellationToken = default
     )
     {
         return await _context.Groups
@@ -157,16 +159,11 @@ public class GroupRepository : IGroupRepository
             })
             .OrderByWithDirection(orderBy, sortDirection)
             .GetPage(pageData)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<Result<int, BusinessError>> CreateAsync(NewGroup newGroup, int courseId, User user)
+    public async Task<int> CreateAsync(NewGroup newGroup, int courseId, User user, CancellationToken cancellationToken = default)
     {
-        if (await _context.Courses.Select(g => g.Name).ContainsAsync(newGroup.Name))
-        {
-            return new BusinessError(GroupErrorMessages.GROUP_NAME_NOT_AVAILABLE);
-        }
-
         Group group = new()
         {
             Name = newGroup.Name,
@@ -177,94 +174,120 @@ public class GroupRepository : IGroupRepository
 
         _context.Groups.Add(group);
         group.Teachers.Add(user);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         return group.GroupId;
     }
 
-    public async Task<BusinessError?> UpdateAsync(int courseId, string groupName, UpdateGroup updatedGroup, User? user = null)
+    public async Task<Result> UpdateAsync(int courseId, string groupName, UpdatedGroup updatedGroup, CancellationToken cancellationToken = default)
     {
-        var group = await _context.Groups.SingleOrDefaultAsync(g => g.CourseId == courseId && g.Name == groupName);
+        var group = await GetByNameAsync(courseId, groupName, cancellationToken);
 
-        if (group is null || (user is not null && group.CreatorId != user.Id))
+        if (group is null)
         {
             return new BusinessError(GroupErrorMessages.GROUP_NOT_FOUND);
         }
+        
+        return await UpdateAsync(group, updatedGroup, cancellationToken);
+    }
+    
+    public async Task<Result> UpdateAsync(int courseId, string groupName, UpdatedGroup updatedGroup, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var group = await GetByNameAsync(courseId, groupName, cancellationToken);
 
-        if (group.Name != updatedGroup.Name)
+        if (group is null)
         {
-            if (await _context.Courses.Select(c => c.Name).ContainsAsync(updatedGroup.Name))
-            {
-                return new BusinessError(GroupErrorMessages.GROUP_NAME_NOT_AVAILABLE);
-            }
+            return new BusinessError(GroupErrorMessages.GROUP_NOT_FOUND);
+        }
+        
+        if (group.CreatorId != userId)
+        {
+            return new ForbiddenError();
         }
 
+        return await UpdateAsync(group, updatedGroup, cancellationToken);
+    }
+
+    private async Task<Result> UpdateAsync(Group group, UpdatedGroup updatedGroup, CancellationToken cancellationToken = default)
+    {
         group.Name = updatedGroup.Name;
         group.Description = updatedGroup.Description;
 
-        await _context.SaveChangesAsync();
-
-        return null;
+        await _context.SaveChangesAsync(cancellationToken);
+        
+        return Result.Ok();
     }
 
-    public async Task AddTeachersAsync(int courseId, string groupName, ICollection<Guid> userIds)
+    public async Task<Result> AddTeachersAsync(int courseId, string groupName, IEnumerable<Guid> userIds, CancellationToken cancellationToken = default)
     {
         var group = await _context.Groups
+            .Where(g => g.CourseId == courseId && g.Name == groupName)
             .Include(g => g.Teachers)
-            .SingleOrDefaultAsync(g => g.CourseId == courseId && g.Name == groupName);
+            .SingleOrDefaultAsync(cancellationToken);
 
-        if (group is not null)
+        if (group is null)
         {
-            var teachers = await _context.Users
-                .Where(u => userIds.Contains(u.Id))
-                .Where(u => u.ManagedCourses.Select(c => c.CourseId).Contains(group.CourseId))
-                .ToListAsync();
-
-            group.Teachers = group.Teachers.UnionBy(teachers, u => u.Id).ToHashSet();
-
-            await _context.SaveChangesAsync();
+            return new NotFoundError(GroupErrorMessages.GROUP_NOT_FOUND);
         }
+        
+        var teachers = await _context.Users
+            .Where(u => userIds.Contains(u.Id))
+            .Where(u => u.ManagedCourses.Select(c => c.CourseId).Contains(group.CourseId))
+            .ToListAsync(cancellationToken);
+
+        group.Teachers = group.Teachers.UnionBy(teachers, u => u.Id).ToHashSet();
+
+        await _context.SaveChangesAsync(cancellationToken);
+        
+        return Result.Ok();
     }
 
-    public async Task AddStudentsAsync(int courseId, string groupName, ICollection<Guid> userIds)
+    public async Task<Result> AddStudentsAsync(int courseId, string groupName, IEnumerable<Guid> userIds, CancellationToken cancellationToken = default)
     {
         var group = await _context.Groups
+            .Where(g => g.CourseId == courseId && g.Name == groupName)
             .Include(g => g.Students)
-            .SingleOrDefaultAsync(g => g.CourseId == courseId && g.Name == groupName);
+            .SingleOrDefaultAsync(cancellationToken);
 
-        if (group is not null)
+        if (group is null)
         {
-            var students = await _context.Users
-                .Where(u => userIds.Contains(u.Id))
-                .Where(u => u.AttendedCourses.Select(c => c.CourseId).Contains(group.CourseId))
-                .ToListAsync();
-
-            group.Students = group.Students.UnionBy(students, u => u.Id).ToHashSet();
-
-            await _context.SaveChangesAsync();
+            return new NotFoundError(GroupErrorMessages.GROUP_NOT_FOUND);
         }
+        
+
+        var students = await _context.Users
+            .Where(u => userIds.Contains(u.Id))
+            .Where(u => u.AttendedCourses.Select(c => c.CourseId).Contains(group.CourseId))
+            .ToListAsync(cancellationToken);
+
+        group.Students = group.Students.UnionBy(students, u => u.Id).ToHashSet();
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Result.Ok();
     }
 
-    public async Task<bool> IsInGroupAsync(int courseId, string groupName, Guid userId)
+    public async Task<bool> IsInGroupAsync(int courseId, string groupName, Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.Groups
             .Where(g => g.CourseId == courseId && g.Name == groupName)
             .Where(g => g.Teachers.Select(u => u.Id).Contains(userId)
                         || g.Students.Select(u => u.Id).Contains(userId))
-            .AnyAsync();
+            .AnyAsync(cancellationToken);
     }
 
-    public async Task<bool> IsCreatorAsync(int courseId, string groupName, Guid userId)
+    public async Task<bool> IsCreatorAsync(int courseId, string groupName, Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.Groups
-            .AnyAsync(g => g.CourseId == courseId && g.Name == groupName && g.CreatorId == userId);
+            .Where(g => g.CourseId == courseId && g.Name == groupName && g.CreatorId == userId)
+            .AnyAsync(cancellationToken);
     }
 
-    public async Task<bool> IsTeacherAsync(int courseId, string groupName, Guid userId)
+    public async Task<bool> IsTeacherAsync(int courseId, string groupName, Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.Groups
             .Where(g => g.CourseId == courseId && g.Name == groupName)
             .SelectMany(g => g.Teachers.Select(u => u.Id))
-            .ContainsAsync(userId);
+            .ContainsAsync(userId, cancellationToken);
     }
 }

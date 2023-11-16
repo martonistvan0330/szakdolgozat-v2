@@ -1,205 +1,162 @@
+using System.Transactions;
+using FluentResults;
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
 using HomeworkManager.BusinessLogic.Services.Email.Interfaces;
-using HomeworkManager.Model.Constants;
 using HomeworkManager.Model.Constants.Errors.Authentication;
-using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.Authentication;
+using HomeworkManager.Model.CustomEntities.Errors;
 using HomeworkManager.Model.CustomEntities.User;
-using HomeworkManager.Model.Entities;
-using HomeworkManager.Model.ErrorEntities;
-using Microsoft.AspNetCore.Identity;
 
 namespace HomeworkManager.BusinessLogic.Managers;
 
 public class AuthenticationManager : IAuthenticationManager
 {
+    private readonly ICurrentUserService _currentUserService;
     private readonly IEmailService _emailService;
     private readonly IJwtService _jwtService;
     private readonly ITokenService _tokenService;
-    private readonly UserManager _userManager;
+    private readonly IUserManager _userManager;
 
     public AuthenticationManager(
+        ICurrentUserService currentUserService,
         IEmailService emailService,
         IJwtService jwtService,
         ITokenService tokenService,
-        UserManager userManager
+        IUserManager userManager
     )
     {
+        _currentUserService = currentUserService;
         _emailService = emailService;
         _jwtService = jwtService;
         _tokenService = tokenService;
         _userManager = userManager;
     }
 
-    public async Task<Result<AuthenticationResponse, BusinessError>> RegisterAsync(NewUser newUser)
+    public async Task<Result<AuthenticationResponse>> RegisterAsync(NewUser newUser, CancellationToken cancellationToken = default)
     {
-        User user = new()
-        {
-            FirstName = newUser.FirstName,
-            LastName = newUser.LastName,
-            FullName = $"{newUser.LastName} {newUser.FirstName}",
-            UserName = newUser.Username,
-            Email = newUser.Email
-        };
+        var createUserResult = await _userManager.CreateAsync(newUser, cancellationToken);
 
-        var createResult = await _userManager.CreateAsync(
-            user,
-            newUser.Password
-        );
-
-        if (!createResult.Succeeded)
+        if (!createUserResult.IsSuccess)
         {
-            return new BusinessError(createResult.Errors.Select<IdentityError, string>(e => e.Description).ToArray());
+            return createUserResult.ToResult();
         }
 
-        var addToRoleResult = await _userManager.AddToRoleAsync(user, Roles.STUDENT);
+        var sendEmailResult = await SendEmailConfirmationAsync(createUserResult.Value, cancellationToken);
 
-        if (!addToRoleResult.Succeeded)
+        if (!sendEmailResult.IsSuccess)
         {
-            return new BusinessError(createResult.Errors.Select(e => e.Description).ToArray());
+            return sendEmailResult;
         }
 
-        await SendEmailConfirmationAsync(user);
-
-        return await _jwtService.CreateTokensAsync(user);
+        return await _jwtService.CreateTokensAsync(createUserResult.Value, cancellationToken);
     }
 
-    public async Task<Result<bool, BusinessError>> ConfirmEmailAsync(string? username, EmailConfirmationRequest emailConfirmationRequest)
+    public async Task<Result> ConfirmEmailAsync(EmailConfirmationRequest emailConfirmationRequest,
+        CancellationToken cancellationToken = default)
     {
-        if (username is null)
+        var userId = await _currentUserService.GetIdAsync(cancellationToken);
+
+        var emailConfirmationResult = await _tokenService.CheckEmailConfirmationTokenAsync(userId, emailConfirmationRequest.Token, cancellationToken);
+
+        if (!emailConfirmationResult.IsSuccess)
         {
-            return new BusinessError(AuthenticationErrorMessages.INVALID_USERNAME);
+            return emailConfirmationResult;
         }
 
-        var user = await _userManager.FindByNameAsync(username);
-        if (user is null)
-        {
-            return new BusinessError(AuthenticationErrorMessages.USER_NOT_FOUND);
-        }
-
-        var emailConfirmationResult = await _tokenService.CheckEmailConfirmationTokenAsync(user.Id, emailConfirmationRequest.Token);
-
-        if (emailConfirmationResult.Success)
-        {
-            user.EmailConfirmed = true;
-            await _userManager.UpdateAsync(user);
-        }
-
-        return emailConfirmationResult;
+        return await _userManager.ConfirmEmailAsync(userId, cancellationToken);
     }
 
-    public async Task<Result<AuthenticationResponse, BusinessError>> LoginAsync(AuthenticationRequest authenticationRequest)
+    public async Task<Result<AuthenticationResponse>> LoginAsync(AuthenticationRequest authenticationRequest,
+        CancellationToken cancellationToken = default)
     {
-        var user = await _userManager.FindByNameAsync(authenticationRequest.Username);
-
-        if (user is null)
+        var userResult = await _userManager.CheckPasswordAsync(authenticationRequest, cancellationToken);
+        
+        if (!userResult.IsSuccess)
         {
-            return new BusinessError(AuthenticationErrorMessages.INVALID_USERNAME);
+            return userResult.ToResult();
         }
 
-        var validPassword = await _userManager.CheckPasswordAsync(user, authenticationRequest.Password);
-
-        if (!validPassword)
-        {
-            return new BusinessError(AuthenticationErrorMessages.INVALID_PASSWORD);
-        }
-
-        return await _jwtService.CreateTokensAsync(user);
+        return await _jwtService.CreateTokensAsync(userResult.Value, cancellationToken);
     }
 
-    public async Task<Result<AuthenticationResponse, BusinessError>> CreateRefreshTokenAsync(
-        string accessToken,
-        string refreshToken
+    public async Task<Result<AuthenticationResponse>> CreateRefreshTokenAsync
+    (
+        RefreshRequest refreshRequest,
+        CancellationToken cancellationToken = default
     )
     {
-        return await _jwtService.RefreshTokensAsync(accessToken, refreshToken);
+        return await _jwtService.RefreshTokensAsync(refreshRequest, cancellationToken);
     }
 
-    public async Task<Result<bool, BusinessError>> Logout(string? username, RevokeRequest tokens)
+    public async Task<Result> Logout(RevokeRequest tokens, CancellationToken cancellationToken = default)
     {
-        if (username is null)
-        {
-            return new BusinessError(AuthenticationErrorMessages.INVALID_USERNAME);
-        }
 
-        var user = await _userManager.FindByNameAsync(username);
+        var userId = await _currentUserService.GetIdAsync(cancellationToken);
 
-        if (user is null)
-        {
-            return new BusinessError(AuthenticationErrorMessages.USER_NOT_FOUND);
-        }
-
-        await _tokenService.RevokeTokensAsync(tokens.AccessToken, tokens.RefreshToken, user.Id);
-
-        return true;
+        return await _tokenService.RevokeTokensAsync(tokens.AccessToken, tokens.RefreshToken, userId, cancellationToken);
     }
 
-    public async Task<Result<bool, BusinessError>> ResendEmailConfirmationAsync(string? username)
+    public async Task<Result> ResendEmailConfirmationAsync(CancellationToken cancellationToken = default)
     {
-        if (username is null)
-        {
-            return new BusinessError(AuthenticationErrorMessages.INVALID_USERNAME);
-        }
-
-        var user = await _userManager.FindByNameAsync(username);
-
-        if (user is null)
-        {
-            return new BusinessError(AuthenticationErrorMessages.USER_NOT_FOUND);
-        }
-
-        if (user.EmailConfirmed)
+        var userModel = await _currentUserService.GetModelAsync(cancellationToken);
+        
+        if (userModel.EmailConfirmed)
         {
             return new BusinessError(AuthenticationErrorMessages.USER_EMAIL_ALREADY_CONFIRMED);
         }
 
-        await SendEmailConfirmationAsync(user);
-
-        return true;
+        return await SendEmailConfirmationAsync(userModel, cancellationToken);
     }
 
-    public async Task SendPasswordRecoveryEmailAsync(string email)
+    public async Task<Result> SendPasswordRecoveryEmailAsync(PasswordRecoveryRequest passwordRecoveryRequest,
+        CancellationToken cancellationToken = default)
     {
-        var user = await _userManager.FindByEmailAsync(email);
+        var userModel = await _currentUserService.GetModelAsync(cancellationToken);
+        
+        var createPasswordRecoveryTokenResult = await _tokenService.CreatePasswordRecoveryTokenAsync(userModel.UserId, cancellationToken);
 
-        if (user is not null)
+        if (!createPasswordRecoveryTokenResult.IsSuccess)
         {
-            var passwordRecoveryToken = await _tokenService.CreatePasswordRecoveryTokenAsync(user.Id);
-
-            if (passwordRecoveryToken is not null)
-            {
-                await _emailService.SendPasswordRecoveryEmailAsync(user, passwordRecoveryToken);
-            }
+            return createPasswordRecoveryTokenResult.ToResult();
         }
+        
+        return await _emailService.SendPasswordRecoveryEmailAsync(userModel, createPasswordRecoveryTokenResult.Value, cancellationToken);
     }
 
-    private async Task SendEmailConfirmationAsync(User user)
+    public async Task<Result> ResetPasswordAsync(PasswordResetRequest passwordResetRequest,
+        CancellationToken cancellationToken = default)
     {
-        var confirmationToken = await _tokenService.CreateEmailConfirmationTokenAsync(user.Id);
+        using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        
+        var userIdResult = await _tokenService.GetUserIdByPasswordRecoveryTokenAsync(passwordResetRequest.Token, cancellationToken);
 
-        if (confirmationToken is not null)
+        if (!userIdResult.IsSuccess)
         {
-            await _emailService.SendConfirmationEmailAsync(user, confirmationToken);
+            return userIdResult.ToResult();
         }
+            
+        var passwordUpdateResult = await _userManager.UpdatePasswordAsync(userIdResult.Value, passwordResetRequest.Password, cancellationToken);
+
+        if (!passwordUpdateResult.IsSuccess)
+        {
+            return passwordUpdateResult;
+        }
+            
+        transactionScope.Complete();
+            
+        return await _tokenService.RevokePasswordRecoveryTokenAsync(passwordResetRequest.Token, cancellationToken);
     }
-    
-    public async Task ResetPasswordAsync(string password, string passwordRecoveryToken)
+
+    private async Task<Result> SendEmailConfirmationAsync(UserModel userModel, CancellationToken cancellationToken = default)
     {
-        var userId = await _tokenService.GetUserIdByPasswordRecoveryTokenAsync(passwordRecoveryToken);
+        var createConfirmationTokenResult = await _tokenService.CreateEmailConfirmationTokenAsync(userModel.UserId, cancellationToken);
 
-        if (userId is not null)
+        if (!createConfirmationTokenResult.IsSuccess)
         {
-            var user = await _userManager.FindByIdAsync(userId);
-
-            if (user is not null)
-            {
-                var passwordHash = _userManager.PasswordHasher.HashPassword(user, password);
-                user.PasswordHash = passwordHash;
-                await _userManager.UpdateAsync(user);
-
-                await _tokenService.RevokePasswordRecoveryTokenAsync(passwordRecoveryToken);
-            }
+            return createConfirmationTokenResult.ToResult();
         }
+
+        return await _emailService.SendConfirmationEmailAsync(userModel, createConfirmationTokenResult.Value, cancellationToken);
     }
 }

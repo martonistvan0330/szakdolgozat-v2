@@ -1,6 +1,6 @@
 ﻿namespace HomeworkManager.Model.CustomEntities.Course;
 
-public class UpdateCourse
+public class UpdatedCourse
 {
     public required string Name { get; set; }
     public string? Description { get; set; }

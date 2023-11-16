@@ -1,155 +1,120 @@
-﻿using HomeworkManager.BusinessLogic.Managers.Interfaces;
+﻿using System.Transactions;
+using FluentResults;
+using HomeworkManager.BusinessLogic.Managers.Interfaces;
+using HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
 using HomeworkManager.DataAccess.Repositories.Interfaces;
 using HomeworkManager.Model.Constants;
-using HomeworkManager.Model.Constants.Errors.Authentication;
-using HomeworkManager.Model.Constants.Errors.Group;
-using HomeworkManager.Model.CustomEntities;
+using HomeworkManager.Model.Constants.Errors;
+using HomeworkManager.Model.Constants.Errors.Course;
 using HomeworkManager.Model.CustomEntities.Course;
+using HomeworkManager.Model.CustomEntities.Errors;
 using HomeworkManager.Model.CustomEntities.Group;
 using HomeworkManager.Model.CustomEntities.User;
-using HomeworkManager.Model.ErrorEntities;
 
 namespace HomeworkManager.BusinessLogic.Managers;
 
 public class CourseManager : ICourseManager
 {
-    private const string GENERAL_GROUP_NAME = "General";
-
     private readonly ICourseRepository _courseRepository;
+    private readonly ICurrentUserService _currentUserService;
     private readonly IGroupRepository _groupRepository;
-    private readonly UserManager _userManager;
+    private readonly IUserManager _userManager;
     private readonly IUserRepository _userRepository;
 
     public CourseManager(
         ICourseRepository courseRepository,
+        ICurrentUserService currentUserService,
         IGroupRepository groupRepository,
-        UserManager userManager,
+        IUserManager userManager,
         IUserRepository userRepository
     )
     {
         _courseRepository = courseRepository;
+        _currentUserService = currentUserService;
         _groupRepository = groupRepository;
         _userManager = userManager;
         _userRepository = userRepository;
     }
-
-    public async Task<Result<IEnumerable<CourseCard>, BusinessError>> GetAllCoursesByUserAsync(string? username)
+    
+    public async Task<bool> ExistsWithIdAsync(int courseId, CancellationToken cancellationToken = default)
     {
-        if (username is null)
+        return await _courseRepository.ExistsWithIdAsync(courseId, cancellationToken);
+    }
+    
+    public async Task<bool> NameAvailableAsync(int courseId, string name, CancellationToken cancellationToken = default)
+    {
+        var courseName = await _courseRepository.GetNameByIdAsync(courseId, cancellationToken);
+
+        if (courseName is not null && courseName == name)
         {
-            return new BusinessError(AuthenticationErrorMessages.INVALID_USERNAME);
+            return true;
+        }
+        
+        return !await _courseRepository.ExistsWithNameAsync(name, cancellationToken);
+    }
+    
+    public async Task<bool> NameAvailableAsync(string name, CancellationToken cancellationToken = default)
+    {
+        return !await _courseRepository.ExistsWithNameAsync(name, cancellationToken);
+    }
+    
+    public async Task<Result<CourseModel>> GetModelAsync(int courseId, CancellationToken cancellationToken = default)
+    {
+        CourseModel? courseModel;
+        
+        if (await _currentUserService.HasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
+        {
+            courseModel = await _courseRepository.GetModelAsync(courseId, cancellationToken);
+        }
+        else
+        {
+            var userId = await _currentUserService.GetIdAsync(cancellationToken);
+            
+            courseModel = await _courseRepository.GetModelIdAsync(courseId, userId, cancellationToken);
         }
 
-        var user = await _userManager.FindByNameAsync(username);
-
-        if (user is null)
+        if (courseModel is null)
         {
-            return new BusinessError(AuthenticationErrorMessages.USER_NOT_FOUND);
+            return new NotFoundError(CourseErrorMessages.COURSE_NOT_FOUND);
         }
-
-        if (await _userManager.IsInRoleAsync(user, Roles.ADMINISTRATOR))
-        {
-            return Result<IEnumerable<CourseCard>, BusinessError>.Ok((await _courseRepository.GetAllAsync()).OrderBy(c => c.Name));
-        }
-
-        return Result<IEnumerable<CourseCard>, BusinessError>.Ok((await _courseRepository.GetAllByUserAsync(user.Id)).OrderBy(c => c.Name));
+        
+        return courseModel;
     }
 
-    public async Task<bool> ExistsAsync(int courseId)
+    public async Task<Result<IEnumerable<CourseCard>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await _courseRepository.ExistsAsync(courseId);
+        IEnumerable<CourseCard> courseCards;
+
+        if (await _currentUserService.HasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
+        {
+            courseCards = await _courseRepository.GetAllAsync(cancellationToken);
+        }
+
+        else
+        {
+            var userId = await _currentUserService.GetIdAsync(cancellationToken);
+
+            courseCards = await _courseRepository.GetAllAsync(userId, cancellationToken);
+        }
+
+        return courseCards.OrderBy(c => c.Name).ToList();
     }
 
-    public async Task<Result<CourseModel?, BusinessError>> GetModelByUserAsync(int courseId, string? username)
+    public async Task<Result<IEnumerable<UserListRow>>> GetTeachersAsync(int courseId, CancellationToken cancellationToken = default)
     {
-        if (username is null)
-        {
-            return new BusinessError(AuthenticationErrorMessages.INVALID_USERNAME);
-        }
-
-        var user = await _userManager.FindByNameAsync(username);
-
-        if (user is null)
-        {
-            return new BusinessError(AuthenticationErrorMessages.USER_NOT_FOUND);
-        }
-
-        if (await _userManager.IsInRoleAsync(user, Roles.ADMINISTRATOR))
-        {
-            return Result<CourseModel?, BusinessError>.Ok(await _courseRepository.GetModelAsync(courseId));
-        }
-
-        return Result<CourseModel?, BusinessError>.Ok(await _courseRepository.GetModelByUserAsync(courseId, user.Id));
+        return Result.Ok(await _courseRepository.GetTeachersAsync(courseId, cancellationToken));
     }
 
-    public async Task<Result<IEnumerable<UserListRow>, BusinessError>> GetTeachersAsync(int courseId, string? username)
+    public async Task<Result<IEnumerable<UserListRow>>> GetStudentsAsync(int courseId, CancellationToken cancellationToken = default)
     {
-        if (username is null)
-        {
-            return new BusinessError(AuthenticationErrorMessages.INVALID_USERNAME);
-        }
-
-        var user = await _userManager.FindByNameAsync(username);
-
-        if (user is null)
-        {
-            return new BusinessError(AuthenticationErrorMessages.USER_NOT_FOUND);
-        }
-
-        if (!await _userManager.IsInRoleAsync(user, Roles.ADMINISTRATOR)
-            && !await _courseRepository.IsInCourseAsync(courseId, user.Id))
-        {
-            return new BusinessError(GroupErrorMessages.NOT_IN_GROUP);
-        }
-
-        return Result<IEnumerable<UserListRow>, BusinessError>.Ok(await _courseRepository.GetTeachersAsync(courseId));
+        return Result.Ok(await _courseRepository.GetStudentsAsync(courseId, cancellationToken));
     }
 
-    public async Task<Result<IEnumerable<UserListRow>, BusinessError>> GetStudentsAsync(int courseId, string? username)
+    public async Task<Result<IEnumerable<UserListRow>>> GetAddableTeachersAsync(int courseId, CancellationToken cancellationToken = default)
     {
-        if (username is null)
-        {
-            return new BusinessError(AuthenticationErrorMessages.INVALID_USERNAME);
-        }
-
-        var user = await _userManager.FindByNameAsync(username);
-
-        if (user is null)
-        {
-            return new BusinessError(AuthenticationErrorMessages.USER_NOT_FOUND);
-        }
-
-        if (!await _userManager.IsInRoleAsync(user, Roles.ADMINISTRATOR)
-            && !await _courseRepository.IsInCourseAsync(courseId, user.Id))
-        {
-            return new BusinessError(GroupErrorMessages.NOT_IN_GROUP);
-        }
-
-        return Result<IEnumerable<UserListRow>, BusinessError>.Ok(await _courseRepository.GetStudentsAsync(courseId));
-    }
-
-    public async Task<Result<IEnumerable<UserListRow>, BusinessError>> GetAddableTeachersAsync(int courseId, string? username)
-    {
-        if (username is null)
-        {
-            return new BusinessError(AuthenticationErrorMessages.INVALID_USERNAME);
-        }
-
-        var user = await _userManager.FindByNameAsync(username);
-
-        if (user is null)
-        {
-            return new BusinessError(AuthenticationErrorMessages.USER_NOT_FOUND);
-        }
-
-        if (!await _userManager.IsInRoleAsync(user, Roles.ADMINISTRATOR))
-        {
-            return new BusinessError(AuthenticationErrorMessages.FORBIDDEN);
-        }
-
-        var users = await _userRepository.GetAllModelsAsync();
-        var courseTeachers = await _courseRepository.GetTeachersAsync(courseId);
-        var courseStudents = await _courseRepository.GetStudentsAsync(courseId);
+        var users = await _userRepository.GetAllModelsAsync(cancellationToken: cancellationToken);
+        var courseTeachers = await _courseRepository.GetTeachersAsync(courseId, cancellationToken);
+        var courseStudents = await _courseRepository.GetStudentsAsync(courseId, cancellationToken);
 
         var addableTeachers = users
             .ExceptBy(
@@ -160,31 +125,14 @@ public class CourseManager : ICourseManager
                 u => u.UserId
             );
 
-        return Result<IEnumerable<UserListRow>, BusinessError>.Ok(addableTeachers);
+        return Result.Ok(addableTeachers);
     }
 
-    public async Task<Result<IEnumerable<UserListRow>, BusinessError>> GetAddableStudentsAsync(int courseId, string? username)
+    public async Task<Result<IEnumerable<UserListRow>>> GetAddableStudentsAsync(int courseId, CancellationToken cancellationToken = default)
     {
-        if (username is null)
-        {
-            return new BusinessError(AuthenticationErrorMessages.INVALID_USERNAME);
-        }
-
-        var user = await _userManager.FindByNameAsync(username);
-
-        if (user is null)
-        {
-            return new BusinessError(AuthenticationErrorMessages.USER_NOT_FOUND);
-        }
-
-        if (!await _userManager.IsInRoleAsync(user, Roles.ADMINISTRATOR))
-        {
-            return new BusinessError(AuthenticationErrorMessages.FORBIDDEN);
-        }
-
-        var users = await _userRepository.GetAllModelsAsync();
-        var courseStudents = await _courseRepository.GetStudentsAsync(courseId);
-        var courseTeachers = await _courseRepository.GetTeachersAsync(courseId);
+        var users = await _userRepository.GetAllModelsAsync(cancellationToken: cancellationToken);
+        var courseStudents = await _courseRepository.GetStudentsAsync(courseId, cancellationToken);
+        var courseTeachers = await _courseRepository.GetTeachersAsync(courseId, cancellationToken);
 
         var addableStudents = users
             .ExceptBy(
@@ -195,173 +143,106 @@ public class CourseManager : ICourseManager
                 u => u.UserId
             );
 
-        return Result<IEnumerable<UserListRow>, BusinessError>.Ok(addableStudents);
+        return Result.Ok(addableStudents);
     }
 
-    public async Task<Result<int, BusinessError>> CreateAsync(NewCourse newCourse, string? username)
+    public async Task<Result<int>> CreateAsync(NewCourse newCourse, CancellationToken cancellationToken = default)
     {
-        if (username is null)
-        {
-            return new BusinessError(AuthenticationErrorMessages.INVALID_USERNAME);
-        }
+        var user = await _currentUserService.GetAsync(cancellationToken);
 
-        var user = await _userManager.FindByNameAsync(username);
-
-        if (user is null)
-        {
-            return new BusinessError(AuthenticationErrorMessages.USER_NOT_FOUND);
-        }
-
-        var courseCreateResult = await _courseRepository.CreateAsync(newCourse, user);
-
-        if (!courseCreateResult.Success)
-        {
-            return courseCreateResult.Error!;
-        }
+        using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+            
+        var courseId = await _courseRepository.CreateAsync(newCourse, user, cancellationToken);
 
         var newGroup = new NewGroup
         {
-            Name = "General",
+            Name = Constants.GENERAL_GROUP_NAME,
             Description = newCourse.Description
         };
 
-        var groupCreateError = await _groupRepository.CreateAsync(newGroup, courseCreateResult.Value, user);
+        await _groupRepository.CreateAsync(newGroup, courseId, user, cancellationToken);
+        
+        transactionScope.Complete();
 
-        if (!groupCreateError.Success)
-        {
-            return groupCreateError.Error!;
-        }
-
-        return courseCreateResult.Value;
+        return courseId;
     }
 
-    public async Task<BusinessError?> UpdateAsync(int courseId, UpdateCourse updatedCourse, string? username)
+    public async Task<Result> UpdateAsync(int courseId, UpdatedCourse updatedCourse, CancellationToken cancellationToken = default)
     {
-        if (username is null)
+        if (await _currentUserService.HasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
         {
-            return new BusinessError(AuthenticationErrorMessages.INVALID_USERNAME);
+            return await _courseRepository.UpdateAsync(courseId, updatedCourse, cancellationToken);
         }
 
-        var user = await _userManager.FindByNameAsync(username);
-
-        if (user is null)
-        {
-            return new BusinessError(AuthenticationErrorMessages.USER_NOT_FOUND);
-        }
-
-        if (await _userManager.IsInRoleAsync(user, Roles.ADMINISTRATOR))
-        {
-            return await _courseRepository.UpdateAsync(courseId, updatedCourse);
-        }
-
-        return await _courseRepository.UpdateAsync(courseId, updatedCourse, user);
+        var userId = await _currentUserService.GetIdAsync(cancellationToken);
+        
+        return await _courseRepository.UpdateAsync(courseId, updatedCourse, userId, cancellationToken);
     }
 
-    public async Task<BusinessError?> AddTeachersAsync(int courseId, string? username, ICollection<Guid> userIds)
+    public async Task<Result> AddTeachersAsync(int courseId, ICollection<Guid> userIds, CancellationToken cancellationToken = default)
     {
-        if (username is null)
+        using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+            
+        var courseAddResult = await _courseRepository.AddTeachersAsync(courseId, userIds, cancellationToken);
+
+        if (!courseAddResult.IsSuccess)
         {
-            return new BusinessError(AuthenticationErrorMessages.INVALID_USERNAME);
+            return courseAddResult;
         }
 
-        var user = await _userManager.FindByNameAsync(username);
+        var groupAddResult = await _groupRepository.AddTeachersAsync(courseId, Constants.GENERAL_GROUP_NAME, userIds, cancellationToken);
 
-        if (user is null)
+        if (!groupAddResult.IsSuccess)
         {
-            return new BusinessError(AuthenticationErrorMessages.USER_NOT_FOUND);
+            return groupAddResult;
         }
+        
+        transactionScope.Complete();
 
-        if (!await _userManager.IsInRoleAsync(user, Roles.ADMINISTRATOR)
-            && !await _courseRepository.IsCreatorAsync(courseId, user.Id))
-        {
-            return new BusinessError(AuthenticationErrorMessages.FORBIDDEN);
-        }
-
-        await _courseRepository.AddTeachersAsync(courseId, userIds);
-        await _groupRepository.AddTeachersAsync(courseId, GENERAL_GROUP_NAME, userIds);
-
-        return null;
+        return Result.Ok();
     }
 
-    public async Task<BusinessError?> AddStudentsAsync(int courseId, string? username, ICollection<Guid> userIds)
+    public async Task<Result> AddStudentsAsync(int courseId, ICollection<Guid> userIds, CancellationToken cancellationToken = default)
     {
-        if (username is null)
+        using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+            
+        var courseAddResult = await _courseRepository.AddStudentsAsync(courseId, userIds, cancellationToken);
+
+        if (!courseAddResult.IsSuccess)
         {
-            return new BusinessError(AuthenticationErrorMessages.INVALID_USERNAME);
+            return courseAddResult;
         }
 
-        var user = await _userManager.FindByNameAsync(username);
+        var groupAddResult = await _groupRepository.AddStudentsAsync(courseId, Constants.GENERAL_GROUP_NAME, userIds, cancellationToken);
 
-        if (user is null)
+        if (!groupAddResult.IsSuccess)
         {
-            return new BusinessError(AuthenticationErrorMessages.USER_NOT_FOUND);
+            return groupAddResult;
         }
+        
+        transactionScope.Complete();
 
-        if (!await _userManager.IsInRoleAsync(user, Roles.ADMINISTRATOR)
-            && !await _courseRepository.IsCreatorAsync(courseId, user.Id))
-        {
-            return new BusinessError(AuthenticationErrorMessages.FORBIDDEN);
-        }
-
-        await _courseRepository.AddStudentsAsync(courseId, userIds);
-        await _groupRepository.AddStudentsAsync(courseId, GENERAL_GROUP_NAME, userIds);
-
-        return null;
+        return Result.Ok();
     }
 
-    public async Task<bool> IsInCourseAsync(int courseId, string? username)
+    public async Task<bool> IsInCourseAsync(int courseId, CancellationToken cancellationToken = default)
     {
-        if (username is null)
-        {
-            return false;
-        }
+        var userId = await _currentUserService.GetIdAsync(cancellationToken);
 
-        var user = await _userManager.FindByNameAsync(username);
-
-        if (user is null)
-        {
-            return false;
-        }
-
-        return await _courseRepository.IsInCourseAsync(courseId, user.Id);
+        return await _courseRepository.IsInCourseAsync(courseId, userId, cancellationToken);
     }
 
-    public async Task<bool> IsCreatorAsync(int courseId, string? username)
+    public async Task<bool> IsCreatorAsync(int courseId, CancellationToken cancellationToken = default)
     {
-        if (username is null)
-        {
-            return false;
-        }
+        var userId = await _currentUserService.GetIdAsync(cancellationToken);
 
-        var user = await _userManager.FindByNameAsync(username);
-
-        if (user is null)
-        {
-            return false;
-        }
-
-        return await _courseRepository.IsCreatorAsync(courseId, user.Id);
+        return await _courseRepository.IsCreatorAsync(courseId, userId, cancellationToken);
     }
 
-    public async Task<bool> IsTeacherAsync(int courseId, string? username)
+    public async Task<bool> IsTeacherAsync(int courseId, CancellationToken cancellationToken = default)
     {
-        if (username is null)
-        {
-            return false;
-        }
+        var userId = await _currentUserService.GetIdAsync(cancellationToken);
 
-        var user = await _userManager.FindByNameAsync(username);
-
-        if (user is null)
-        {
-            return false;
-        }
-
-        return await _courseRepository.IsTeacherAsync(courseId, user.Id);
-    }
-
-    public async Task<bool> NameAvailableAsync(string name)
-    {
-        return !await _courseRepository.ExistsWithNameAsync(name);
+        return await _courseRepository.IsTeacherAsync(courseId, userId, cancellationToken);
     }
 }

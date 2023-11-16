@@ -1,13 +1,15 @@
-﻿using HomeworkManager.API.Attributes;
-using HomeworkManager.BusinessLogic.Managers;
+﻿using FluentValidation;
+using HomeworkManager.API.Attributes;
+using HomeworkManager.API.Extensions;
+using HomeworkManager.API.Validation;
+using HomeworkManager.API.Validation.Role;
+using HomeworkManager.API.Validation.User;
+using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.Model.Constants;
 using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.User;
-using HomeworkManager.Model.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace HomeworkManager.API.Controllers;
 
@@ -16,109 +18,102 @@ namespace HomeworkManager.API.Controllers;
 [Route("api/User")]
 public class UserController : ControllerBase
 {
-    private readonly RoleManager<Role> _roleManager;
-    private readonly UserManager _userManager;
+    private readonly EmailValidator _emailValidator;
+    private readonly RoleValidator _roleValidator;
+    private readonly UserIdValidator _userIdValidator;
+    private readonly IUserManager _userManager;
 
-    public UserController(RoleManager<Role> roleManager, UserManager userManager)
+    public UserController
+    (
+        EmailValidator emailValidator,
+        RoleValidator roleValidator,
+        UserIdValidator userIdValidator,
+        IUserManager userManager
+    )
     {
-        _roleManager = roleManager;
+        _emailValidator = emailValidator;
+        _roleValidator = roleValidator;
+        _userIdValidator = userIdValidator;
         _userManager = userManager;
     }
 
     [HttpGet("Authenticate")]
-    public async Task<ActionResult<UserModel?>> Authenticate()
+    public async Task<ActionResult<UserModel>> Authenticate(CancellationToken cancellationToken = default)
     {
-        var user = await _userManager.GetByNameAsync(User.Identity!.Name!);
-
-        if (user is null)
-        {
-            return NotFound();
-        }
-
-        return user;
+        return await _userManager.GetCurrentModelAsync(cancellationToken);
     }
 
     [HttpGet("{userId:guid}")]
-    public async Task<ActionResult<UserModel?>> GetAsync(Guid userId)
+    public async Task<ActionResult<UserModel>> GetAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        var currentUser = await _userManager.FindByNameAsync(User.Identity!.Name!);
+        var validationResult = await _userIdValidator.ValidateAsync
+        (
+            userId,
+            options => { options.IncludeRuleSets("Default", UserIdValidator.IS_USER); },
+            cancellationToken
+        );
 
-        if (currentUser is null)
+        if (!validationResult.IsValid)
         {
-            return NotFound();
+            return validationResult.ToActionResult();
         }
 
-        if (currentUser.Id != userId && !await _userManager.IsInRoleAsync(currentUser, Roles.ADMINISTRATOR))
-        {
-            return Forbid();
-        }
+        var userModelResult = await _userManager.GetModelByIdAsync(userId, cancellationToken);
 
-        return await _userManager.GetByIdAsync(userId);
+        return userModelResult.ToActionResult();
     }
 
     [HomeworkManagerAuthorize(Roles = Roles.ADMINISTRATOR)]
     [HttpGet]
-    public async Task<ActionResult<Pageable<UserListRow>>> GetAllAsync([FromQuery] PageableOptions pageableOptions)
+    public async Task<ActionResult<Pageable<UserListRow>>> GetAllAsync([FromQuery] PageableOptions pageableOptions,
+        CancellationToken cancellationToken = default)
     {
-        return await _userManager.GetAllAsync(pageableOptions);
-    }
-
-    [HttpGet("Username")]
-    public async Task<ActionResult<string>> GetUsernameAsync()
-    {
-        if (User.Identity?.Name is not null)
-        {
-            var user = await _userManager.FindByNameAsync(User.Identity.Name);
-
-            if (user?.UserName != null)
-            {
-                return user.UserName;
-            }
-        }
-
-        return Unauthorized();
+        return await _userManager.GetAllAsync(pageableOptions, cancellationToken);
     }
 
     [AllowAnonymous]
     [HttpGet("EmailAvailable")]
-    public async Task<ActionResult<bool>> EmailAvailableAsync(string email)
+    public async Task<ActionResult<bool>> EmailAvailableAsync(string email, CancellationToken cancellationToken = default)
     {
-        var user = await _userManager.FindByEmailAsync(email);
+        var validationResult = await _emailValidator.ValidateAsync(email, cancellationToken);
 
-        return user is null;
+        if (!validationResult.IsValid)
+        {
+            return validationResult.ToActionResult();
+        }
+
+        return await _userManager.EmailAvailableAsync(email, cancellationToken);
     }
+
 
     [AllowAnonymous]
     [HttpGet("UsernameAvailable")]
-    public async Task<ActionResult<bool>> UsernameAvailableAsync(string username)
+    public async Task<ActionResult<bool>> UsernameAvailableAsync(string username, CancellationToken cancellationToken = default)
     {
-        var user = await _userManager.FindByNameAsync(username);
-
-        return user is null;
+        return await _userManager.UsernameAvailableAsync(username, cancellationToken);
     }
 
+
     [HomeworkManagerAuthorize(Roles = Roles.ADMINISTRATOR)]
-    [HttpPut("{userId}/Roles")]
-    public async Task<ActionResult<bool>> UpdateRoles(string userId, ICollection<int> roleIds)
+    [HttpPut("{userId:guid}/Roles")]
+    public async Task<ActionResult> UpdateRoles(Guid userId, ICollection<int> roleIds, CancellationToken cancellationToken = default)
     {
-        var roleDict = await _roleManager.Roles.ToDictionaryAsync(r => r.RoleId, r => r.Name!);
-        var roles = roleIds.Select(id => roleDict[id]).ToHashSet();
+        var userIdValidationResult = await _userIdValidator.ValidateAsync(userId, cancellationToken);
 
-        var user = await _userManager.FindByIdAsync(userId);
-
-        if (user is null)
+        if (!userIdValidationResult.IsValid)
         {
-            return NotFound();
+            return userIdValidationResult.ToActionResult();
         }
 
-        var userRoles = await _userManager.GetRolesAsync(user);
+        var rolesValidationResult = await _roleValidator.ValidateAsync(roleIds, cancellationToken);
 
-        var removeRoles = userRoles.Except(roles);
-        var addRoles = roles.Except(userRoles);
+        if (!rolesValidationResult.IsValid)
+        {
+            return rolesValidationResult.ToActionResult();
+        }
 
-        await _userManager.RemoveFromRolesAsync(user, removeRoles);
-        await _userManager.AddToRolesAsync(user, addRoles);
+        var roleUpdateResult = await _userManager.UpdateRoles(userId, roleIds, cancellationToken);
 
-        return true;
+        return roleUpdateResult.ToActionResult();
     }
 }

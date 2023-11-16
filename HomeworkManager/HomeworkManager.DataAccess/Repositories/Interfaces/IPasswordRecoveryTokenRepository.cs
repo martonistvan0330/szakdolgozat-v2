@@ -4,7 +4,7 @@ namespace HomeworkManager.DataAccess.Repositories.Interfaces;
 
 public interface IPasswordRecoveryTokenRepository
 {
-    Task<string?> GetUserIdByActiveTokenAsync(string passwordRecoveryToken);
-    Task<string?> CreateAsync(Guid userId, string passwordRecoveryToken);
-    Task RevokeAsync(string passwordRecoveryToken);
+    Task<Guid?> GetUserIdByActiveTokenAsync(string passwordRecoveryToken, CancellationToken cancellationToken = default);
+    Task<PasswordRecoveryToken?> CreateAsync(Guid userId, string passwordRecoveryToken, CancellationToken cancellationToken = default);
+    Task RevokeAsync(string passwordRecoveryToken, CancellationToken cancellationToken = default);
 }

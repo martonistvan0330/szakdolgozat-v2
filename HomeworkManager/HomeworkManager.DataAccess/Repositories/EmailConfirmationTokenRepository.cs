@@ -14,16 +14,23 @@ public class EmailConfirmationTokenRepository : IEmailConfirmationTokenRepositor
         _context = context;
     }
 
-    public async Task<EmailConfirmationToken?> GetActiveByUserAsync(Guid userId)
+    public async Task<EmailConfirmationToken?> GetActiveByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.EmailConfirmationTokens
             .Where(ect => ect.UserId == userId && ect.IsActive)
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<string?> CreateAsync(Guid userId, string emailConfirmationToken)
+    public async Task<bool> IsActiveAsync(string emailConfirmationToken, CancellationToken cancellationToken = default)
     {
-        var dbEmailConfirmationToken = await GetActiveByUserAsync(userId);
+        return await _context.EmailConfirmationTokens
+            .Where(ect => ect.Token == emailConfirmationToken && ect.IsActive)
+            .AnyAsync(cancellationToken);
+    }
+
+    public async Task<string> CreateAsync(Guid userId, string emailConfirmationToken, CancellationToken cancellationToken = default)
+    {
+        var dbEmailConfirmationToken = await GetActiveByUserIdAsync(userId, cancellationToken);
 
         if (dbEmailConfirmationToken is not null)
         {
@@ -37,14 +44,16 @@ public class EmailConfirmationTokenRepository : IEmailConfirmationTokenRepositor
         };
 
         _context.EmailConfirmationTokens.Add(newEmailConfirmationToken);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         return emailConfirmationToken;
     }
 
-    public async Task RevokeAsync(EmailConfirmationToken emailConfirmationToken)
+    public async Task<bool> RevokeAsync(EmailConfirmationToken emailConfirmationToken, CancellationToken cancellationToken = default)
     {
         emailConfirmationToken.IsActive = false;
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return true;
     }
 }

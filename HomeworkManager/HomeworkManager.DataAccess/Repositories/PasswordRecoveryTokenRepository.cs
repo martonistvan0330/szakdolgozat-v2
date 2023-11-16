@@ -14,17 +14,17 @@ public class PasswordRecoveryTokenRepository : IPasswordRecoveryTokenRepository
         _context = context;
     }
 
-    public async Task<string?> GetUserIdByActiveTokenAsync(string passwordRecoveryToken)
+    public async Task<Guid?> GetUserIdByActiveTokenAsync(string passwordRecoveryToken, CancellationToken cancellationToken = default)
     {
         return await _context.PasswordRecoveryTokens
             .Where(prt => prt.Token == passwordRecoveryToken && prt.IsActive)
-            .Select(prt => prt.UserId.ToString())
-            .SingleOrDefaultAsync();
+            .Select(prt => prt.UserId)
+            .SingleOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<string?> CreateAsync(Guid userId, string passwordRecoveryToken)
+    public async Task<PasswordRecoveryToken?> CreateAsync(Guid userId, string passwordRecoveryToken, CancellationToken cancellationToken = default)
     {
-        var dbPasswordRecoveryToken = await GetActiveByUserAsync(userId);
+        var dbPasswordRecoveryToken = await GetActiveByUserAsync(userId, cancellationToken);
 
         if (dbPasswordRecoveryToken is not null)
         {
@@ -38,27 +38,28 @@ public class PasswordRecoveryTokenRepository : IPasswordRecoveryTokenRepository
         };
 
         _context.PasswordRecoveryTokens.Add(newPasswordRecoveryToken);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
-        return passwordRecoveryToken;
+        return dbPasswordRecoveryToken;
     }
     
-    public async Task RevokeAsync(string passwordRecoveryToken)
+    public async Task RevokeAsync(string passwordRecoveryToken, CancellationToken cancellationToken = default)
     {
         var dbPasswordRecoveryToken = await _context.PasswordRecoveryTokens
-            .SingleOrDefaultAsync(prt => prt.Token == passwordRecoveryToken);
+            .Where(prt => prt.Token == passwordRecoveryToken)
+            .SingleOrDefaultAsync(cancellationToken);
 
         if (dbPasswordRecoveryToken is not null)
         {
             dbPasswordRecoveryToken.IsActive = false;
-            await _context.SaveChangesAsync();            
+            await _context.SaveChangesAsync(cancellationToken);            
         }
     }
     
-    private async Task<PasswordRecoveryToken?> GetActiveByUserAsync(Guid userId)
+    private async Task<PasswordRecoveryToken?> GetActiveByUserAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.PasswordRecoveryTokens
             .Where(prt => prt.UserId == userId && prt.IsActive)
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
     }
 }

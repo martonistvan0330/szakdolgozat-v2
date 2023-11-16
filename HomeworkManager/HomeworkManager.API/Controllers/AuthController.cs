@@ -1,4 +1,6 @@
+using FluentValidation;
 using HomeworkManager.API.Attributes;
+using HomeworkManager.API.Extensions;
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.Model.CustomEntities.Authentication;
 using HomeworkManager.Model.CustomEntities.User;
@@ -11,96 +13,111 @@ namespace HomeworkManager.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthenticationManager _authenticationManager;
+    private readonly AbstractValidator<EmailConfirmationRequest> _emailConfirmationRequestValidator;
+    private readonly AbstractValidator<NewUser> _newUserValidator;
+    private readonly AbstractValidator<PasswordResetRequest> _passwordResetRequestValidator;
 
-    public AuthController(
-        IAuthenticationManager authenticationManager
+    public AuthController
+    (
+        IAuthenticationManager authenticationManager,
+        AbstractValidator<EmailConfirmationRequest> emailConfirmationRequestValidator,
+        AbstractValidator<NewUser> newUserValidator,
+        AbstractValidator<PasswordResetRequest> passwordResetRequestValidator
     )
     {
         _authenticationManager = authenticationManager;
+        _emailConfirmationRequestValidator = emailConfirmationRequestValidator;
+        _newUserValidator = newUserValidator;
+        _passwordResetRequestValidator = passwordResetRequestValidator;
     }
 
     [HttpPost("Register")]
-    public async Task<ActionResult<AuthenticationResponse>> RegisterAsync(NewUser newUser)
+    public async Task<ActionResult<AuthenticationResponse>> RegisterAsync(NewUser newUser, CancellationToken cancellationToken)
     {
-        var registerUserResult = await _authenticationManager.RegisterAsync(newUser);
+        var validationResult = await _newUserValidator.ValidateAsync(newUser, cancellationToken);
 
-        return registerUserResult.Match<ActionResult<AuthenticationResponse>>(
-            result => Ok(result),
-            error => BadRequest(error.Message)
-        );
+        if (!validationResult.IsValid)
+        {
+            return validationResult.ToActionResult();
+        }
+
+        var registerUserResult = await _authenticationManager.RegisterAsync(newUser, cancellationToken);
+
+        return registerUserResult.ToActionResult();
     }
 
     [HttpPost("ConfirmEmail")]
-    public async Task<ActionResult<bool>> ConfirmEmailAsync(EmailConfirmationRequest emailConfirmationRequest)
+    public async Task<ActionResult<bool>> ConfirmEmailAsync(EmailConfirmationRequest emailConfirmationRequest, CancellationToken cancellationToken)
     {
-        var confirmEmailResult = await _authenticationManager.ConfirmEmailAsync(User.Identity?.Name, emailConfirmationRequest);
+        var validationResult = await _emailConfirmationRequestValidator.ValidateAsync(emailConfirmationRequest, cancellationToken);
 
-        return confirmEmailResult.Match<ActionResult<bool>>(
-            result => Ok(result),
-            error => BadRequest(error.Message)
-        );
+        if (!validationResult.IsValid)
+        {
+            return validationResult.ToActionResult();
+        }
+
+        var confirmEmailResult = await _authenticationManager.ConfirmEmailAsync(emailConfirmationRequest, cancellationToken);
+
+        return confirmEmailResult.ToActionResult();
     }
 
     [HttpPost("Login")]
-    public async Task<ActionResult<AuthenticationResponse>> CreateBearerTokenAsync(AuthenticationRequest authenticationRequest)
+    public async Task<ActionResult<AuthenticationResponse>> CreateBearerTokenAsync(AuthenticationRequest authenticationRequest,
+        CancellationToken cancellationToken)
     {
-        var authenticationResponseResult =
-            await _authenticationManager.LoginAsync(authenticationRequest);
+        var authenticationResponseResult = await _authenticationManager.LoginAsync(authenticationRequest, cancellationToken);
 
-        return authenticationResponseResult.Match<ActionResult<AuthenticationResponse>>(
-            result => Ok(result),
-            error => Unauthorized(error.Message)
-        );
+        return authenticationResponseResult.ToActionResult();
     }
 
     [HttpPost("RefreshToken")]
-    public async Task<ActionResult<AuthenticationResponse>> RefreshTokenAsync(RefreshRequest tokens)
+    public async Task<ActionResult<AuthenticationResponse>> RefreshTokenAsync(RefreshRequest refreshRequest,
+        CancellationToken cancellationToken)
     {
-        var authenticationResult = await _authenticationManager.CreateRefreshTokenAsync(tokens.AccessToken, tokens.RefreshToken);
+        var authenticationResult = await _authenticationManager.CreateRefreshTokenAsync(refreshRequest, cancellationToken);
 
-        return authenticationResult.Match<ActionResult<AuthenticationResponse>>(
-            result => Ok(result),
-            error => Unauthorized(error.Message)
-        );
+        return authenticationResult.ToActionResult();
     }
 
     [HomeworkManagerAuthorize]
     [HttpPost("Logout")]
-    public async Task<ActionResult<bool>> LogoutAsync(RevokeRequest tokens)
+    public async Task<ActionResult<bool>> LogoutAsync(RevokeRequest revokeRequest, CancellationToken cancellationToken)
     {
-        var logoutResult = await _authenticationManager.Logout(User.Identity?.Name, tokens);
+        var logoutResult = await _authenticationManager.Logout(revokeRequest, cancellationToken);
 
-        return logoutResult.Match<ActionResult<bool>>(
-            result => Ok(result),
-            error => Unauthorized(error.Message)
-        );
+        return logoutResult.ToActionResult();
     }
 
     [HomeworkManagerAuthorize]
     [HttpPatch("ResendConfirmation")]
-    public async Task<ActionResult<bool>> ResendConfirmationEmailAsync()
+    public async Task<ActionResult<bool>> ResendConfirmationEmailAsync(CancellationToken cancellationToken)
     {
-        var resendConfirmationResult = await _authenticationManager.ResendEmailConfirmationAsync(User.Identity?.Name);
+        var resendConfirmationResult =
+            await _authenticationManager.ResendEmailConfirmationAsync(cancellationToken);
 
-        return resendConfirmationResult.Match<ActionResult<bool>>(
-            result => Ok(result),
-            error => BadRequest(error.Message)
-        );
+        return resendConfirmationResult.ToActionResult();
     }
 
     [HttpPost("PasswordRecovery")]
-    public async Task<ActionResult> RecoverPasswordAsync(PasswordRecoveryRequest passwordRecoveryRequest)
+    public async Task<ActionResult> RecoverPasswordAsync(PasswordRecoveryRequest passwordRecoveryRequest, CancellationToken cancellationToken)
     {
-        await _authenticationManager.SendPasswordRecoveryEmailAsync(passwordRecoveryRequest.Email);
+        var passwordRecoveryResult = await _authenticationManager.SendPasswordRecoveryEmailAsync(passwordRecoveryRequest, cancellationToken);
 
-        return Ok();
+        return passwordRecoveryResult.ToActionResult();
     }
 
     [HttpPost("PasswordReset")]
-    public async Task<ActionResult> ResetPasswordAsync(PasswordResetRequest passwordResetRequest)
+    public async Task<ActionResult> ResetPasswordAsync(PasswordResetRequest passwordResetRequest, CancellationToken cancellationToken)
     {
-        await _authenticationManager.ResetPasswordAsync(passwordResetRequest.Password, passwordResetRequest.Token);
+        var validationResult = await _passwordResetRequestValidator.ValidateAsync(passwordResetRequest, cancellationToken);
 
-        return Ok();
+        if (!validationResult.IsValid)
+        {
+            return validationResult.ToActionResult();
+        }
+
+        var passwordResetResult = await _authenticationManager.ResetPasswordAsync(passwordResetRequest, cancellationToken);
+
+        return passwordResetResult.ToActionResult();
     }
 }
