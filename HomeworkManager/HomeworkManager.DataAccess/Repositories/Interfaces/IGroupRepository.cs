@@ -10,7 +10,7 @@ namespace HomeworkManager.DataAccess.Repositories.Interfaces;
 public interface IGroupRepository
 {
     Task<bool> ExistsWithNameAsync(int courseId, string groupName, CancellationToken cancellationToken = default);
-    Task<Group?> GetByNameAsync(int courseId, string groupName, CancellationToken cancellationToken = default);
+    Task<int?> GetIdByNameAsync(GroupName groupName, CancellationToken cancellationToken = default);
     Task<GroupModel?> GetModelAsync(int courseId, string groupName, CancellationToken cancellationToken = default);
     Task<GroupModel?> GetModelAsync(int courseId, string groupName, Guid userId, CancellationToken cancellationToken = default);
     Task<IEnumerable<GroupListRow>> GetAllAsync(int courseId, CancellationToken cancellationToken = default);

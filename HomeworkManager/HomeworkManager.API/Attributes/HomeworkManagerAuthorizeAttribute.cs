@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.DataAccess.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +32,7 @@ public class HomeworkManagerAuthorizeAttribute : AuthorizeAttribute, IAsyncAutho
 
             if (user is not null)
             {
-                var dbAccessToken = await accessTokenRepository.GetAsync(accessToken, user.Id);
+                var dbAccessToken = await accessTokenRepository.GetAsync(accessToken, user.Id, cancellationToken);
 
                 if (dbAccessToken is not null && dbAccessToken.IsActive)
                 {

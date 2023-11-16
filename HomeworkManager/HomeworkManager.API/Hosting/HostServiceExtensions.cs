@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using HomeworkManager.API.Validation;
+using HomeworkManager.API.Validation.Assignment;
 using HomeworkManager.API.Validation.Authentication;
 using HomeworkManager.API.Validation.Course;
 using HomeworkManager.API.Validation.Group;
@@ -16,8 +17,10 @@ using HomeworkManager.BusinessLogic.Services.Seed.Interfaces;
 using HomeworkManager.DataAccess.Repositories;
 using HomeworkManager.DataAccess.Repositories.Interfaces;
 using HomeworkManager.Model.Configurations;
+using HomeworkManager.Model.CustomEntities.Assignment;
 using HomeworkManager.Model.CustomEntities.Authentication;
 using HomeworkManager.Model.CustomEntities.Course;
+using HomeworkManager.Model.CustomEntities.Group;
 using HomeworkManager.Model.CustomEntities.User;
 using HomeworkManager.Shared.Services;
 using HomeworkManager.Shared.Services.Interfaces;
@@ -36,6 +39,7 @@ public static class HostServiceExtensions
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IAccessTokenRepository, AccessTokenRepository>();
+        services.AddScoped<IAssignmentRepository, AssignmentRepository>();
         services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddScoped<IGroupRepository, GroupRepository>();
         services.AddScoped<IEmailConfirmationTokenRepository, EmailConfirmationTokenRepository>();
@@ -49,6 +53,7 @@ public static class HostServiceExtensions
 
     public static IServiceCollection AddManagers(this IServiceCollection services)
     {
+        services.AddScoped<IAssignmentManager, AssignmentManager>();
         services.AddScoped<IAuthenticationManager, AuthenticationManager>();
         services.AddScoped<ICourseManager, CourseManager>();
         services.AddScoped<IEntityManager, EntityManager>();
@@ -73,13 +78,14 @@ public static class HostServiceExtensions
     public static IServiceCollection AddValidators(this IServiceCollection services)
     {
         services.AddScoped<AbstractValidator<EmailConfirmationRequest>, EmailConfirmationRequestValidator>();
+        services.AddScoped<AbstractValidator<GroupName>, GroupNameValidator>();
+        services.AddScoped<AbstractValidator<NewAssignment>, NewAssignmentValidator>();
         services.AddScoped<AbstractValidator<NewCourse>, NewCourseValidator>();
         services.AddScoped<AbstractValidator<NewUser>, NewUserValidator>();
         services.AddScoped<AbstractValidator<PasswordResetRequest>, PasswordResetRequestValidator>();
 
         services.AddScoped<CourseIdValidator>();
         services.AddScoped<EmailValidator>();
-        services.AddScoped<GroupNameValidator>();
         services.AddScoped<NewGroupValidator>();
         services.AddScoped<PasswordValidator>();
         services.AddScoped<RoleValidator>();

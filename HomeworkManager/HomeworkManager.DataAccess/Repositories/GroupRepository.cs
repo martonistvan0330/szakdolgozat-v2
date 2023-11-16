@@ -30,10 +30,11 @@ public class GroupRepository : IGroupRepository
             .AnyAsync(cancellationToken);
     }
 
-    public async Task<Group?> GetByNameAsync(int courseId, string groupName, CancellationToken cancellationToken = default)
+    public async Task<int?> GetIdByNameAsync(GroupName groupName, CancellationToken cancellationToken = default)
     {
         return await _context.Groups
-            .Where(g => g.CourseId == courseId && g.Name == groupName)
+            .Where(g => g.CourseId == groupName.CourseId && g.Name == groupName.Name)
+            .Select(g => g.GroupId)
             .SingleOrDefaultAsync(cancellationToken);
     }
 
@@ -338,6 +339,13 @@ public class GroupRepository : IGroupRepository
             .Where(g => g.CourseId == courseId && g.Name == groupName)
             .SelectMany(g => g.Teachers.Select(u => u.Id))
             .ContainsAsync(userId, cancellationToken);
+    }
+
+    private async Task<Group?> GetByNameAsync(int courseId, string groupName, CancellationToken cancellationToken = default)
+    {
+        return await _context.Groups
+            .Where(g => g.CourseId == courseId && g.Name == groupName)
+            .SingleOrDefaultAsync(cancellationToken);
     }
 
     private async Task<Result> UpdateAsync(Group group, UpdatedGroup updatedGroup, CancellationToken cancellationToken = default)
