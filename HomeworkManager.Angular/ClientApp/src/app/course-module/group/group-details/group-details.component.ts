@@ -22,6 +22,7 @@ export class GroupDetailsComponent implements OnInit, OnDestroy {
   editUrl: string = `../../${NavigationItems.groupEdit.navigationUrl}/General`;
   isAdministrator = false
   isCreator = false;
+  isTeacher = false;
 
   ngOnInit() {
     this.activatedRoute.data
@@ -48,9 +49,13 @@ export class GroupDetailsComponent implements OnInit, OnDestroy {
       .subscribe({
         next: isCreator => {
           this.isCreator = isCreator;
-        },
-        error: err => {
-          console.log("NOT GOOD");
+        }
+      });
+
+    this.groupService.isTeacher(this.group.name)
+      .subscribe({
+        next: isTeacher => {
+          this.isTeacher = isTeacher;
         }
       });
 

@@ -1,0 +1,98 @@
+<div class="assignment-details-container">
+    <div class="assignment-details-header">
+        <h1>{{ assignment.name }}</h1>
+    </div>
+    <div class="assignment-details-content">
+        <mat-tab-group class="assignment-details-tab-group">
+            <mat-tab class="assignment-details-tab" label="Assignment">
+                <div class="center">
+                    <form [formGroup]="assignmentForm" class="assignment-details-form">
+                        <div class="assignment-details-form-content">
+                            <div class="column">
+                                <mat-form-field>
+                                    <mat-label>Name</mat-label>
+                                    <input [required]="isCreator" formControlName="name" id="name"
+                                           matInput
+                                           name="name" type="text">
+                                    <mat-error [ngSwitch]="nameError">
+                                    <span *ngSwitchCase="Errors.Required">
+                                        Name required
+                                    </span>
+                                        <span *ngSwitchCase="Errors.Unique">
+                                        Name is already taken
+                                    </span>
+                                        <span *ngSwitchDefault>
+                                        Name required
+                                    </span>
+                                    </mat-error>
+                                </mat-form-field>
+                                <mat-form-field>
+                                    <mat-label>Description</mat-label>
+                                    <textarea formControlName="description" id="description" matInput
+                                              name="description" rows="4"></textarea>
+                                </mat-form-field>
+                                <mat-form-field>
+                                    <mat-label>Deadline</mat-label>
+                                    <input [matDatepicker]="deadlinePicker" [min]="minDate"
+                                           formControlName="deadline"
+                                           matInput
+                                           required>
+                                    <mat-hint>MM/DD/YYYY</mat-hint>
+                                    <mat-datepicker-toggle [for]="deadlinePicker"
+                                                           matIconSuffix></mat-datepicker-toggle>
+                                    <mat-datepicker #deadlinePicker
+                                                    [disabled]="!isCreator || !assignment.isDraft"></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                            <div class="column">
+                                <mat-form-field>
+                                    <mat-label>Course</mat-label>
+                                    <input formControlName="courseName" id="courseName" matInput
+                                           name="courseName" type="text">
+                                </mat-form-field>
+                                <mat-form-field>
+                                    <mat-label>Group</mat-label>
+                                    <input formControlName="groupName" id="groupName" matInput
+                                           name="groupName" type="text">
+                                </mat-form-field>
+                                <mat-form-field>
+                                    <mat-label>AssignmentType</mat-label>
+                                    <mat-select formControlName="assignmentType">
+                                        <mat-option *ngFor="let assignmentType of assignmentTypes"
+                                                    [value]="assignmentType.assignmentTypeId">{{ assignmentType.name }}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <mat-checkbox (change)="presentationRequiredChanged($event)"
+                                              [checked]="presentationRequired"
+                                              [disabled]="!isCreator || !assignment.isDraft"
+                                              labelPosition="before">
+                                    Presentation
+                                </mat-checkbox>
+                            </div>
+                        </div>
+
+
+                        <div class="assignment-details-form-actions">
+                            <ng-container *ngIf="isCreator">
+                                <button (click)="save()" [disabled]="!assignment.isDraft" color="primary"
+                                        mat-raised-button>
+                                    Save
+                                </button>
+                                <button (click)="publish()" [disabled]="!assignment.isDraft" color="primary"
+                                        mat-raised-button>
+                                    Publish
+                                </button>
+                            </ng-container>
+                        </div>
+                        <div *ngIf="!isTeacher">
+                            <h3>WOO</h3>
+                        </div>
+                    </form>
+                </div>
+            </mat-tab>
+            <mat-tab *ngIf="isTeacher" class="assignment-details-tab" label="Submission">
+                <div>qwe</div>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+</div>

@@ -22,6 +22,7 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { ListAddDialogComponent } from './list-add-dialog/list-add-dialog.component';
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatDialogModule } from "@angular/material/dialog";
+import { MatCheckboxModule } from "@angular/material/checkbox";
 
 @NgModule({
   declarations: [
@@ -52,7 +53,8 @@ import { MatDialogModule } from "@angular/material/dialog";
     ReactiveFormsModule,
     MatAutocompleteModule,
     MatDialogModule,
-    MatOptionModule
+    MatOptionModule,
+    MatCheckboxModule
   ],
   exports: [
     NavMenuComponent,

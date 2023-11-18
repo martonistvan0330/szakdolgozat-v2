@@ -33,8 +33,13 @@ public class HomeworkManagerContext : IdentityDbContext<User, Role, Guid>
                 .HasConversion<int>();
 
             entity
+                .HasOne(a => a.Group)
+                .WithMany(g => g.Assignments)
+                .HasForeignKey(a => a.GroupId);
+            
+            entity
                 .HasOne(a => a.Creator)
-                .WithMany()
+                .WithMany(u => u.CreatedAssignments)
                 .HasForeignKey(a => a.CreatorId);
         });
 

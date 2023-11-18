@@ -24,8 +24,8 @@
              class="table-loading-shade">
             <mat-spinner/>
         </div>
-        <mat-table [dataSource]="dataSource$" class="table mat-elevation-z8"
-                   matSort matSortActive="fullName" matSortDirection="asc" matSortDisableClear>
+        <mat-table [dataSource]="dataSource$" [matSortActive]="sortField"
+                   [matSortDirection]="sortDirection" class="table mat-elevation-z8" matSort matSortDisableClear>
             <ng-container *ngFor="let column of columnDefs" matColumnDef="{{ column.fieldName }}">
                 <ng-container *ngIf="column.isSorted">
                     <mat-header-cell *matHeaderCellDef mat-header-cell mat-sort-header>
@@ -37,7 +37,18 @@
                         {{ column.label }}
                     </mat-header-cell>
                 </ng-container>
-                <mat-cell *matCellDef="let data" mat-cell>{{ data[column.fieldName] }}</mat-cell>
+                <mat-cell *matCellDef="let data" mat-cell>
+                    <ng-container *ngIf="checkIfBoolean(data[column.fieldName])">
+                        <mat-checkbox [checked]="data[column.fieldName]" disabled/>
+                    </ng-container>
+                    <ng-container *ngIf="checkIfDate(data[column.fieldName])">
+                        {{ formatDate(data[column.fieldName], 'yyyy-MM-dd', 'en-US') }}
+                    </ng-container>
+                    <ng-container
+                            *ngIf="!checkIfBoolean(data[column.fieldName]) && !checkIfDate(data[column.fieldName])">
+                        {{ data[column.fieldName] }}
+                    </ng-container>
+                </mat-cell>
             </ng-container>
             <ng-container matColumnDef="actions">
                 <mat-header-cell *matHeaderCellDef mat-header-cell/>

@@ -15,4 +15,5 @@ public class User : IdentityUser<Guid>
     public ICollection<Group> AttendedGroups { get; set; } = new HashSet<Group>();
     public ICollection<Group> ManagedGroups { get; set; } = new HashSet<Group>();
     public ICollection<Group> CreatedGroups { get; set; } = new HashSet<Group>();
+    public ICollection<Assignment> CreatedAssignments { get; set; } = new HashSet<Assignment>();
 }

@@ -6,14 +6,12 @@ namespace HomeworkManager.API.Validation.Group;
 
 public class NewGroupValidator : AbstractValidator<NewGroup>
 {
-    public int CourseId { get; set; }
-    
     public NewGroupValidator(IGroupManager groupManager)
     {
-        RuleFor(x => x.Name)
+        RuleFor(x => x)
             .NotNull()
             .NotEmpty()
-            .MustAsync(async (groupName, cancellationToken) =>
-                await groupManager.NameAvailableAsync(CourseId, groupName, cancellationToken));
+            .MustAsync(async (newGroup, cancellationToken) =>
+                await groupManager.NameAvailableAsync(newGroup, cancellationToken));
     }
 }

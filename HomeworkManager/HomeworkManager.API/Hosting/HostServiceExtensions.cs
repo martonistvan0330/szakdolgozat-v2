@@ -77,20 +77,22 @@ public static class HostServiceExtensions
 
     public static IServiceCollection AddValidators(this IServiceCollection services)
     {
-        services.AddScoped<AbstractValidator<EmailConfirmationRequest>, EmailConfirmationRequestValidator>();
-        services.AddScoped<AbstractValidator<GroupName>, GroupNameValidator>();
-        services.AddScoped<AbstractValidator<NewAssignment>, NewAssignmentValidator>();
-        services.AddScoped<AbstractValidator<NewCourse>, NewCourseValidator>();
-        services.AddScoped<AbstractValidator<NewUser>, NewUserValidator>();
-        services.AddScoped<AbstractValidator<PasswordResetRequest>, PasswordResetRequestValidator>();
+        services.AddScoped<IValidator<EmailConfirmationRequest>, EmailConfirmationRequestValidator>();
+        services.AddScoped<IValidator<GroupInfo>, GroupNameValidator>();
+        services.AddScoped<IValidator<NewAssignment>, NewAssignmentValidator>();
+        services.AddScoped<IValidator<NewCourse>, NewCourseValidator>();
+        services.AddScoped<IValidator<NewGroup>, NewGroupValidator>();
+        services.AddScoped<IValidator<NewUser>, NewUserValidator>();
+        services.AddScoped<IValidator<PasswordResetRequest>, PasswordResetRequestValidator>();
+        services.AddScoped<IValidator<UpdatedCourse>, UpdatedCourseValidator>();
+        services.AddScoped<IValidator<UpdatedGroup>, UpdatedGroupValidator>();
+        services.AddScoped<IValidator<UpdatedAssignment>, UpdatedAssignmentValidator>();
 
+        services.AddScoped<AssignmentIdValidator>();
         services.AddScoped<CourseIdValidator>();
         services.AddScoped<EmailValidator>();
-        services.AddScoped<NewGroupValidator>();
         services.AddScoped<PasswordValidator>();
         services.AddScoped<RoleValidator>();
-        services.AddScoped<UpdatedCourseValidator>();
-        services.AddScoped<UpdatedGroupValidator>();
         services.AddScoped<UserIdValidator>();
         return services;
     }

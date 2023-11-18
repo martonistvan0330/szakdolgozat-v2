@@ -91,4 +91,10 @@ export class NavigationItems {
     navigationUrl: 'groups/edit',
     roles: [Role.ADMINISTRATOR, Role.TEACHER]
   }
+
+  public static assignmentDetails: NavigationItem = {
+    routerUrlPattern: 'assignments/:assignmentId',
+    navigationUrl: '/assignments',
+    roles: []
+  }
 }

@@ -13,16 +13,16 @@ namespace HomeworkManager.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthenticationManager _authenticationManager;
-    private readonly AbstractValidator<EmailConfirmationRequest> _emailConfirmationRequestValidator;
-    private readonly AbstractValidator<NewUser> _newUserValidator;
-    private readonly AbstractValidator<PasswordResetRequest> _passwordResetRequestValidator;
+    private readonly IValidator<EmailConfirmationRequest> _emailConfirmationRequestValidator;
+    private readonly IValidator<NewUser> _newUserValidator;
+    private readonly IValidator<PasswordResetRequest> _passwordResetRequestValidator;
 
     public AuthController
     (
         IAuthenticationManager authenticationManager,
-        AbstractValidator<EmailConfirmationRequest> emailConfirmationRequestValidator,
-        AbstractValidator<NewUser> newUserValidator,
-        AbstractValidator<PasswordResetRequest> passwordResetRequestValidator
+        IValidator<EmailConfirmationRequest> emailConfirmationRequestValidator,
+        IValidator<NewUser> newUserValidator,
+        IValidator<PasswordResetRequest> passwordResetRequestValidator
     )
     {
         _authenticationManager = authenticationManager;

@@ -5,6 +5,7 @@ using HomeworkManager.DataAccess.Repositories.Interfaces;
 using HomeworkManager.Model.Constants;
 using HomeworkManager.Model.Constants.Errors;
 using HomeworkManager.Model.CustomEntities;
+using HomeworkManager.Model.CustomEntities.Assignment;
 using HomeworkManager.Model.CustomEntities.Group;
 using HomeworkManager.Model.CustomEntities.User;
 
@@ -33,19 +34,29 @@ public class GroupManager : IGroupManager
         return await _groupRepository.ExistsWithNameAsync(courseId, groupName, cancellationToken);
     }
 
-    public async Task<bool> NameAvailableAsync(int courseId, string name, CancellationToken cancellationToken = default)
+    public async Task<bool> NameAvailableAsync(NewGroup newGroup, CancellationToken cancellationToken = default)
     {
-        return !await _groupRepository.ExistsWithNameAsync(courseId, name, cancellationToken);
+        if (!newGroup.CourseId.HasValue)
+        {
+            return false;
+        }
+
+        return !await _groupRepository.ExistsWithNameAsync(newGroup.CourseId.Value, newGroup.Name, cancellationToken);
     }
 
-    public async Task<bool> NameAvailableAsync(int courseId, string groupName, string name, CancellationToken cancellationToken = default)
+    public async Task<bool> NameAvailableAsync(UpdatedGroup updatedGroup, CancellationToken cancellationToken = default)
     {
-        if (groupName == name)
+        if (!updatedGroup.CourseId.HasValue || updatedGroup.OldName is null)
+        {
+            return false;
+        }
+
+        if (updatedGroup.OldName == updatedGroup.Name)
         {
             return true;
         }
 
-        return !await _groupRepository.ExistsWithNameAsync(courseId, name, cancellationToken);
+        return !await _groupRepository.ExistsWithNameAsync(updatedGroup.CourseId.Value, updatedGroup.Name, cancellationToken);
     }
 
     public async Task<Result<IEnumerable<GroupListRow>>> GetAllAsync(int courseId, CancellationToken cancellationToken = default)
@@ -87,6 +98,46 @@ public class GroupManager : IGroupManager
         }
 
         return group;
+    }
+
+    public async Task<Result<Pageable<AssignmentListRow>>> GetAssignmentsAsync
+    (
+        int courseId,
+        string groupName,
+        PageableOptions options,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var userId = await _currentUserService.GetIdAsync(cancellationToken);
+
+        var assignmentCount = await _groupRepository.GetAssignmentCountAsync(courseId, groupName, userId, options.SearchText, cancellationToken);
+
+        var assignments = options.SortOptions?.Sort switch
+        {
+            "name" => await _groupRepository.GetAssignmentsAsync(
+                courseId, groupName,
+                userId,
+                options.PageData,
+                a => a.Name,
+                options.SortOptions.SortDirection.ToSortDirection(),
+                options.SearchText,
+                cancellationToken),
+            "deadline" => await _groupRepository.GetAssignmentsAsync(
+                courseId, groupName,
+                userId,
+                options.PageData,
+                a => a.Deadline,
+                options.SortOptions.SortDirection.ToSortDirection(),
+                options.SearchText,
+                cancellationToken),
+            _ => await _groupRepository.GetAssignmentsAsync(courseId, groupName, userId, options.PageData, options.SearchText, cancellationToken)
+        };
+
+        return new Pageable<AssignmentListRow>
+        {
+            Items = assignments,
+            TotalCount = assignmentCount
+        };
     }
 
     public async Task<Result<Pageable<UserListRow>>> GetTeachersAsync

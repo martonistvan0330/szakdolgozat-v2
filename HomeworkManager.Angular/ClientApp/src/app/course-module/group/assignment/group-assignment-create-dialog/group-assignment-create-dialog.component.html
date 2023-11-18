@@ -1,0 +1,15 @@
+<h1 mat-dialog-title>Create assignment</h1>
+<mat-dialog-content>
+    <form [formGroup]="createAssignmentForm" class="create-assignment-form">
+        <mat-form-field class="name">
+            <mat-label>Name</mat-label>
+            <input formControlName="name"
+                   matInput
+                   type="text">
+        </mat-form-field>
+    </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button (click)="onCancelClick()" mat-button>Cancel</button>
+    <button (click)="onOkClick()" mat-button>OK</button>
+</mat-dialog-actions>

@@ -84,7 +84,7 @@ export class CourseEditComponent implements OnInit {
   private formSetup() {
     this.courseEditForm = new FormGroup({
       name: new FormControl(this.course!!.name, {
-        validators: [Validators.required,],
+        validators: [Validators.required],
         asyncValidators: [uniqueCourseNameAsyncValidator(this.courseService, this.course?.name)],
         updateOn: 'change'
       }),

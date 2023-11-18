@@ -1,6 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { AuthorizedApiClientService } from "../../services";
 import {
+  AssignmentListRow,
+  AssignmentListRowWithDate,
   GroupListRow,
   GroupModel,
   NewGroup,
@@ -10,6 +12,7 @@ import {
   UserListRow
 } from "../../shared-module";
 import { delay, distinctUntilChanged, Subject, tap } from "rxjs";
+import { map } from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
@@ -33,6 +36,10 @@ export class GroupService {
 
   private _courseId!: number;
 
+  get courseId() {
+    return this._courseId;
+  }
+
   set courseId(value: number) {
     this._courseId = value;
   }
@@ -51,6 +58,36 @@ export class GroupService {
 
   getGroup(groupName: string) {
     return this.authApiClient.get<GroupModel | null>('Course/' + this._courseId + '/Group/' + groupName);
+  }
+
+  getAssignments(groupName: string, options: PageableOptions) {
+    const requestUrl = 'Course/' + this._courseId + '/Group/' + groupName + '/Assignment'
+      + '?pageData.pageIndex=' + options.pageData?.pageIndex
+      + '&pageData.pageSize=' + options.pageData?.pageSize
+      + '&sortOptions.sort=' + options.sortOptions?.sort
+      + '&sortOptions.sortDirection=' + options.sortOptions?.sortDirection
+      + '&searchText=' + options.searchText;
+
+    return this.authApiClient.get<Pageable<AssignmentListRow>>(requestUrl)
+      .pipe(
+        delay(1000),
+        map(assignmentListRows => {
+          const assignmentListRowsWithDate = assignmentListRows.items.map(assignmentListRow => {
+            const assignmentListRowWithDate = new AssignmentListRowWithDate();
+
+            assignmentListRowWithDate.assignmentId = assignmentListRow.assignmentId;
+            assignmentListRowWithDate.name = assignmentListRow.name;
+            assignmentListRowWithDate.isDraft = assignmentListRow.isDraft;
+            assignmentListRowWithDate.deadline = new Date(assignmentListRow.deadline.split('+')[0]);
+
+            return assignmentListRowWithDate;
+          });
+
+          return {
+            items: assignmentListRowsWithDate,
+            totalCount: assignmentListRows.totalCount
+          } as Pageable<AssignmentListRowWithDate>;
+        }));
   }
 
   getTeachers(groupName: string, options: PageableOptions) {

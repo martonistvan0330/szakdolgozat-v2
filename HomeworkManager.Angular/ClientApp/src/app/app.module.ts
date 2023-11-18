@@ -13,12 +13,14 @@ import { TokenInterceptor } from "./core-module/interceptors/token-interceptor";
 import { AuthModule } from "./auth-module/auth.module";
 import { UserModule } from "./user-module/user.module";
 import { CourseModule } from "./course-module/course.module";
+import { AssignmentModule } from "./assignment-module/assignment.module";
 
 @NgModule({
   declarations: [
     AppComponent
   ],
   imports: [
+    AssignmentModule,
     AuthModule,
     ControlModule,
     CoreModule,

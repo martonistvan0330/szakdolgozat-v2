@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using HomeworkManager.Model.CustomEntities;
+using HomeworkManager.Model.CustomEntities.Assignment;
 using HomeworkManager.Model.CustomEntities.Group;
 using HomeworkManager.Model.CustomEntities.User;
 
@@ -8,11 +9,14 @@ namespace HomeworkManager.BusinessLogic.Managers.Interfaces;
 public interface IGroupManager
 {
     Task<bool> ExistsWithNameAsync(int courseId, string groupName, CancellationToken cancellationToken = default);
-    Task<bool> NameAvailableAsync(int courseId, string name, CancellationToken cancellationToken = default);
-    Task<bool> NameAvailableAsync(int courseId, string groupName, string name, CancellationToken cancellationToken = default);
+    Task<bool> NameAvailableAsync(NewGroup newGroup, CancellationToken cancellationToken = default);
+    Task<bool> NameAvailableAsync(UpdatedGroup updatedGroup, CancellationToken cancellationToken = default);
     Task<Result<IEnumerable<GroupListRow>>> GetAllAsync(int courseId, CancellationToken cancellationToken = default);
     Task<Result<GroupModel?>> GetModelAsync(int courseId, string groupName, CancellationToken cancellationToken = default);
 
+    Task<Result<Pageable<AssignmentListRow>>> GetAssignmentsAsync(int courseId, string groupName, PageableOptions options,
+        CancellationToken cancellationToken = default);
+    
     Task<Result<Pageable<UserListRow>>> GetTeachersAsync(int courseId, string groupName, PageableOptions options,
         CancellationToken cancellationToken = default);
 

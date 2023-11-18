@@ -6,6 +6,7 @@ using HomeworkManager.Model.Constants.Errors.Group;
 using HomeworkManager.Model.Constants.Errors.User;
 using HomeworkManager.Model.Contexts;
 using HomeworkManager.Model.CustomEntities;
+using HomeworkManager.Model.CustomEntities.Assignment;
 using HomeworkManager.Model.CustomEntities.Errors;
 using HomeworkManager.Model.CustomEntities.Group;
 using HomeworkManager.Model.CustomEntities.User;
@@ -30,10 +31,10 @@ public class GroupRepository : IGroupRepository
             .AnyAsync(cancellationToken);
     }
 
-    public async Task<int?> GetIdByNameAsync(GroupName groupName, CancellationToken cancellationToken = default)
+    public async Task<int?> GetIdByNameAsync(GroupInfo groupInfo, CancellationToken cancellationToken = default)
     {
         return await _context.Groups
-            .Where(g => g.CourseId == groupName.CourseId && g.Name == groupName.Name)
+            .Where(g => g.CourseId == groupInfo.CourseId && g.Name == groupInfo.Name)
             .Select(g => g.GroupId)
             .SingleOrDefaultAsync(cancellationToken);
     }
@@ -90,6 +91,17 @@ public class GroupRepository : IGroupRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<int> GetAssignmentCountAsync(int courseId, string groupName, Guid userId, string? searchText = null,
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.Groups
+            .Where(g => g.CourseId == courseId && g.Name == groupName)
+            .SelectMany(g => g.Assignments)
+            .Where(a => !a.IsDraft || a.CreatorId == userId)
+            .Search(searchText)
+            .CountAsync(cancellationToken);
+    }
+
     public async Task<int> GetTeacherCountAsync(int courseId, string groupName, string? searchText = null,
         CancellationToken cancellationToken = default)
     {
@@ -108,6 +120,29 @@ public class GroupRepository : IGroupRepository
             .SelectMany(g => g.Students)
             .Search(searchText)
             .CountAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<AssignmentListRow>> GetAssignmentsAsync<TKey>
+    (
+        int courseId,
+        string groupName,
+        Guid userId,
+        PageData? pageData = null,
+        Expression<Func<AssignmentListRow, TKey>>? orderBy = null,
+        SortDirection sortDirection = SortDirection.Ascending,
+        string? searchText = null,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await _context.Groups
+            .Where(g => g.CourseId == courseId && g.Name == groupName)
+            .SelectMany(g => g.Assignments)
+            .Where(a => !a.IsDraft || a.CreatorId == userId)
+            .Search(searchText)
+            .ToListModel()
+            .OrderByWithDirection(orderBy, sortDirection)
+            .GetPage(pageData)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<UserListRow>> GetTeachersAsync<TKey>
@@ -337,6 +372,30 @@ public class GroupRepository : IGroupRepository
     {
         return await _context.Groups
             .Where(g => g.CourseId == courseId && g.Name == groupName)
+            .SelectMany(g => g.Teachers.Select(u => u.Id))
+            .ContainsAsync(userId, cancellationToken);
+    }
+
+    public async Task<bool> IsInGroupAsync(int groupId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Groups
+            .Where(g => g.GroupId == groupId)
+            .Where(g => g.Teachers.Select(u => u.Id).Contains(userId)
+                        || g.Students.Select(u => u.Id).Contains(userId))
+            .AnyAsync(cancellationToken);
+    }
+
+    public async Task<bool> IsCreatorAsync(int groupId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Groups
+            .Where(g => g.GroupId == groupId && g.CreatorId == userId)
+            .AnyAsync(cancellationToken);
+    }
+
+    public async Task<bool> IsTeacherAsync(int groupId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Groups
+            .Where(g => g.GroupId == groupId)
             .SelectMany(g => g.Teachers.Select(u => u.Id))
             .ContainsAsync(userId, cancellationToken);
     }

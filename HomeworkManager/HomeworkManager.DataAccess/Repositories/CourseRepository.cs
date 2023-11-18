@@ -61,7 +61,7 @@ public class CourseRepository : ICourseRepository
             .SingleOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<CourseModel?> GetModelIdAsync(int courseId, Guid userId, CancellationToken cancellationToken = default)
+    public async Task<CourseModel?> GetModelAsync(int courseId, Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.Courses
             .Where(c => c.CourseId == courseId)
@@ -98,7 +98,7 @@ public class CourseRepository : ICourseRepository
                 Name = c.Name
             })
             .ToListAsync(cancellationToken);
-        
+
         var attendedCourses = await _context.Users
             .Where(u => u.Id == userId)
             .SelectMany(u => u.AttendedCourses)

@@ -46,7 +46,13 @@ import { MatDialogModule } from "@angular/material/dialog";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { CourseTeacherAddDialogComponent } from './course-teacher-add-dialog/course-teacher-add-dialog.component';
 import { CourseStudentAddDialogComponent } from './course-student-add-dialog/course-student-add-dialog.component';
-import { GroupStudentAddDialogComponent } from './group/student/group-student-add-dialog/group-student-add-dialog.component';
+import {
+  GroupStudentAddDialogComponent
+} from './group/student/group-student-add-dialog/group-student-add-dialog.component';
+import { GroupAssignmentListComponent } from './group/assignment/group-assignment-list/group-assignment-list.component';
+import {
+  GroupAssignmentCreateDialogComponent
+} from './group/assignment/group-assignment-create-dialog/group-assignment-create-dialog.component';
 
 
 @NgModule({
@@ -67,7 +73,9 @@ import { GroupStudentAddDialogComponent } from './group/student/group-student-ad
     GroupTeacherAddDialogComponent,
     CourseTeacherAddDialogComponent,
     CourseStudentAddDialogComponent,
-    GroupStudentAddDialogComponent
+    GroupStudentAddDialogComponent,
+    GroupAssignmentCreateDialogComponent,
+    GroupAssignmentListComponent
   ],
   imports: [
     CommonModule,

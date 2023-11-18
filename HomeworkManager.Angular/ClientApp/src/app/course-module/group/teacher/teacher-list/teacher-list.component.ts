@@ -55,13 +55,7 @@ export class TeacherListComponent implements OnInit, OnDestroy {
     options
       .pipe(
         switchMap(options => {
-          const groupName = options.extras;
-
-          if (groupName && this.groupName === groupName) {
-            return this.groupService.getTeachers(options.extras || '', options.pageableOptions);
-          }
-
-          throw '';
+          return this.groupService.getTeachers(options.extras || '', options.pageableOptions);
         })
       )
       .subscribe(teachers => {

@@ -9,7 +9,7 @@
         <mat-tab-group class="group-details-tab-group">
             <mat-tab class="group-details-tab" label="Assignments">
                 <ng-template matTabContent>
-                    <div>assignments</div>
+                    <hwm-group-assignment-list [groupName]="group.name" [isTeacher]="isTeacher"/>
                 </ng-template>
             </mat-tab>
             <mat-tab class="group-details-tab" label="Teachers">

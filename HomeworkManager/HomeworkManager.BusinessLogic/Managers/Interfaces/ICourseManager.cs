@@ -7,7 +7,7 @@ namespace HomeworkManager.BusinessLogic.Managers.Interfaces;
 public interface ICourseManager
 {
     Task<bool> ExistsWithIdAsync(int courseId, CancellationToken cancellationToken = default);
-    Task<bool> NameAvailableAsync(int courseId, string name, CancellationToken cancellationToken = default);
+    Task<bool> NameAvailableAsync(UpdatedCourse updatedCourse, CancellationToken cancellationToken = default);
     Task<bool> NameAvailableAsync(string name, CancellationToken cancellationToken = default);
     Task<Result<CourseModel>> GetModelAsync(int courseId, CancellationToken cancellationToken = default);
     Task<Result<IEnumerable<CourseCard>>> GetAllAsync(CancellationToken cancellationToken = default);

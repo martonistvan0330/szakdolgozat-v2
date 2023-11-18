@@ -12,10 +12,10 @@ public class CourseIdValidator : AbstractValidator<int>
     public CourseIdValidator(ICourseManager courseManager, ICurrentUserService currentUserService)
     {
         RuleFor(x => x)
-            .MustAsync(async (userId, cancellationToken) =>
-                await courseManager.ExistsWithIdAsync(userId, cancellationToken))
+            .MustAsync(async (courseId, cancellationToken) =>
+                await courseManager.ExistsWithIdAsync(courseId, cancellationToken))
             .WithMessage(CourseErrorMessages.COURSE_WITH_ID_NOT_FOUND);
-        
+
         RuleFor(x => x)
             .MustAsync(async (courseId, cancellationToken) =>
             {
@@ -27,7 +27,7 @@ public class CourseIdValidator : AbstractValidator<int>
                 return await courseManager.IsInCourseAsync(courseId, cancellationToken);
             })
             .WithErrorCode(ErrorCodes.FORBIDDEN);
-        
+
         RuleSet("IsTeacher", () =>
         {
             RuleFor(x => x)
@@ -42,7 +42,7 @@ public class CourseIdValidator : AbstractValidator<int>
                 })
                 .WithErrorCode(ErrorCodes.FORBIDDEN);
         });
-        
+
         RuleSet("IsCreator", () =>
         {
             RuleFor(x => x)

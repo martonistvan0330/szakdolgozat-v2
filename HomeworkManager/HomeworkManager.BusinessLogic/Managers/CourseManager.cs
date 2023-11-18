@@ -35,33 +35,38 @@ public class CourseManager : ICourseManager
         _userManager = userManager;
         _userRepository = userRepository;
     }
-    
+
     public async Task<bool> ExistsWithIdAsync(int courseId, CancellationToken cancellationToken = default)
     {
         return await _courseRepository.ExistsWithIdAsync(courseId, cancellationToken);
     }
-    
-    public async Task<bool> NameAvailableAsync(int courseId, string name, CancellationToken cancellationToken = default)
-    {
-        var courseName = await _courseRepository.GetNameByIdAsync(courseId, cancellationToken);
 
-        if (courseName is not null && courseName == name)
+    public async Task<bool> NameAvailableAsync(UpdatedCourse updatedCourse, CancellationToken cancellationToken = default)
+    {
+        if (!updatedCourse.CourseId.HasValue)
+        {
+            return false;
+        }
+
+        var courseName = await _courseRepository.GetNameByIdAsync(updatedCourse.CourseId.Value, cancellationToken);
+
+        if (courseName is not null && courseName == updatedCourse.Name)
         {
             return true;
         }
-        
-        return !await _courseRepository.ExistsWithNameAsync(name, cancellationToken);
+
+        return !await _courseRepository.ExistsWithNameAsync(updatedCourse.Name, cancellationToken);
     }
-    
+
     public async Task<bool> NameAvailableAsync(string name, CancellationToken cancellationToken = default)
     {
         return !await _courseRepository.ExistsWithNameAsync(name, cancellationToken);
     }
-    
+
     public async Task<Result<CourseModel>> GetModelAsync(int courseId, CancellationToken cancellationToken = default)
     {
         CourseModel? courseModel;
-        
+
         if (await _currentUserService.HasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
         {
             courseModel = await _courseRepository.GetModelAsync(courseId, cancellationToken);
@@ -69,15 +74,15 @@ public class CourseManager : ICourseManager
         else
         {
             var userId = await _currentUserService.GetIdAsync(cancellationToken);
-            
-            courseModel = await _courseRepository.GetModelIdAsync(courseId, userId, cancellationToken);
+
+            courseModel = await _courseRepository.GetModelAsync(courseId, userId, cancellationToken);
         }
 
         if (courseModel is null)
         {
             return new NotFoundError(CourseErrorMessages.COURSE_NOT_FOUND);
         }
-        
+
         return courseModel;
     }
 
@@ -132,7 +137,7 @@ public class CourseManager : ICourseManager
 
     public async Task<Result<IEnumerable<UserListRow>>> GetAddableStudentsAsync(int courseId, CancellationToken cancellationToken = default)
     {
-        var students = await _userRepository.GetAllModelByRoleAsync(Roles.STUDENT, cancellationToken: cancellationToken);
+        var students = await _userRepository.GetAllModelByRoleAsync(Roles.STUDENT, cancellationToken);
         var courseStudents = await _courseRepository.GetStudentsAsync(courseId, cancellationToken);
         var courseTeachers = await _courseRepository.GetTeachersAsync(courseId, cancellationToken);
 
@@ -153,7 +158,7 @@ public class CourseManager : ICourseManager
         var user = await _currentUserService.GetAsync(cancellationToken);
 
         using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-            
+
         var courseId = await _courseRepository.CreateAsync(newCourse, user, cancellationToken);
 
         var newGroup = new NewGroup
@@ -163,7 +168,7 @@ public class CourseManager : ICourseManager
         };
 
         await _groupRepository.CreateAsync(newGroup, courseId, user, cancellationToken);
-        
+
         transactionScope.Complete();
 
         return courseId;
@@ -177,14 +182,14 @@ public class CourseManager : ICourseManager
         }
 
         var userId = await _currentUserService.GetIdAsync(cancellationToken);
-        
+
         return await _courseRepository.UpdateAsync(courseId, updatedCourse, userId, cancellationToken);
     }
 
     public async Task<Result> AddTeachersAsync(int courseId, ICollection<Guid> userIds, CancellationToken cancellationToken = default)
     {
         using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-            
+
         var courseAddResult = await _courseRepository.AddTeachersAsync(courseId, userIds, cancellationToken);
 
         if (!courseAddResult.IsSuccess)
@@ -198,7 +203,7 @@ public class CourseManager : ICourseManager
         {
             return groupAddResult;
         }
-        
+
         transactionScope.Complete();
 
         return Result.Ok();
@@ -207,7 +212,7 @@ public class CourseManager : ICourseManager
     public async Task<Result> AddStudentsAsync(int courseId, ICollection<Guid> userIds, CancellationToken cancellationToken = default)
     {
         using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-            
+
         var courseAddResult = await _courseRepository.AddStudentsAsync(courseId, userIds, cancellationToken);
 
         if (!courseAddResult.IsSuccess)
@@ -221,7 +226,7 @@ public class CourseManager : ICourseManager
         {
             return groupAddResult;
         }
-        
+
         transactionScope.Complete();
 
         return Result.Ok();

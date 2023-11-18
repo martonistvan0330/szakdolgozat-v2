@@ -61,6 +61,12 @@ namespace HomeworkManager.Model.Migrations
                     b.Property<Guid>("CreatorId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("Deadline")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("GroupId")
                         .HasColumnType("int");
 
@@ -70,6 +76,9 @@ namespace HomeworkManager.Model.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PresentationRequired")
+                        .HasColumnType("bit");
 
                     b.HasKey("AssignmentId");
 
@@ -555,13 +564,13 @@ namespace HomeworkManager.Model.Migrations
                         .HasForeignKey("AssignmentTypeId");
 
                     b.HasOne("HomeworkManager.Model.Entities.User", "Creator")
-                        .WithMany()
+                        .WithMany("CreatedAssignments")
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("HomeworkManager.Model.Entities.Group", "Group")
-                        .WithMany()
+                        .WithMany("Assignments")
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -774,9 +783,16 @@ namespace HomeworkManager.Model.Migrations
                     b.Navigation("Groups");
                 });
 
+            modelBuilder.Entity("HomeworkManager.Model.Entities.Group", b =>
+                {
+                    b.Navigation("Assignments");
+                });
+
             modelBuilder.Entity("HomeworkManager.Model.Entities.User", b =>
                 {
                     b.Navigation("AccessTokens");
+
+                    b.Navigation("CreatedAssignments");
 
                     b.Navigation("CreatedCourses");
 

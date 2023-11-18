@@ -1,0 +1,62 @@
+.assignment-details-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 50px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.assignment-details-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.assignment-details-content {
+  height: 100%;
+  width: 100%;
+}
+
+.assignment-details-tab-group, .assignment-details-tab {
+  height: 100%;
+
+  ::ng-deep .mat-mdc-tab-body-wrapper {
+    height: 100%;
+  }
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.assignment-details-form {
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.assignment-details-form-content {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.assignment-details-form-actions {
+  display: flex;
+  justify-content: flex-end;
+
+  button {
+    margin: 5px;
+  }
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  margin: 15px;
+  min-width: 350px;
+}

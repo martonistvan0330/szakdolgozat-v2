@@ -1,3 +1,8 @@
+export * from './models/assignment/assignment-list-row';
+export * from './models/assignment/assignment-model';
+export * from './models/assignment/assignment-type';
+export * from './models/assignment/assignment-type-id';
+export * from './models/assignment/new-assignment';
 export * from './models/auth/authentication-request';
 export * from './models/auth/authentication-response';
 export * from './models/auth/email-confirmation-request';
@@ -11,6 +16,7 @@ export * from './models/course/course-card';
 export * from './models/course/course-model';
 export * from './models/course/new-course';
 export * from './models/error/errors';
+export * from './models/group/group-info';
 export * from './models/group/group-list-row';
 export * from './models/group/group-model';
 export * from './models/group/new-group';

@@ -7,7 +7,7 @@
                [columnDefs]="columnDefs"
                [dataSource]="teachers$"
                [pageSizeOptions]="[10, 25]"
-               [removableRows]="isAdministrator || isCreator"
+               [removableRows]="(isAdministrator || isCreator) && groupName !== 'General'"
                class="teacher-list-table">
         <button (click)="onAddClick()"
                 *ngIf="isAdministrator || isCreator"

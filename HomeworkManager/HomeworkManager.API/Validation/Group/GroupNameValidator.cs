@@ -8,7 +8,7 @@ using HomeworkManager.Model.CustomEntities.Group;
 
 namespace HomeworkManager.API.Validation.Group;
 
-public class GroupNameValidator : AbstractValidator<GroupName>
+public class GroupNameValidator : AbstractValidator<GroupInfo>
 {
     public GroupNameValidator(IGroupManager groupManager, ICurrentUserService currentUserService)
     {
@@ -16,7 +16,7 @@ public class GroupNameValidator : AbstractValidator<GroupName>
             .MustAsync(async (groupName, cancellationToken) =>
                 await groupManager.ExistsWithNameAsync(groupName.CourseId, groupName.Name, cancellationToken))
             .WithMessage(GroupErrorMessages.GROUP_WITH_NAME_NOT_FOUND);
-        
+
         RuleFor(x => x)
             .MustAsync(async (groupName, cancellationToken) =>
             {
@@ -28,7 +28,7 @@ public class GroupNameValidator : AbstractValidator<GroupName>
                 return await groupManager.IsInGroupAsync(groupName.CourseId, groupName.Name, cancellationToken);
             })
             .WithErrorCode(ErrorCodes.FORBIDDEN);
-        
+
         RuleSet("IsTeacher", () =>
         {
             RuleFor(x => x)
@@ -43,7 +43,7 @@ public class GroupNameValidator : AbstractValidator<GroupName>
                 })
                 .WithErrorCode(ErrorCodes.FORBIDDEN);
         });
-        
+
         RuleSet("IsCreator", () =>
         {
             RuleFor(x => x)

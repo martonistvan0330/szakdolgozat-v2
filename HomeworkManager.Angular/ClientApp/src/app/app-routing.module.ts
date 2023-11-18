@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import * as assignment from './assignment-module';
 import * as auth from './auth-module';
 import * as control from './control-module';
 import * as course from './course-module';
@@ -25,21 +26,6 @@ const routes: Routes = [
       {
         path: 'dashboard',
         component: homework_manager.DashboardComponent
-      },
-
-      // User
-      {
-        path: NavigationItems.userList.routerUrlPattern,
-        component: user.UserListComponent,
-        canActivate: [AuthGuard.requireAnyRole(NavigationItems.userList.roles)]
-      },
-      {
-        path: NavigationItems.userDetail.routerUrlPattern,
-        component: user.UserDetailComponent,
-        resolve: {
-          user: user.userResolver
-        },
-        canActivate: [AuthGuard.requireUserExists, AuthGuard.requireIsUser()]
       },
 
       // Course
@@ -92,6 +78,31 @@ const routes: Routes = [
 
           { path: '**', redirectTo: `${NavigationItems.groupDetails.navigationUrl}/General` }
         ]
+      },
+
+      //Assignment
+      {
+        path: NavigationItems.assignmentDetails.routerUrlPattern,
+        component: assignment.AssignmentDetailsComponent,
+        resolve: {
+          assignment: assignment.assignmentDetailsResolver
+        },
+        canActivate: []
+      },
+
+      // User
+      {
+        path: NavigationItems.userList.routerUrlPattern,
+        component: user.UserListComponent,
+        canActivate: [AuthGuard.requireAnyRole(NavigationItems.userList.roles)]
+      },
+      {
+        path: NavigationItems.userDetail.routerUrlPattern,
+        component: user.UserDetailComponent,
+        resolve: {
+          user: user.userResolver
+        },
+        canActivate: [AuthGuard.requireUserExists, AuthGuard.requireIsUser()]
       },
 
       { path: '**', redirectTo: NavigationItems.home.navigationUrl }

@@ -9,10 +9,11 @@ import {
   SortOptions,
   TableChangeOptions
 } from "../../shared-module";
-import { MatSort } from "@angular/material/sort";
+import { MatSort, SortDirection } from "@angular/material/sort";
 import { MatPaginator } from "@angular/material/paginator";
 import { map } from "rxjs/operators";
 import { FormControl, FormGroup } from "@angular/forms";
+import { formatDate } from "@angular/common";
 
 @Component({
   selector: 'hwm-table',
@@ -21,6 +22,7 @@ import { FormControl, FormGroup } from "@angular/forms";
 })
 export class TableComponent<T, E> implements OnInit, AfterViewInit {
   protected readonly NavigationItems = NavigationItems;
+  protected readonly formatDate = formatDate;
   @Input() title: string = '';
   @Input() columnDefs: ColumnDefinition[] = [];
   @Input() dataSource!: Observable<Pageable<T>> | Observable<T[]>;
@@ -28,6 +30,8 @@ export class TableComponent<T, E> implements OnInit, AfterViewInit {
   @Input() pageable = true;
   @Input() pageSize = 25;
   @Input() pageSizeOptions = [10, 25, 50];
+  @Input() sortField = '';
+  @Input() sortDirection: SortDirection = 'asc';
   @Input() clickableRows = false;
   @Input() removableRows = false;
   @Input() removeIcon = 'remove';
@@ -144,5 +148,17 @@ export class TableComponent<T, E> implements OnInit, AfterViewInit {
     if (this.removableRows) {
       this.rowRemove.emit(row);
     }
+  }
+
+  checkIfBoolean(field: any) {
+    return typeof field == 'boolean';
+  }
+
+  checkIfDate(field: any) {
+    return typeof field == 'object' && field instanceof Date;
+  }
+
+  getDateString(field: any) {
+
   }
 }

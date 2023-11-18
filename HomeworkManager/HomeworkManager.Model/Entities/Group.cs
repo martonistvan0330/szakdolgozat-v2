@@ -13,4 +13,5 @@ public class Group
 
     public ICollection<User> Teachers { get; set; } = new HashSet<User>();
     public ICollection<User> Students { get; set; } = new HashSet<User>();
+    public ICollection<Assignment> Assignments { get; set; } = new HashSet<Assignment>();
 }

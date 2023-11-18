@@ -59,7 +59,7 @@ import { MAT_DIALOG_DEFAULT_OPTIONS } from "@angular/material/dialog";
         enterAnimationDuration: 100,
         width: '50%'
       }
-    },
+    }
   ]
 })
 export class CoreModule {

@@ -1,0 +1,21 @@
+<div class="teacher-list-container">
+    <hwm-table (optionsSetup)="onOptionsSetup($event)"
+               (rowClick)="onRowClick($event)"
+               [changeDataSource]="changeDataSource$"
+               [changeData]="groupName"
+               [clickableRows]="true"
+               [columnDefs]="columnDefs"
+               [dataSource]="assignments$"
+               [pageSizeOptions]="[10, 25]"
+               class="teacher-list-table"
+               sortDirection="asc"
+               sortField="deadline">
+        <button (click)="onCreateClick()"
+                *ngIf="isAdministrator || isTeacher"
+                hwm-table-actions
+                mat-flat-button>
+            <mat-icon>add</mat-icon>
+            Create Assignment
+        </button>
+    </hwm-table>
+</div>
