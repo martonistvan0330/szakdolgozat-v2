@@ -1,8 +1,11 @@
-﻿using FluentResults;
+﻿using System.Linq.Expressions;
+using FluentResults;
 using HomeworkManager.DataAccess.Repositories.Extensions;
 using HomeworkManager.DataAccess.Repositories.Interfaces;
+using HomeworkManager.Model.Constants;
 using HomeworkManager.Model.Constants.Errors.Assignment;
 using HomeworkManager.Model.Contexts;
+using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.Assignment;
 using HomeworkManager.Model.CustomEntities.Errors;
 using HomeworkManager.Model.Entities;
@@ -38,6 +41,38 @@ public class AssignmentRepository : IAssignmentRepository
         return await _context.Assignments
             .Where(a => a.GroupId == groupId && a.Name == name)
             .AnyAsync(cancellationToken);
+    }
+
+    public async Task<int> GetCountByUserIdAsync(Guid userId, string? searchText = null, CancellationToken cancellationToken = default)
+    {
+        return await _context.Users
+            .Where(u => u.Id == userId)
+            .SelectMany(u => u.AttendedGroups.Union(u.ManagedGroups))
+            .SelectMany(g => g.Assignments)
+            .Where(a => !a.IsDraft || a.CreatorId == userId)
+            .Search(searchText)
+            .CountAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<AssignmentListRow>> GetAllByUserIdAsync<TKey>(
+        Guid userId,
+        PageData? pageData = null,
+        Expression<Func<AssignmentListRow, TKey>>? orderBy = null,
+        SortDirection sortDirection = SortDirection.Ascending,
+        string? searchText = null,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await _context.Users
+            .Where(u => u.Id == userId)
+            .SelectMany(u => u.AttendedGroups.Union(u.ManagedGroups))
+            .SelectMany(g => g.Assignments)
+            .Where(a => !a.IsDraft || a.CreatorId == userId)
+            .Search(searchText)
+            .ToListModel()
+            .OrderByWithDirection(orderBy, sortDirection)
+            .GetPage(pageData)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<AssignmentModel?> GetModelByIdAsync(int assignmentId, CancellationToken cancellationToken = default)
@@ -154,6 +189,14 @@ public class AssignmentRepository : IAssignmentRepository
         return await _context.Assignments
             .Where(a => a.AssignmentId == assignmentId && a.CreatorId == userId)
             .AnyAsync(cancellationToken);
+    }
+
+    public async Task<AssignmentTypeId?> GetAssignmentTypeIdAsync(int assignmentId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Assignments
+            .Where(a => a.AssignmentId == assignmentId)
+            .Select(a => a.AssignmentTypeId)
+            .SingleOrDefaultAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<AssignmentType>> GetAssignmentTypes(CancellationToken cancellationToken = default)

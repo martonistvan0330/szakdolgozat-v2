@@ -82,11 +82,23 @@ const routes: Routes = [
 
       //Assignment
       {
+        path: NavigationItems.assignmentList.routerUrlPattern,
+        component: assignment.AssignmentListComponent,
+        canActivate: []
+      },
+      {
         path: NavigationItems.assignmentDetails.routerUrlPattern,
         component: assignment.AssignmentDetailsComponent,
         resolve: {
           assignment: assignment.assignmentDetailsResolver
         },
+        canActivate: []
+      },
+
+      //Submission
+      {
+        path: NavigationItems.submissionDetails.routerUrlPattern,
+        component: assignment.SubmissionDetailsComponent,
         canActivate: []
       },
 

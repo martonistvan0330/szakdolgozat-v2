@@ -16,6 +16,8 @@ public class HomeworkManagerContext : IdentityDbContext<User, Role, Guid>
     public DbSet<Group> Groups => Set<Group>();
     public DbSet<PasswordRecoveryToken> PasswordRecoveryTokens => Set<PasswordRecoveryToken>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Submission> Submissions => Set<Submission>();
+    public DbSet<TextSubmission> TextSubmissions => Set<TextSubmission>();
 
     public HomeworkManagerContext(DbContextOptions<HomeworkManagerContext> dbContextOptions)
         : base(dbContextOptions)
@@ -36,7 +38,7 @@ public class HomeworkManagerContext : IdentityDbContext<User, Role, Guid>
                 .HasOne(a => a.Group)
                 .WithMany(g => g.Assignments)
                 .HasForeignKey(a => a.GroupId);
-            
+
             entity
                 .HasOne(a => a.Creator)
                 .WithMany(u => u.CreatedAssignments)
@@ -49,14 +51,15 @@ public class HomeworkManagerContext : IdentityDbContext<User, Role, Guid>
                 .Property(at => at.AssignmentTypeId)
                 .HasConversion<int>();
 
-            entity.HasData(
-                Enum.GetValues(typeof(AssignmentTypeId))
-                    .Cast<AssignmentTypeId>()
-                    .Select(assignmentTypeId => new AssignmentType
-                    {
-                        AssignmentTypeId = assignmentTypeId,
-                        Name = assignmentTypeId.ToString()
-                    }));
+            entity.HasData(new()
+            {
+                AssignmentTypeId = AssignmentTypeId.TextAnswerAssignment,
+                Name = "Text answer"
+            }, new()
+            {
+                AssignmentTypeId = AssignmentTypeId.FileUploadAssignment,
+                Name = "File upload"
+            });
         });
 
         builder.Entity<Course>(entity =>
@@ -88,6 +91,22 @@ public class HomeworkManagerContext : IdentityDbContext<User, Role, Guid>
                 .WithMany(u => u.CreatedGroups)
                 .HasForeignKey(g => g.CreatorId)
                 .OnDelete(DeleteBehavior.NoAction);
+        });
+
+        builder.Entity<Submission>(entity =>
+        {
+            entity.UseTptMappingStrategy();
+
+            entity
+                .HasOne(s => s.Assignment)
+                .WithMany(a => a.Submissions)
+                .HasForeignKey(s => s.AssignmentId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            entity
+                .HasOne(s => s.Student)
+                .WithMany()
+                .HasForeignKey(s => s.StudentId);
         });
 
         builder.Entity<User>(entity =>

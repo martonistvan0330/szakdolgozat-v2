@@ -1,0 +1,14 @@
+<div class="submission-list-container">
+    <hwm-table (optionsSetup)="onOptionsSetup($event)"
+               (rowClick)="onRowClick($event)"
+               [changeDataSource]="changeDataSource$"
+               [changeData]="assignmentId"
+               [clickableRows]="true"
+               [columnDefs]="columnDefs"
+               [dataSource]="submissions$"
+               [pageSizeOptions]="[10, 25]"
+               class="submission-list-table"
+               sortDirection="asc"
+               sortField="submittedAt">
+    </hwm-table>
+</div>

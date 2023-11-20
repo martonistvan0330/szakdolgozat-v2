@@ -108,17 +108,12 @@ namespace HomeworkManager.Model.Migrations
                         new
                         {
                             AssignmentTypeId = 1,
-                            Name = "AnswerAssignment"
+                            Name = "Text answer"
                         },
                         new
                         {
                             AssignmentTypeId = 2,
-                            Name = "FileUploadAssignment"
-                        },
-                        new
-                        {
-                            AssignmentTypeId = 3,
-                            Name = "GitHubAssignment"
+                            Name = "File upload"
                         });
                 });
 
@@ -365,6 +360,37 @@ namespace HomeworkManager.Model.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
+            modelBuilder.Entity("HomeworkManager.Model.Entities.Submission", b =>
+                {
+                    b.Property<int>("SubmissionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SubmissionId"));
+
+                    b.Property<int>("AssignmentId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDraft")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("SubmittedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("SubmissionId");
+
+                    b.HasIndex("AssignmentId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Submissions");
+
+                    b.UseTptMappingStrategy();
+                });
+
             modelBuilder.Entity("HomeworkManager.Model.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -546,6 +572,17 @@ namespace HomeworkManager.Model.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("HomeworkManager.Model.Entities.TextSubmission", b =>
+                {
+                    b.HasBaseType("HomeworkManager.Model.Entities.Submission");
+
+                    b.Property<string>("Answer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("TextSubmissions");
+                });
+
             modelBuilder.Entity("HomeworkManager.Model.Entities.AccessToken", b =>
                 {
                     b.HasOne("HomeworkManager.Model.Entities.User", "User")
@@ -721,6 +758,25 @@ namespace HomeworkManager.Model.Migrations
                     b.Navigation("AccessToken");
                 });
 
+            modelBuilder.Entity("HomeworkManager.Model.Entities.Submission", b =>
+                {
+                    b.HasOne("HomeworkManager.Model.Entities.Assignment", "Assignment")
+                        .WithMany("Submissions")
+                        .HasForeignKey("AssignmentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("HomeworkManager.Model.Entities.User", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Assignment");
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("HomeworkManager.Model.Entities.Role", null)
@@ -772,10 +828,24 @@ namespace HomeworkManager.Model.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("HomeworkManager.Model.Entities.TextSubmission", b =>
+                {
+                    b.HasOne("HomeworkManager.Model.Entities.Submission", null)
+                        .WithOne()
+                        .HasForeignKey("HomeworkManager.Model.Entities.TextSubmission", "SubmissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("HomeworkManager.Model.Entities.AccessToken", b =>
                 {
                     b.Navigation("RefreshToken")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("HomeworkManager.Model.Entities.Assignment", b =>
+                {
+                    b.Navigation("Submissions");
                 });
 
             modelBuilder.Entity("HomeworkManager.Model.Entities.Course", b =>

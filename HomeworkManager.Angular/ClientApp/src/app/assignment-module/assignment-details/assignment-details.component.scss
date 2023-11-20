@@ -30,6 +30,7 @@
 
 .center {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
@@ -59,4 +60,10 @@
   flex-direction: column;
   margin: 15px;
   min-width: 350px;
+}
+
+.submission {
+  width: 50%;
+  display: flex;
+  justify-content: center;
 }

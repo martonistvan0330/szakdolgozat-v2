@@ -1,0 +1,21 @@
+<form [formGroup]="submissionForm" class="submission-details-form">
+    <div class="submission-details-form">
+        <mat-form-field class="answer">
+            <mat-label>Answer</mat-label>
+            <textarea formControlName="answer" id="answer" matInput
+                      name="answer" rows="4"></textarea>
+        </mat-form-field>
+    </div>
+
+
+    <div class="submission-details-form-actions">
+        <button (click)="save()" [disabled]="!actionsEnabled" color="primary"
+                mat-raised-button>
+            Save
+        </button>
+        <button (click)="submit()" [disabled]="!actionsEnabled" color="primary"
+                mat-raised-button>
+            Submit
+        </button>
+    </div>
+</form>

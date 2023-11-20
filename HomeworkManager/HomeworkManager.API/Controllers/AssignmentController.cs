@@ -4,7 +4,9 @@ using HomeworkManager.API.Extensions;
 using HomeworkManager.API.Validation.Assignment;
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.Model.Constants;
+using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.Assignment;
+using HomeworkManager.Model.CustomEntities.Group;
 using HomeworkManager.Model.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,11 +35,23 @@ public class AssignmentController : ControllerBase
         _newAssignmentValidator = newAssignmentValidator;
         _updatedAssignmentValidator = updatedAssignmentValidator;
     }
+    
+    [HttpGet]
+    public async Task<ActionResult<Pageable<AssignmentListRow>>> GetAllByUserAsync([FromQuery] PageableOptions pageableOptions,
+        CancellationToken cancellationToken)
+    {
+        var getAssignmentsResult = await _assignmentManager.GetAllByUserAsync(pageableOptions, cancellationToken);
+
+        return getAssignmentsResult.ToActionResult();
+    }
 
     [HttpGet("{assignmentId:int}")]
     public async Task<ActionResult<AssignmentModel>> GetAsync(int assignmentId, CancellationToken cancellationToken)
     {
-        var assignmentIdValidationResult = await _assignmentIdValidator.ValidateAsync(assignmentId, cancellationToken);
+        var assignmentIdValidationResult = await _assignmentIdValidator.ValidateAsync(
+            assignmentId,
+            options => { options.IncludeRuleSets("Default", "IsInGroup"); },
+            cancellationToken);
 
         if (!assignmentIdValidationResult.IsValid)
         {
@@ -159,6 +173,14 @@ public class AssignmentController : ControllerBase
     public async Task<ActionResult<bool>> UpdatedNameAvailableAsync(int assignmentId, string name, CancellationToken cancellationToken)
     {
         return await _assignmentManager.NameAvailableAsync(assignmentId, name, cancellationToken);
+    }
+
+    [HttpGet("{assignmentId:int}/Type")]
+    public async Task<ActionResult<AssignmentTypeId>> GetAssignmentTypeIdAsync(int assignmentId, CancellationToken cancellationToken = default)
+    {
+        var getResult = await _assignmentManager.GetAssignmentTypeIdAsync(assignmentId, cancellationToken);
+
+        return getResult.ToActionResult();
     }
 
     [HttpGet("Types")]

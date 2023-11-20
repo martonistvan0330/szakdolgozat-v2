@@ -5,6 +5,7 @@ using HomeworkManager.API.Validation.Authentication;
 using HomeworkManager.API.Validation.Course;
 using HomeworkManager.API.Validation.Group;
 using HomeworkManager.API.Validation.Role;
+using HomeworkManager.API.Validation.Submission;
 using HomeworkManager.API.Validation.User;
 using HomeworkManager.BusinessLogic.Managers;
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
@@ -21,6 +22,7 @@ using HomeworkManager.Model.CustomEntities.Assignment;
 using HomeworkManager.Model.CustomEntities.Authentication;
 using HomeworkManager.Model.CustomEntities.Course;
 using HomeworkManager.Model.CustomEntities.Group;
+using HomeworkManager.Model.CustomEntities.Submission;
 using HomeworkManager.Model.CustomEntities.User;
 using HomeworkManager.Shared.Services;
 using HomeworkManager.Shared.Services.Interfaces;
@@ -47,6 +49,7 @@ public static class HostServiceExtensions
         services.AddScoped<IPasswordRecoveryTokenRepository, PasswordRecoveryTokenRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<ISubmissionRepository, SubmissionRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         return services;
     }
@@ -59,6 +62,7 @@ public static class HostServiceExtensions
         services.AddScoped<IEntityManager, EntityManager>();
         services.AddScoped<IGroupManager, GroupManager>();
         services.AddScoped<IRoleManager, RoleManager>();
+        services.AddScoped<ISubmissionManager, SubmissionManager>();
         services.AddScoped<IUserManager, UserManager>();
         return services;
     }
@@ -84,15 +88,17 @@ public static class HostServiceExtensions
         services.AddScoped<IValidator<NewGroup>, NewGroupValidator>();
         services.AddScoped<IValidator<NewUser>, NewUserValidator>();
         services.AddScoped<IValidator<PasswordResetRequest>, PasswordResetRequestValidator>();
+        services.AddScoped<IValidator<UpdatedAssignment>, UpdatedAssignmentValidator>();
         services.AddScoped<IValidator<UpdatedCourse>, UpdatedCourseValidator>();
         services.AddScoped<IValidator<UpdatedGroup>, UpdatedGroupValidator>();
-        services.AddScoped<IValidator<UpdatedAssignment>, UpdatedAssignmentValidator>();
+        services.AddScoped<IValidator<UpdatedTextSubmission>, UpdatedTextSubmissionValidator>();
 
         services.AddScoped<AssignmentIdValidator>();
         services.AddScoped<CourseIdValidator>();
         services.AddScoped<EmailValidator>();
         services.AddScoped<PasswordValidator>();
         services.AddScoped<RoleValidator>();
+        services.AddScoped<SubmissionIdValidator>();
         services.AddScoped<UserIdValidator>();
         return services;
     }

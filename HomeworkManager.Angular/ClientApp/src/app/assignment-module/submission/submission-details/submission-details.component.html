@@ -1,0 +1,8 @@
+<div class="submission-details-container">
+    <h2>Submission</h2>
+    <ng-container [ngSwitch]="assignmentTypeId">
+        <hwm-text-submission-details *ngSwitchCase="AssignmentTypeId.TextAnswerAssignment"
+                                     [assignmentId]="assignmentId!"/>
+        <hwm-file-submission-details *ngSwitchCase="AssignmentTypeId.FileUploadAssignment"/>
+    </ng-container>
+</div>

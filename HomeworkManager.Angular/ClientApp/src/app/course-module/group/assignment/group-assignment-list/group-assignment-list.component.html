@@ -1,4 +1,4 @@
-<div class="teacher-list-container">
+<div class="assignment-list-container">
     <hwm-table (optionsSetup)="onOptionsSetup($event)"
                (rowClick)="onRowClick($event)"
                [changeDataSource]="changeDataSource$"
@@ -7,7 +7,7 @@
                [columnDefs]="columnDefs"
                [dataSource]="assignments$"
                [pageSizeOptions]="[10, 25]"
-               class="teacher-list-table"
+               class="assignment-list-table"
                sortDirection="asc"
                sortField="deadline">
         <button (click)="onCreateClick()"

@@ -15,12 +15,28 @@ import {
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { MatNativeDateModule } from "@angular/material/core";
 import { MatSelectModule } from "@angular/material/select";
+import { SubmissionDetailsComponent } from './submission/submission-details/submission-details.component';
+import { SubmissionListComponent } from './submission/submission-list/submission-list.component';
+import {
+  TextSubmissionDetailsComponent
+} from './submission/submission-details/text-submission-details/text-submission-details.component';
+import {
+  FileSubmissionDetailsComponent
+} from './submission/submission-details/file-submission-details/file-submission-details.component';
+import { MatDividerModule } from "@angular/material/divider";
+import { ControlModule } from "../control-module/control.module";
+import { AssignmentListComponent } from './assignment-list/assignment-list.component';
 
 
 @NgModule({
   declarations: [
     AssignmentDetailsComponent,
     UniqueAssignmentNameAsyncValidatorDirective,
+    SubmissionDetailsComponent,
+    SubmissionListComponent,
+    TextSubmissionDetailsComponent,
+    FileSubmissionDetailsComponent,
+    AssignmentListComponent,
   ],
   imports: [
     CommonModule,
@@ -35,10 +51,14 @@ import { MatSelectModule } from "@angular/material/select";
     MatDatepickerModule,
     MatNativeDateModule,
     MatCheckboxModule,
-    MatSelectModule
+    MatSelectModule,
+    MatDividerModule,
+    ControlModule
   ],
   exports: [
-    AssignmentDetailsComponent
+    AssignmentDetailsComponent,
+    SubmissionDetailsComponent,
+    AssignmentListComponent
   ]
 })
 export class AssignmentModule {

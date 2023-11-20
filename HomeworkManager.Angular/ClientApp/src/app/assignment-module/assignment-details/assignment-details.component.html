@@ -66,7 +66,7 @@
                                               [checked]="presentationRequired"
                                               [disabled]="!isCreator || !assignment.isDraft"
                                               labelPosition="before">
-                                    Presentation
+                                    Presentation required
                                 </mat-checkbox>
                             </div>
                         </div>
@@ -84,14 +84,15 @@
                                 </button>
                             </ng-container>
                         </div>
-                        <div *ngIf="!isTeacher">
-                            <h3>WOO</h3>
-                        </div>
                     </form>
+                    <mat-divider/>
+                    <div *ngIf="!isTeacher" class="submission">
+                        <hwm-submission-details [assignmentId]="assignment.assignmentId"/>
+                    </div>
                 </div>
             </mat-tab>
             <mat-tab *ngIf="isTeacher" class="assignment-details-tab" label="Submission">
-                <div>qwe</div>
+                <hwm-submission-list [assignmentId]="assignment.assignmentId"/>
             </mat-tab>
         </mat-tab-group>
     </div>

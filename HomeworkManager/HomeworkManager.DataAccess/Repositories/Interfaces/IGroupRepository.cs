@@ -32,7 +32,7 @@ public interface IGroupRepository
         CancellationToken cancellationToken = default
     )
     {
-        return GetAssignmentsAsync(courseId, groupName, userId, pageData, u => u.Name, searchText: searchText, cancellationToken: cancellationToken);
+        return GetAssignmentsAsync(courseId, groupName, userId, pageData, a => a.Name, searchText: searchText, cancellationToken: cancellationToken);
     }
 
     Task<IEnumerable<AssignmentListRow>> GetAssignmentsAsync<TKey>(

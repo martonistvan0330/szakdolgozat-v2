@@ -92,9 +92,21 @@ export class NavigationItems {
     roles: [Role.ADMINISTRATOR, Role.TEACHER]
   }
 
+  public static assignmentList: NavigationItem = {
+    routerUrlPattern: 'assignments',
+    navigationUrl: '/assignments',
+    roles: []
+  }
+
   public static assignmentDetails: NavigationItem = {
     routerUrlPattern: 'assignments/:assignmentId',
     navigationUrl: '/assignments',
     roles: []
+  }
+
+  public static submissionDetails: NavigationItem = {
+    routerUrlPattern: 'assignments/:assignmentId/submissions/:userId',
+    navigationUrl: 'submissions',
+    roles: [Role.ADMINISTRATOR, Role.TEACHER]
   }
 }

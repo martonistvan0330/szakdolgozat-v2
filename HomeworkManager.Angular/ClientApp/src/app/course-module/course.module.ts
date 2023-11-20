@@ -115,7 +115,8 @@ import {
     CourseDetailsComponent,
     GroupDetailsComponent,
     GroupCreateComponent,
-    GroupEditComponent
+    GroupEditComponent,
+    StudentListComponent
   ]
 })
 export class CourseModule {

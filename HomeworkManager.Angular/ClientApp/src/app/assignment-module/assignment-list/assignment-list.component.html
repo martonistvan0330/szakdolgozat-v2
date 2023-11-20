@@ -1,0 +1,12 @@
+<div class="assignment-list-container">
+    <hwm-table (optionsSetup)="onOptionsSetup($event)"
+               (rowClick)="onRowClick($event)"
+               [clickableRows]="true"
+               [columnDefs]="columnDefs"
+               [dataSource]="assignments$"
+               [pageSizeOptions]="[10, 25]"
+               class="assignment-list-table"
+               sortDirection="asc"
+               sortField="deadline"
+               title="Assignments"/>
+</div>

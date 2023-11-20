@@ -1,0 +1,12 @@
+.assignment-list-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 50px;
+}
+
+.assignment-list-table {
+  width: 100%;
+}

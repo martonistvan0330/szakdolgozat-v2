@@ -5,6 +5,7 @@ using HomeworkManager.DataAccess.Repositories.Interfaces;
 using HomeworkManager.Model.Constants;
 using HomeworkManager.Model.Constants.Errors.Assignment;
 using HomeworkManager.Model.Constants.Errors.Group;
+using HomeworkManager.Model.CustomEntities;
 using HomeworkManager.Model.CustomEntities.Assignment;
 using HomeworkManager.Model.CustomEntities.Errors;
 using HomeworkManager.Model.Entities;
@@ -32,6 +33,38 @@ public class AssignmentManager : IAssignmentManager
     public async Task<bool> ExistsDraftWithIdAsync(int assignmentId, CancellationToken cancellationToken = default)
     {
         return await _assignmentRepository.ExistsDraftWithIdAsync(assignmentId, cancellationToken);
+    }
+    
+    public async Task<Result<Pageable<AssignmentListRow>>> GetAllByUserAsync(PageableOptions options, CancellationToken cancellationToken = default)
+    {
+        var userId = await _currentUserService.GetIdAsync(cancellationToken);
+
+        var assignmentCount = await _assignmentRepository.GetCountByUserIdAsync(userId, options.SearchText, cancellationToken);
+
+        var assignments = options.SortOptions?.Sort switch
+        {
+            "name" => await _assignmentRepository.GetAllByUserIdAsync(
+                userId,
+                options.PageData,
+                a => a.Name,
+                options.SortOptions.SortDirection.ToSortDirection(),
+                options.SearchText,
+                cancellationToken),
+            "deadline" => await _assignmentRepository.GetAllByUserIdAsync(
+                userId,
+                options.PageData,
+                a => a.Deadline,
+                options.SortOptions.SortDirection.ToSortDirection(),
+                options.SearchText,
+                cancellationToken),
+            _ => await _assignmentRepository.GetAllByUserIdAsync(userId, options.PageData, options.SearchText, cancellationToken)
+        };
+
+        return new Pageable<AssignmentListRow>
+        {
+            Items = assignments,
+            TotalCount = assignmentCount
+        };
     }
 
     public async Task<Result<AssignmentModel>> GetModelAsync(int assignmentId, CancellationToken cancellationToken = default)
@@ -143,6 +176,18 @@ public class AssignmentManager : IAssignmentManager
         var userId = await _currentUserService.GetIdAsync(cancellationToken);
 
         return await _assignmentRepository.IsCreatorAsync(assignmentId, userId, cancellationToken);
+    }
+
+    public async Task<Result<AssignmentTypeId>> GetAssignmentTypeIdAsync(int assignmentId, CancellationToken cancellationToken = default)
+    {
+        var assignmentTypeId = await _assignmentRepository.GetAssignmentTypeIdAsync(assignmentId, cancellationToken);
+
+        if (assignmentTypeId is null)
+        {
+            return new BusinessError(AssignmentErrorMessages.ASSIGNMENT_WITH_ID_NOT_FOUND);
+        }
+
+        return assignmentTypeId;
     }
 
     public async Task<IEnumerable<AssignmentType>> GetAssignmentTypes(CancellationToken cancellationToken = default)

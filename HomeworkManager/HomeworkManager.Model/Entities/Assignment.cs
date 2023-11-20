@@ -19,4 +19,6 @@ public class Assignment
 
     public Guid CreatorId { get; set; }
     public User Creator { get; set; } = null!;
+
+    public ICollection<Submission> Submissions { get; set; } = new HashSet<Submission>();
 }
