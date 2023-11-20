@@ -10,7 +10,7 @@ public interface ICourseManager
     Task<bool> NameAvailableAsync(UpdatedCourse updatedCourse, CancellationToken cancellationToken = default);
     Task<bool> NameAvailableAsync(string name, CancellationToken cancellationToken = default);
     Task<Result<CourseModel>> GetModelAsync(int courseId, CancellationToken cancellationToken = default);
-    Task<Result<IEnumerable<CourseCard>>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<Result<IEnumerable<CourseListRow>>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<Result<IEnumerable<UserListRow>>> GetTeachersAsync(int courseId, CancellationToken cancellationToken = default);
     Task<Result<IEnumerable<UserListRow>>> GetStudentsAsync(int courseId, CancellationToken cancellationToken = default);
     Task<Result<IEnumerable<UserListRow>>> GetAddableTeachersAsync(int courseId, CancellationToken cancellationToken = default);

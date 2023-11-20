@@ -35,7 +35,7 @@ public class CourseController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<CourseCard>>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<CourseListRow>>> GetAllAsync(CancellationToken cancellationToken)
     {
         var allCoursesByUserResult = await _courseManager.GetAllAsync(cancellationToken);
 

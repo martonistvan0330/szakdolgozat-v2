@@ -86,9 +86,9 @@ public class CourseManager : ICourseManager
         return courseModel;
     }
 
-    public async Task<Result<IEnumerable<CourseCard>>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<Result<IEnumerable<CourseListRow>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        IEnumerable<CourseCard> courseCards;
+        IEnumerable<CourseListRow> courseCards;
 
         if (await _currentUserService.HasRoleAsync(Roles.ADMINISTRATOR, cancellationToken))
         {

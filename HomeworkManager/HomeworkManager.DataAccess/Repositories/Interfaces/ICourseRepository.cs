@@ -13,8 +13,8 @@ public interface ICourseRepository
     Task<Course?> GetByIdAsync(int courseId, CancellationToken cancellationToken = default);
     Task<CourseModel?> GetModelAsync(int courseId, CancellationToken cancellationToken = default);
     Task<CourseModel?> GetModelAsync(int courseId, Guid userId, CancellationToken cancellationToken = default);
-    Task<IEnumerable<CourseCard>> GetAllAsync(CancellationToken cancellationToken = default);
-    Task<IEnumerable<CourseCard>> GetAllAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<CourseListRow>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<IEnumerable<CourseListRow>> GetAllAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<IEnumerable<UserListRow>> GetTeachersAsync(int courseId, CancellationToken cancellationToken = default);
     Task<IEnumerable<UserListRow>> GetStudentsAsync(int courseId, CancellationToken cancellationToken = default);
     Task<int> CreateAsync(NewCourse newCourse, User user, CancellationToken cancellationToken = default);

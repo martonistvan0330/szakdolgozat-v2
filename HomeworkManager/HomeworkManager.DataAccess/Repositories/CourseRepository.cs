@@ -76,10 +76,10 @@ public class CourseRepository : ICourseRepository
             .SingleOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<CourseCard>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<CourseListRow>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Courses
-            .Select(c => new CourseCard
+            .Select(c => new CourseListRow
             {
                 CourseId = c.CourseId,
                 Name = c.Name
@@ -87,12 +87,12 @@ public class CourseRepository : ICourseRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<CourseCard>> GetAllAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<CourseListRow>> GetAllAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         var managedCourses = await _context.Users
             .Where(u => u.Id == userId)
             .SelectMany(u => u.ManagedCourses)
-            .Select(c => new CourseCard
+            .Select(c => new CourseListRow
             {
                 CourseId = c.CourseId,
                 Name = c.Name
@@ -102,7 +102,7 @@ public class CourseRepository : ICourseRepository
         var attendedCourses = await _context.Users
             .Where(u => u.Id == userId)
             .SelectMany(u => u.AttendedCourses)
-            .Select(c => new CourseCard
+            .Select(c => new CourseListRow
             {
                 CourseId = c.CourseId,
                 Name = c.Name
