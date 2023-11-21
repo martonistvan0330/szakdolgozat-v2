@@ -25,7 +25,7 @@ class CourseListViewModel(private val courseHandler: CourseHandler) : ViewModel(
         loadCourses()
     }
 
-    fun loadCourses() {
+    private fun loadCourses() {
         courseHandler.getCourses(
             { result ->
                 _state.value = CourseListState.Result(

@@ -13,7 +13,7 @@ interface AuthApi {
         @Body newUser: NewUser,
     ): Call<NewUser>?
 
-    @POST("/api/Auth/BearerToken")
+    @POST("/api/Auth/Login")
     fun login(
         @Body authRequest: AuthenticationRequest,
     ): Call<AuthenticationResponse>?

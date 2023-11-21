@@ -12,7 +12,7 @@ class CourseNetworkManager(context: Context) {
     private val retrofit: Retrofit
     private val courseApi: CourseApi
 
-    private val SERVICE_URL = "http://10.0.2.2:5024"
+    private val SERVICE_URL = "http://10.0.2.2:5020"
 
     init {
         val client = OkHttpClient.Builder().addInterceptor(AuthInterceptor(context)).build()

@@ -30,8 +30,8 @@ class AuthHandler(private val context: Context) {
         )
     }
 
-    fun login(userName: String, password: String, onSuccess: () -> Unit, onError: () -> Unit) {
-        AuthNetworkManager(context).login(AuthenticationRequest(userName, password))?.handle(
+    fun login(username: String, password: String, onSuccess: () -> Unit, onError: () -> Unit) {
+        AuthNetworkManager(context).login(AuthenticationRequest(username, password))?.handle(
             { authResponse ->
                 val sharedPref = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
                 with(sharedPref.edit()) {

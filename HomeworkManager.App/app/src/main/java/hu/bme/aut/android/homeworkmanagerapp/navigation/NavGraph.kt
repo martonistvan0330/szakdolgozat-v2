@@ -1,6 +1,5 @@
 package hu.bme.aut.android.homeworkmanagerapp.navigation
 
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -9,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import hu.bme.aut.android.homeworkmanagerapp.feature.auth.login.LoginScreen
 import hu.bme.aut.android.homeworkmanagerapp.feature.auth.register.RegisterScreen
+import hu.bme.aut.android.homeworkmanagerapp.feature.course.list.CourseListScreen
 
 @Composable
 fun NavGraph(
@@ -20,52 +20,75 @@ fun NavGraph(
         route = ROOT_GRAPH_ROUTE,
     ) {
         authNavGraph(navController = navController)
+        courseNavGraph(navController = navController)
+        groupNavGraph(navController = navController)
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 fun NavGraphBuilder.authNavGraph(
     navController: NavHostController,
 ) {
     navigation(
-        startDestination = Screen.Login.route,
+        startDestination = Screen.Login.routePattern,
         route = AUTH_GRAPH_ROUTE,
     ) {
         composable(
-            route = Screen.Login.route,
+            route = Screen.Login.routePattern,
         ) {
             LoginScreen(
                 onLogin = {
-                    navController.navigate(Screen.CourseList.route) {
-                        popUpTo(Screen.Login.route) {
+                    navController.navigate(Screen.CourseList.navigationRoute) {
+                        popUpTo(Screen.Login.routePattern) {
                             inclusive = true
                         }
                     }
                 },
                 onRegisterClick = {
-                    navController.navigate(Screen.Register.route) {
-                        popUpTo(Screen.Login.route) {
+                    navController.navigate(Screen.Register.navigationRoute) {
+                        popUpTo(Screen.Login.routePattern) {
                             inclusive = true
                         }
                     }
                 },
             )
         }
-        composable(route = Screen.Register.route) {
+        composable(
+            route = Screen.Register.routePattern
+        ) {
             RegisterScreen(
                 onRegister = {
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(Screen.Register.route) {
+                    navController.navigate(Screen.Login.navigationRoute) {
+                        popUpTo(Screen.Register.routePattern) {
                             inclusive = true
                         }
                     }
                 },
                 onLoginClick = {
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(Screen.Register.route) {
+                    navController.navigate(Screen.Login.navigationRoute) {
+                        popUpTo(Screen.Register.routePattern) {
                             inclusive = true
                         }
                     }
+                },
+            )
+        }
+    }
+}
+
+fun NavGraphBuilder.courseNavGraph(
+    navController: NavHostController,
+) {
+    navigation(
+        startDestination = Screen.CourseList.routePattern,
+        route = COURSE_GRAPH_ROUTE,
+    ) {
+        composable(
+            route = Screen.CourseList.routePattern,
+        ) {
+            CourseListScreen(
+                onListItemClick = { courseId ->
+                    navController.navigate(Screen.GroupList.navigationRoute + courseId)
                 },
             )
         }

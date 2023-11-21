@@ -13,7 +13,7 @@ class AuthNetworkManager(context: Context) {
     private val retrofit: Retrofit
     private val authApi: AuthApi
 
-    private val SERVICE_URL = "http://10.0.2.2:7020"
+    private val SERVICE_URL = "http://10.0.2.2:5020"
 
     init {
         retrofit = Retrofit.Builder()
