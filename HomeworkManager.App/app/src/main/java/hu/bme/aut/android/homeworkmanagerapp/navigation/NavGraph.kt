@@ -21,7 +21,7 @@ fun NavGraph(
     ) {
         authNavGraph(navController = navController)
         courseNavGraph(navController = navController)
-        groupNavGraph(navController = navController)
+        //groupNavGraph(navController = navController)
     }
 }
 
