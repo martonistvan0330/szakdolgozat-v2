@@ -23,12 +23,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import hu.bme.aut.android.homeworkmanagerapp.R
-import hu.bme.aut.android.homeworkmanagerapp.feature.auth.AuthHandler
 import hu.bme.aut.android.homeworkmanagerapp.ui.common.BottomTextButton
 import hu.bme.aut.android.homeworkmanagerapp.ui.common.NormalTextField
 import hu.bme.aut.android.homeworkmanagerapp.ui.common.PasswordTextField
@@ -37,6 +35,7 @@ import hu.bme.aut.android.homeworkmanagerapp.ui.common.PasswordTextField
 @Composable
 fun RegisterScreen(
     modifier: Modifier = Modifier,
+    viewModel: RegisterViewModel = hiltViewModel(),
     onRegister: (String) -> Unit,
     onLoginClick: () -> Unit,
 ) {
@@ -53,8 +52,6 @@ fun RegisterScreen(
     var confirmPasswordValue by remember { mutableStateOf("") }
     var isConfirmPasswordVisible by remember { mutableStateOf(false) }
     var isConfirmPasswordError by remember { mutableStateOf(false) }
-
-    val context = LocalContext.current
 
     Box(
         modifier = modifier
@@ -138,7 +135,7 @@ fun RegisterScreen(
             )
             Button(
                 onClick = {
-                    if (emailValue.isEmpty() || !emailValue.contains(Regex("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\$"))) {
+                    if (emailValue.isEmpty() || !emailValue.contains(Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}\$"))) {
                         isEmailError = true
                     } else if (usernameValue.isEmpty()) {
                         isUsernameError = true
@@ -147,7 +144,7 @@ fun RegisterScreen(
                     } else if (confirmPasswordValue.isEmpty() || passwordValue != confirmPasswordValue) {
                         isConfirmPasswordError = true
                     } else {
-                        AuthHandler(context).register(
+                        viewModel.register(
                             firstName = "",
                             lastName = "",
                             username = usernameValue,
@@ -169,14 +166,4 @@ fun RegisterScreen(
             modifier = Modifier.align(Alignment.BottomCenter),
         )
     }
-}
-
-@ExperimentalMaterial3Api
-@Preview(showBackground = true)
-@Composable
-fun RegisterScreen_Preview() {
-    RegisterScreen(
-        onLoginClick = { },
-        onRegister = { },
-    )
 }

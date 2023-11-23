@@ -23,12 +23,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import hu.bme.aut.android.homeworkmanagerapp.R
-import hu.bme.aut.android.homeworkmanagerapp.feature.auth.AuthHandler
 import hu.bme.aut.android.homeworkmanagerapp.ui.common.BottomTextButton
 import hu.bme.aut.android.homeworkmanagerapp.ui.common.NormalTextField
 import hu.bme.aut.android.homeworkmanagerapp.ui.common.PasswordTextField
@@ -37,6 +35,7 @@ import hu.bme.aut.android.homeworkmanagerapp.ui.common.PasswordTextField
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
+    viewModel: LoginViewModel = hiltViewModel(),
     onLogin: () -> Unit,
     onRegisterClick: () -> Unit,
 ) {
@@ -46,9 +45,6 @@ fun LoginScreen(
     var passwordValue by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isPasswordError by remember { mutableStateOf(false) }
-
-    val context = LocalContext.current
-    val authHandler by remember { mutableStateOf(AuthHandler(context)) }
 
     Box(
         modifier = modifier
@@ -101,7 +97,7 @@ fun LoginScreen(
                     } else if (passwordValue.isEmpty()) {
                         isPasswordError = true
                     } else {
-                        authHandler.login(usernameValue, passwordValue, onLogin, {})
+                        viewModel.login(usernameValue, passwordValue, onLogin, {})
                     }
                 },
                 modifier = Modifier.width(TextFieldDefaults.MinWidth),
@@ -115,14 +111,4 @@ fun LoginScreen(
             modifier = Modifier.align(Alignment.BottomCenter),
         )
     }
-}
-
-@ExperimentalMaterial3Api
-@Preview(showBackground = true)
-@Composable
-fun LoginScreen_Preview() {
-    LoginScreen(
-        onLogin = { },
-        onRegisterClick = { },
-    )
 }

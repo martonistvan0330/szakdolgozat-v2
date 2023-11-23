@@ -1,10 +1,14 @@
 package hu.bme.aut.android.homeworkmanagerapp.network
 
 import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.Interceptor
 import okhttp3.Response
+import javax.inject.Inject
 
-class AuthInterceptor(private val context: Context) : Interceptor {
+class AuthInterceptor @Inject constructor(
+    @ApplicationContext val context: Context
+) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val sharedPref = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
         val accessToken = sharedPref.getString("access-token", "")

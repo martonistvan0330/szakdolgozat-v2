@@ -1,15 +1,13 @@
 package hu.bme.aut.android.homeworkmanagerapp.feature.course.list
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.bme.aut.android.homeworkmanagerapp.feature.course.CourseHandler
 import hu.bme.aut.android.homeworkmanagerapp.ui.model.course.CourseListRowUi
 import hu.bme.aut.android.homeworkmanagerapp.ui.model.course.asCourseListRowUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
 
 sealed class CourseListState {
     object Loading : CourseListState()
@@ -17,7 +15,10 @@ sealed class CourseListState {
     data class Result(val courseList: List<CourseListRowUi>) : CourseListState()
 }
 
-class CourseListViewModel(private val courseHandler: CourseHandler) : ViewModel() {
+@HiltViewModel
+class CourseListViewModel @Inject constructor(
+    private val courseHandler: CourseHandler
+) : ViewModel() {
     private val _state = MutableStateFlow<CourseListState>(CourseListState.Loading)
     val state = _state.asStateFlow()
 
@@ -34,13 +35,5 @@ class CourseListViewModel(private val courseHandler: CourseHandler) : ViewModel(
             },
             { _state.value = CourseListState.Error(Exception("ERROR")) },
         )
-    }
-
-    companion object {
-        fun factory(context: Context): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                CourseListViewModel(CourseHandler(context))
-            }
-        }
     }
 }
