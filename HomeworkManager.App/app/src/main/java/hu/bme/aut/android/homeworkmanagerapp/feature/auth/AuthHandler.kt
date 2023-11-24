@@ -6,13 +6,14 @@ import hu.bme.aut.android.homeworkmanagerapp.domain.model.auth.AuthenticationReq
 import hu.bme.aut.android.homeworkmanagerapp.domain.model.user.NewUser
 import hu.bme.aut.android.homeworkmanagerapp.network.auth.AuthNetworkManager
 import hu.bme.aut.android.homeworkmanagerapp.network.handle
+import retrofit2.HttpException
 import javax.inject.Inject
 
 class AuthHandler @Inject constructor(
     private val authNetworkManager: AuthNetworkManager,
     @ApplicationContext private val context: Context
 ) {
-    fun register(
+    /*suspend*/ fun register(
         firstName: String,
         lastName: String,
         email: String,
@@ -29,24 +30,30 @@ class AuthHandler @Inject constructor(
                 password = password,
                 email = email,
             )
-        )?.handle(
+        ).handle(
             { onSuccess() },
             { onError() },
         )
     }
 
-    fun login(username: String, password: String, onSuccess: () -> Unit, onError: () -> Unit) {
-        authNetworkManager.login(AuthenticationRequest(username, password))?.handle(
-            { authResponse ->
-                val sharedPref = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
-                with(sharedPref.edit()) {
-                    putString("access-token", authResponse.accessToken)
-                    putString("refresh-token", authResponse.refreshToken)
-                    apply()
-                }
-                onSuccess()
-            },
-            { onError() },
-        )
+    suspend fun login(
+        authenticationRequest: AuthenticationRequest,
+        onSuccess: () -> Unit,
+        onError: () -> Unit
+    ) {
+        try {
+            val authenticationResponse = authNetworkManager.login(authenticationRequest)
+            val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+            with(sharedPreferences.edit()) {
+                putString("access-token", authenticationResponse.accessToken)
+                putString("refresh-token", authenticationResponse.refreshToken)
+                apply()
+            }
+            onSuccess()
+        } catch (httpException: HttpException) {
+            onError()
+        } catch (exception: Exception) {
+            println(exception.stackTrace)
+        }
     }
 }

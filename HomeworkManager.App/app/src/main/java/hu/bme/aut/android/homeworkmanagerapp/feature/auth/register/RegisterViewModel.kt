@@ -1,8 +1,10 @@
 package hu.bme.aut.android.homeworkmanagerapp.feature.auth.register
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.bme.aut.android.homeworkmanagerapp.feature.auth.AuthHandler
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,6 +20,8 @@ class RegisterViewModel @Inject constructor(
         onSuccess: () -> Unit,
         onError: () -> Unit
     ) {
-        authHandler.register(firstName, lastName, email, username, password, onSuccess, onError)
+        viewModelScope.launch {
+            authHandler.register(firstName, lastName, email, username, password, onSuccess, onError)
+        }
     }
 }

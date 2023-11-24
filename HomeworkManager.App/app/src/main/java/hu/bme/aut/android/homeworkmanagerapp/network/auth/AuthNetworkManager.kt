@@ -9,11 +9,11 @@ import javax.inject.Inject
 class AuthNetworkManager @Inject constructor(
     private val authApi: AuthApi
 ) {
-    fun register(newUser: NewUser): Call<NewUser>? {
+    /*suspend*/ fun register(newUser: NewUser): Call<NewUser>? {
         return authApi.register(newUser)
     }
 
-    fun login(authRequest: AuthenticationRequest): Call<AuthenticationResponse>? {
+    suspend fun login(authRequest: AuthenticationRequest): AuthenticationResponse {
         return authApi.login(authRequest)
     }
 }
