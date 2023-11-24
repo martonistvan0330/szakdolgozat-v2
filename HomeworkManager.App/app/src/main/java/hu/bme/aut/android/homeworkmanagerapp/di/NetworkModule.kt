@@ -9,7 +9,9 @@ import dagger.hilt.components.SingletonComponent
 import hu.bme.aut.android.homeworkmanagerapp.network.AuthInterceptor
 import hu.bme.aut.android.homeworkmanagerapp.network.auth.AuthApi
 import hu.bme.aut.android.homeworkmanagerapp.network.course.CourseApi
+import hu.bme.aut.android.homeworkmanagerapp.network.user.UserApi
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -28,7 +30,12 @@ class NetworkModule {
     @Singleton
     @Provides
     fun provideClient(authInterceptor: AuthInterceptor): OkHttpClient {
-        return OkHttpClient.Builder().addInterceptor(authInterceptor).build()
+        val logger = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BASIC }
+
+        return OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
+            .addInterceptor(logger)
+            .build()
     }
 
     @Singleton
@@ -49,5 +56,10 @@ class NetworkModule {
     @Provides
     fun provideCourseApi(retrofit: Retrofit): CourseApi {
         return retrofit.create(CourseApi::class.java)
+    }
+
+    @Provides
+    fun provideUserApi(retrofit: Retrofit): UserApi {
+        return retrofit.create(UserApi::class.java)
     }
 }

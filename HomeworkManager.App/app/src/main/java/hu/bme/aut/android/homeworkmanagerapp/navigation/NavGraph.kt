@@ -5,7 +5,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navigation
 import hu.bme.aut.android.homeworkmanagerapp.feature.auth.login.LoginScreen
 import hu.bme.aut.android.homeworkmanagerapp.feature.auth.register.RegisterScreen
 import hu.bme.aut.android.homeworkmanagerapp.feature.course.list.CourseListScreen
@@ -13,11 +12,11 @@ import hu.bme.aut.android.homeworkmanagerapp.feature.course.list.CourseListScree
 @Composable
 fun NavGraph(
     navController: NavHostController,
+    loggedIn: Boolean = false
 ) {
     NavHost(
         navController = navController,
-        startDestination = AUTH_GRAPH_ROUTE,
-        route = ROOT_GRAPH_ROUTE,
+        startDestination = if (loggedIn) Screen.CourseList.routePattern else Screen.Login.routePattern,
     ) {
         authNavGraph(navController = navController)
         courseNavGraph(navController = navController)
@@ -29,68 +28,58 @@ fun NavGraph(
 fun NavGraphBuilder.authNavGraph(
     navController: NavHostController,
 ) {
-    navigation(
-        startDestination = Screen.Login.routePattern,
-        route = AUTH_GRAPH_ROUTE,
+    composable(
+        route = Screen.Login.routePattern,
     ) {
-        composable(
-            route = Screen.Login.routePattern,
-        ) {
-            LoginScreen(
-                onLogin = {
-                    navController.navigate(Screen.CourseList.navigationRoute) {
-                        popUpTo(Screen.Login.routePattern) {
-                            inclusive = true
-                        }
+        LoginScreen(
+            onLogin = {
+                navController.navigate(Screen.CourseList.navigationRoute) {
+                    popUpTo(Screen.Login.routePattern) {
+                        inclusive = true
                     }
-                },
-                onRegisterClick = {
-                    navController.navigate(Screen.Register.navigationRoute) {
-                        popUpTo(Screen.Login.routePattern) {
-                            inclusive = true
-                        }
+                }
+            },
+            onRegisterClick = {
+                navController.navigate(Screen.Register.navigationRoute) {
+                    popUpTo(Screen.Login.routePattern) {
+                        inclusive = true
                     }
-                },
-            )
-        }
-        composable(
-            route = Screen.Register.routePattern
-        ) {
-            RegisterScreen(
-                onRegister = {
-                    navController.navigate(Screen.CourseList.navigationRoute) {
-                        popUpTo(Screen.Register.routePattern) {
-                            inclusive = true
-                        }
+                }
+            },
+        )
+    }
+    composable(
+        route = Screen.Register.routePattern
+    ) {
+        RegisterScreen(
+            onRegister = {
+                navController.navigate(Screen.CourseList.navigationRoute) {
+                    popUpTo(Screen.Register.routePattern) {
+                        inclusive = true
                     }
-                },
-                onLoginClick = {
-                    navController.navigate(Screen.Login.navigationRoute) {
-                        popUpTo(Screen.Register.routePattern) {
-                            inclusive = true
-                        }
+                }
+            },
+            onLoginClick = {
+                navController.navigate(Screen.Login.navigationRoute) {
+                    popUpTo(Screen.Register.routePattern) {
+                        inclusive = true
                     }
-                },
-            )
-        }
+                }
+            },
+        )
     }
 }
 
 fun NavGraphBuilder.courseNavGraph(
     navController: NavHostController,
 ) {
-    navigation(
-        startDestination = Screen.CourseList.routePattern,
-        route = COURSE_GRAPH_ROUTE,
+    composable(
+        route = Screen.CourseList.routePattern,
     ) {
-        composable(
-            route = Screen.CourseList.routePattern,
-        ) {
-            CourseListScreen(
-                onListItemClick = { courseId ->
-                    navController.navigate(Screen.CourseList.navigationRoute + courseId + Screen.GroupList.navigationRoute)
-                },
-            )
-        }
+        CourseListScreen(
+            onListItemClick = { courseId ->
+                navController.navigate(Screen.CourseList.navigationRoute + courseId + Screen.GroupList.navigationRoute)
+            },
+        )
     }
 }

@@ -89,6 +89,8 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
 
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 }
 
 kapt {

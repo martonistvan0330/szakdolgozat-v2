@@ -16,15 +16,16 @@ suspend fun <T> handleRequest(block: suspend () -> T): T {
     }
 }
 
-suspend fun <T> handleAuthorizedRequest(block: suspend () -> T): T {
+suspend fun <T> handleAuthorizedRequest(
+    refreshService: RefreshService,
+    block: suspend () -> T
+): T {
     return try {
         block()
     } catch (httpException: HttpException) {
         if (httpException.code() == 401) {
-            val authenticateService = AuthenticateService.create()
-
             return try {
-                authenticateService.authenticate()
+                refreshService.refreshToken()
                 handleRequest { block() }
             } catch (exception: Exception) {
                 throw exception
