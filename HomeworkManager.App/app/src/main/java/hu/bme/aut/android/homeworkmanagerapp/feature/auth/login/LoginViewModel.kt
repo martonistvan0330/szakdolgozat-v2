@@ -63,7 +63,7 @@ class LoginViewModel @Inject constructor(
                 )
             }
         } else {
-            login(loginUiState.value.asAuthenticationRequest(), onLogin, onError)
+            login(state.asAuthenticationRequest(), onLogin, onError)
         }
     }
 

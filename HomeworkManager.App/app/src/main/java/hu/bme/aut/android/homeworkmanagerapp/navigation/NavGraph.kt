@@ -58,7 +58,7 @@ fun NavGraphBuilder.authNavGraph(
         ) {
             RegisterScreen(
                 onRegister = {
-                    navController.navigate(Screen.Login.navigationRoute) {
+                    navController.navigate(Screen.CourseList.navigationRoute) {
                         popUpTo(Screen.Register.routePattern) {
                             inclusive = true
                         }

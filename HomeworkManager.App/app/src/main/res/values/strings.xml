@@ -8,6 +8,8 @@
     <string name="button_label_register">Register</string>
     <string name="button_label_already_have_account">I already have an account</string>
     <string name="text_field_label_username">username</string>
+    <string name="text_field_label_first_name">first name</string>
+    <string name="text_field_label_last_name">last name</string>
     <string name="text_empty_course_list">You don\'t have any courses</string>
     <string name="text_your_course_list">Your courses</string>
 </resources>

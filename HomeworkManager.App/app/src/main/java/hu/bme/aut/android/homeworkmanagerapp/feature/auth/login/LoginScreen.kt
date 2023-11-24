@@ -48,6 +48,7 @@ fun LoginScreen(
     val snackBarHostState = remember {
         SnackbarHostState()
     }
+
     val loginUiState by viewModel.loginUiState.collectAsState()
 
     Scaffold(
@@ -100,12 +101,13 @@ fun LoginScreen(
                 Button(
                     onClick = {
                         viewModel.login(
-                            onLogin
-                        ) {
-                            scope.launch {
-                                snackBarHostState.showSnackbar("Login failed")
+                            onLogin = onLogin,
+                            onError = {
+                                scope.launch {
+                                    snackBarHostState.showSnackbar("Login failed")
+                                }
                             }
-                        }
+                        )
                     },
                     modifier = Modifier.width(TextFieldDefaults.MinWidth),
                 ) {
