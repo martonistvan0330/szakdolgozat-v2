@@ -12,4 +12,5 @@
     <string name="text_field_label_last_name">last name</string>
     <string name="text_empty_course_list">You don\'t have any courses</string>
     <string name="text_your_course_list">Your courses</string>
+    <string name="something_went_wrong">Something went wrong</string>
 </resources>

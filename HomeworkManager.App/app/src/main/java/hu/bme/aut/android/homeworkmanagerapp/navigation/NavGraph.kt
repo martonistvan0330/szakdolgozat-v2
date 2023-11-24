@@ -88,7 +88,7 @@ fun NavGraphBuilder.courseNavGraph(
         ) {
             CourseListScreen(
                 onListItemClick = { courseId ->
-                    navController.navigate(Screen.GroupList.navigationRoute + courseId)
+                    navController.navigate(Screen.CourseList.navigationRoute + courseId + Screen.GroupList.navigationRoute)
                 },
             )
         }

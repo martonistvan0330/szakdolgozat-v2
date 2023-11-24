@@ -40,6 +40,9 @@ fun CourseListScreen(
     val state = viewModel.state.collectAsStateWithLifecycle().value
 
     Scaffold(
+        topBar = {},
+        bottomBar = {},
+        snackbarHost = {},
         modifier = Modifier.fillMaxSize()
     ) {
         Box(
