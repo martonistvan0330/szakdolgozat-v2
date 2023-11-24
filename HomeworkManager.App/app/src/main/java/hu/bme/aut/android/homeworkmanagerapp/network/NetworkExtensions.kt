@@ -2,9 +2,43 @@ package hu.bme.aut.android.homeworkmanagerapp.network
 
 import retrofit2.Call
 import retrofit2.Callback
+import retrofit2.HttpException
 import retrofit2.Response
 
-fun<T> Call<T>?.handle(onSuccess: (T) -> Unit, onError: () -> Unit) {
+suspend fun <T> handleRequest(block: suspend () -> T): T {
+    return try {
+        block()
+    } catch (httpException: HttpException) {
+        throw httpException
+    } catch (exception: Exception) {
+        println(exception.stackTrace)
+        throw exception
+    }
+}
+
+suspend fun <T> handleAuthorizedRequest(block: suspend () -> T): T {
+    return try {
+        block()
+    } catch (httpException: HttpException) {
+        if (httpException.code() == 401) {
+            val authenticateService = AuthenticateService.create()
+
+            return try {
+                authenticateService.authenticate()
+                handleRequest { block() }
+            } catch (exception: Exception) {
+                throw exception
+            }
+        } else {
+            throw httpException
+        }
+    } catch (exception: Exception) {
+        println(exception.stackTrace)
+        throw exception
+    }
+}
+
+fun <T> Call<T>?.handle(onSuccess: (T) -> Unit, onError: () -> Unit) {
     this?.enqueue(object : Callback<T> {
         override fun onResponse(
             call: Call<T>,
@@ -29,7 +63,7 @@ fun<T> Call<T>?.handle(onSuccess: (T) -> Unit, onError: () -> Unit) {
     })
 }
 
-fun<T> Call<T>?.handleAuthorize(onSuccess: (T) -> Unit, onError: () -> Unit) {
+fun <T> Call<T>?.handleAuthorize(onSuccess: (T) -> Unit, onError: () -> Unit) {
     this?.enqueue(object : Callback<T> {
         override fun onResponse(
             call: Call<T>,
