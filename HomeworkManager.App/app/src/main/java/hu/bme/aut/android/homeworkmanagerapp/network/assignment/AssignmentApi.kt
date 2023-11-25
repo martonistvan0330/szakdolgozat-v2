@@ -10,5 +10,6 @@ interface AssignmentApi {
     suspend fun getAssignments(
         @Query("pageData.pageIndex") pageIndex: Int,
         @Query("pageData.pageSize") pageSize: Int,
+        @Query("searchText") searchText: String,
     ): Pageable<AssignmentListRow>
 }

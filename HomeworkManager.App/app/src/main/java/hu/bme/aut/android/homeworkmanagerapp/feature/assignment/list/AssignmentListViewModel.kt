@@ -2,44 +2,47 @@ package hu.bme.aut.android.homeworkmanagerapp.feature.assignment.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.bme.aut.android.homeworkmanagerapp.feature.assignment.AssignmentHandler
 import hu.bme.aut.android.homeworkmanagerapp.ui.model.assignment.AssignmentListRowUi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 sealed class AssignmentListState {
     object Loading : AssignmentListState()
-    data class Error(val error: Throwable) : AssignmentListState()
-    data class Result(val assignmentList: List<AssignmentListRowUi>) : AssignmentListState()
+    data class Result(
+        val assignmentList: Flow<PagingData<AssignmentListRowUi>>
+    ) : AssignmentListState()
 }
 
 @HiltViewModel
 class AssignmentListViewModel @Inject constructor(
-    assignmentHandler: AssignmentHandler,
-    //@ApplicationContext private val context: Context
+    private val assignmentHandler: AssignmentHandler
 ) : ViewModel() {
+    private val _searchTextState = MutableStateFlow("")
+    val searchTextState = _searchTextState.asStateFlow()
 
-    val assignments = assignmentHandler.getAssignments().cachedIn(viewModelScope)
+    private val _state = MutableStateFlow<AssignmentListState>(AssignmentListState.Loading)
+    val state = _state.asStateFlow()
 
-//    private val _state = MutableStateFlow<AssignmentListState>(AssignmentListState.Loading)
-//    val state = _state.asStateFlow()
-//
-//    fun loadAssignments(groupId: Int?) {
-//        viewModelScope.launch {
-//            if (groupId == null) {
-//                assignmentHandler.getAssignments(
-//                    onSuccess = { result ->
-//                        _state.value = AssignmentListState.Result(
-//                            assignmentList = result.map { it.asAssignmentListRowUi() }
-//                        )
-//                    },
-//                    onError = {
-//                        _state.value =
-//                            AssignmentListState.Error(Exception(context.getString(R.string.something_went_wrong)))
-//                    }
-//                )
-//            }
-//        }
-//    }
+    fun updateSearchText(newValue: String) {
+        _searchTextState.value = newValue
+    }
+
+    fun loadAssignments(groupId: Int?) {
+        val assignments = if (groupId == null) {
+            assignmentHandler
+                .getAssignments(_searchTextState.value)
+                .cachedIn(viewModelScope)
+        } else {
+            assignmentHandler
+                .getAssignments(_searchTextState.value)
+                .cachedIn(viewModelScope)
+        }
+        _state.value = AssignmentListState.Result(assignmentList = assignments)
+    }
 }
