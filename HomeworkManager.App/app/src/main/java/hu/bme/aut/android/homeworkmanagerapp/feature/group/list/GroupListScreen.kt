@@ -37,7 +37,7 @@ import hu.bme.aut.android.homeworkmanagerapp.ui.common.topbar.TopBar
 fun GroupListScreen(
     courseId: Int,
     onLogout: () -> Unit,
-    onListItemClick: (Int) -> Unit,
+    onListItemClick: (String) -> Unit,
     navController: NavHostController,
     viewModel: GroupListViewModel = hiltViewModel()
 ) {
@@ -109,15 +109,10 @@ fun GroupListScreen(
                                             Text(text = group.name)
                                         }
                                     },
-                                    supportingText = {
-                                        Text(
-                                            text = group.name,
-                                        )
-                                    },
                                     modifier = Modifier
                                         .clickable(onClick = {
                                             onListItemClick(
-                                                group.groupId,
+                                                group.name,
                                             )
                                         })
                                         .animateItemPlacement(),

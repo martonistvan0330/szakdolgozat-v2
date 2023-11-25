@@ -33,15 +33,21 @@ class AssignmentListViewModel @Inject constructor(
         _searchTextState.value = newValue
     }
 
-    fun loadAssignments(groupId: Int?) {
-        val assignments = if (groupId == null) {
+    fun loadAssignments(courseId: Int?, groupName: String?) {
+        val assignments = if (courseId == null) {
             assignmentHandler
                 .getAssignments(_searchTextState.value)
                 .cachedIn(viewModelScope)
         } else {
-            assignmentHandler
-                .getAssignments(_searchTextState.value)
-                .cachedIn(viewModelScope)
+            if (groupName == null) {
+                assignmentHandler
+                    .getAssignments(courseId, "General", _searchTextState.value)
+                    .cachedIn(viewModelScope)
+            } else {
+                assignmentHandler
+                    .getAssignments(courseId, groupName, _searchTextState.value)
+                    .cachedIn(viewModelScope)
+            }
         }
         _state.value = AssignmentListState.Result(assignmentList = assignments)
     }

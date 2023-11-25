@@ -11,6 +11,7 @@ import hu.bme.aut.android.homeworkmanagerapp.feature.assignment.list.AssignmentL
 import hu.bme.aut.android.homeworkmanagerapp.feature.auth.login.LoginScreen
 import hu.bme.aut.android.homeworkmanagerapp.feature.auth.register.RegisterScreen
 import hu.bme.aut.android.homeworkmanagerapp.feature.course.list.CourseListScreen
+import hu.bme.aut.android.homeworkmanagerapp.feature.group.details.GroupDetailsScreen
 import hu.bme.aut.android.homeworkmanagerapp.feature.group.list.GroupListScreen
 
 @Composable
@@ -104,8 +105,10 @@ fun NavGraphBuilder.groupNavGraph(
         route = Screen.GroupList.routePattern,
         arguments = listOf(navArgument("courseId") { type = NavType.IntType })
     ) { backStackEntry ->
+        val courseId = backStackEntry.arguments!!.getInt("courseId")
+
         GroupListScreen(
-            backStackEntry.arguments!!.getInt("courseId"),
+            courseId,
             onLogout = {
                 navController.navigate(Screen.Login.navigationRoute) {
                     popUpTo(navController.graph.id) {
@@ -113,8 +116,28 @@ fun NavGraphBuilder.groupNavGraph(
                     }
                 }
             },
-            onListItemClick = { groupId ->
-                // TODO
+            onListItemClick = { groupName ->
+                navController.navigate("${Screen.CourseList.navigationRoute}/$courseId/${Screen.GroupDetails.navigationRoute}/$groupName")
+            },
+            navController = navController
+        )
+    }
+    composable(
+        route = Screen.GroupDetails.routePattern,
+        arguments = listOf(
+            navArgument("courseId") { type = NavType.IntType },
+            navArgument("groupName") { type = NavType.StringType }
+        )
+    ) { backStackEntry ->
+        GroupDetailsScreen(
+            backStackEntry.arguments!!.getInt("courseId"),
+            backStackEntry.arguments!!.getString("groupName")!!,
+            onLogout = {
+                navController.navigate(Screen.Login.navigationRoute) {
+                    popUpTo(navController.graph.id) {
+                        inclusive = true
+                    }
+                }
             },
             navController = navController
         )
@@ -128,6 +151,7 @@ fun NavGraphBuilder.assignmentNavGraph(
         route = Screen.AssignmentList.routePattern
     ) {
         AssignmentListScreen(
+            null,
             null,
             onLogout = {
                 navController.navigate(Screen.Login.navigationRoute) {

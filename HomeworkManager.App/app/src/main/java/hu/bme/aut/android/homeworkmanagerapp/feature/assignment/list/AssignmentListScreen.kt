@@ -41,25 +41,30 @@ import hu.bme.aut.android.homeworkmanagerapp.ui.common.topbar.TopBar
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun AssignmentListScreen(
-    groupId: Int? = null,
-    onLogout: () -> Unit,
+    courseId: Int? = null,
+    groupName: String? = null,
+    onLogout: (() -> Unit)? = null,
+    navController: NavHostController? = null,
     onListItemClick: (Int) -> Unit,
-    navController: NavHostController,
     viewModel: AssignmentListViewModel = hiltViewModel()
 ) {
-    viewModel.loadAssignments(groupId)
+    viewModel.loadAssignments(courseId, groupName)
 
     Scaffold(
         topBar = {
-            TopBar(
-                title = stringResource(id = R.string.text_your_assignment_list),
-                onLogout = onLogout
-            )
+            if (onLogout != null) {
+                TopBar(
+                    title = stringResource(id = R.string.text_your_assignment_list),
+                    onLogout = onLogout
+                )
+            }
         },
         bottomBar = {
-            BottomBar(
-                navController = navController
-            )
+            if (navController != null) {
+                BottomBar(
+                    navController = navController
+                )
+            }
         },
         snackbarHost = {},
         modifier = Modifier.fillMaxSize()
@@ -85,12 +90,12 @@ fun AssignmentListScreen(
                     leadingIcon = { },
                     trailingIcon = {
                         IconButton(onClick = {
-                            viewModel.loadAssignments(groupId)
+                            viewModel.loadAssignments(courseId, groupName)
                         }) {
                             Icon(Icons.Default.Search, null)
                         }
                     },
-                    onDone = { viewModel.loadAssignments(groupId) }
+                    onDone = { viewModel.loadAssignments(courseId, groupName) }
                 )
                 Box(
                     modifier = Modifier
