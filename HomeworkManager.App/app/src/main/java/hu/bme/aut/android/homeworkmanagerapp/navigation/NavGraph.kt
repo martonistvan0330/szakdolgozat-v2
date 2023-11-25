@@ -77,6 +77,13 @@ fun NavGraphBuilder.courseNavGraph(
         route = Screen.CourseList.routePattern,
     ) {
         CourseListScreen(
+            onLogout = {
+                navController.navigate(Screen.Login.navigationRoute) {
+                    popUpTo(Screen.CourseList.routePattern) {
+                        inclusive = true
+                    }
+                }
+            },
             onListItemClick = { courseId ->
                 navController.navigate(Screen.CourseList.navigationRoute + courseId + Screen.GroupList.navigationRoute)
             },

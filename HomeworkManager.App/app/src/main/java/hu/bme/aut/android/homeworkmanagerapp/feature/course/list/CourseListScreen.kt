@@ -11,18 +11,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.outlined.School
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,10 +28,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.bme.aut.android.homeworkmanagerapp.R
+import hu.bme.aut.android.homeworkmanagerapp.ui.common.topbar.TopBar
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun CourseListScreen(
+    onLogout: () -> Unit,
     onListItemClick: (Int) -> Unit,
     viewModel: CourseListViewModel = hiltViewModel()
 ) {
@@ -42,13 +41,9 @@ fun CourseListScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Courses") },
-                actions = {
-                    IconButton(onClick = { }) {
-                        Icon(Icons.Filled.Logout, "logout")
-                    }
-                }
+            TopBar(
+                title = stringResource(id = R.string.text_your_course_list),
+                onLogout = onLogout
             )
         },
         bottomBar = {},

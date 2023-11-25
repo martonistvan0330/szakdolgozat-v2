@@ -3,6 +3,7 @@ package hu.bme.aut.android.homeworkmanagerapp.network.auth
 import hu.bme.aut.android.homeworkmanagerapp.domain.model.auth.AuthenticationRequest
 import hu.bme.aut.android.homeworkmanagerapp.domain.model.auth.AuthenticationResponse
 import hu.bme.aut.android.homeworkmanagerapp.domain.model.auth.RefreshRequest
+import hu.bme.aut.android.homeworkmanagerapp.domain.model.auth.RevokeRequest
 import hu.bme.aut.android.homeworkmanagerapp.domain.model.user.NewUser
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -22,4 +23,9 @@ interface AuthApi {
     suspend fun refreshToken(
         @Body refreshRequest: RefreshRequest,
     ): AuthenticationResponse
+
+    @POST("/api/Auth/Logout")
+    suspend fun logout(
+        @Body revokeRequest: RevokeRequest
+    ): Boolean
 }
