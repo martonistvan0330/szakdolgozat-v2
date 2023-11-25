@@ -142,7 +142,7 @@ fun AssignmentListScreen(
                                         },
                                         supportingText = {
                                             Text(
-                                                text = assignment.deadline.toString(),
+                                                text = assignment.deadline,
                                             )
                                         },
                                         modifier = Modifier
