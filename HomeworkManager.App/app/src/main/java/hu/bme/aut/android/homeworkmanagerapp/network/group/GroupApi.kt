@@ -3,6 +3,7 @@ package hu.bme.aut.android.homeworkmanagerapp.network.group
 import hu.bme.aut.android.homeworkmanagerapp.domain.model.Pageable
 import hu.bme.aut.android.homeworkmanagerapp.domain.model.assignment.AssignmentListRow
 import hu.bme.aut.android.homeworkmanagerapp.domain.model.group.GroupListRow
+import hu.bme.aut.android.homeworkmanagerapp.domain.model.user.UserListRow
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -21,4 +22,22 @@ interface GroupApi {
         @Query("pageData.pageSize") pageSize: Int,
         @Query("searchText") searchText: String,
     ): Pageable<AssignmentListRow>
+
+    @GET("/api/Course/{courseId}/Group/{groupName}/Teacher")
+    suspend fun getTeachers(
+        @Path("courseId") courseId: Int,
+        @Path("groupName") groupName: String,
+        @Query("pageData.pageIndex") pageIndex: Int,
+        @Query("pageData.pageSize") pageSize: Int,
+        @Query("searchText") searchText: String,
+    ): Pageable<UserListRow>
+
+    @GET("/api/Course/{courseId}/Group/{groupName}/Student")
+    suspend fun getStudents(
+        @Path("courseId") courseId: Int,
+        @Path("groupName") groupName: String,
+        @Query("pageData.pageIndex") pageIndex: Int,
+        @Query("pageData.pageSize") pageSize: Int,
+        @Query("searchText") searchText: String,
+    ): Pageable<UserListRow>
 }
