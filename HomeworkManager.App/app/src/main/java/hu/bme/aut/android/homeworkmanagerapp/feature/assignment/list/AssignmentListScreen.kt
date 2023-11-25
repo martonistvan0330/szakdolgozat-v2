@@ -1,7 +1,6 @@
 package hu.bme.aut.android.homeworkmanagerapp.feature.assignment.list
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -9,10 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Assignment
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,8 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.paging.compose.collectAsLazyPagingItems
 import hu.bme.aut.android.homeworkmanagerapp.R
 import hu.bme.aut.android.homeworkmanagerapp.ui.common.bottombar.BottomBar
 import hu.bme.aut.android.homeworkmanagerapp.ui.common.topbar.TopBar
@@ -41,8 +38,7 @@ fun AssignmentListScreen(
     navController: NavHostController,
     viewModel: AssignmentListViewModel = hiltViewModel()
 ) {
-    val state = viewModel.state.collectAsStateWithLifecycle().value
-    viewModel.loadAssignments(groupId)
+    val assignments = viewModel.assignments.collectAsLazyPagingItems()
 
     Scaffold(
         topBar = {
@@ -62,74 +58,55 @@ fun AssignmentListScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(it)
-                .background(
-                    color = if (state is AssignmentListState.Loading || state is AssignmentListState.Error) {
-                        MaterialTheme.colorScheme.secondaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.background
-                    }
-                ),
+                .padding(it),
             contentAlignment = Alignment.Center,
         ) {
-            when (state) {
-                is AssignmentListState.Loading -> CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-
-                is AssignmentListState.Error -> Text(
-                    text = state.error.toString()
-                )
-
-                is AssignmentListState.Result -> {
-                    if (state.assignmentList.isEmpty()) {
-                        Text(text = stringResource(id = R.string.text_empty_assignment_list))
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                        ) {
-                            items(
-                                state.assignmentList,
-                                key = { assignment -> assignment.assignmentId }) { assignment ->
-                                ListItem(
-                                    headlineText = {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(
-                                                imageVector = Icons.Outlined.Assignment,
-                                                contentDescription = null,
-                                                modifier = Modifier
-                                                    .size(40.dp)
-                                                    .padding(
-                                                        end = 8.dp,
-                                                        top = 8.dp,
-                                                        bottom = 8.dp,
-                                                    ),
-                                            )
-                                            Text(text = assignment.name)
-                                        }
-                                    },
-                                    supportingText = {
-                                        Text(
-                                            text = assignment.deadline.toString(),
-                                        )
-                                    },
+            LazyColumn(
+                modifier = Modifier
+            ) {
+                items(
+                    count = assignments.itemCount,
+                    key = { index ->
+                        val assignment = assignments[index]
+                        "${assignment?.assignmentId ?: ""}$index"
+                    }
+                ) { index ->
+                    val assignment = assignments[index] ?: return@items
+                    ListItem(
+                        headlineText = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Assignment,
+                                    contentDescription = null,
                                     modifier = Modifier
-                                        .clickable(onClick = {
-                                            onListItemClick(
-                                                assignment.assignmentId,
-                                            )
-                                        })
-                                        .animateItemPlacement(),
+                                        .size(40.dp)
+                                        .padding(
+                                            end = 8.dp,
+                                            top = 8.dp,
+                                            bottom = 8.dp,
+                                        ),
                                 )
-                                if (state.assignmentList.last() != assignment) {
-                                    Divider(
-                                        thickness = 2.dp,
-                                        color = MaterialTheme.colorScheme.secondaryContainer,
-                                    )
-                                }
+                                Text(text = assignment.name)
                             }
-                        }
+                        },
+                        supportingText = {
+                            Text(
+                                text = assignment.deadline.toString(),
+                            )
+                        },
+                        modifier = Modifier
+                            .clickable(onClick = {
+                                onListItemClick(
+                                    assignment.assignmentId,
+                                )
+                            })
+                            .animateItemPlacement(),
+                    )
+                    if (assignments.itemCount != index) {
+                        Divider(
+                            thickness = 2.dp,
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                        )
                     }
                 }
             }
