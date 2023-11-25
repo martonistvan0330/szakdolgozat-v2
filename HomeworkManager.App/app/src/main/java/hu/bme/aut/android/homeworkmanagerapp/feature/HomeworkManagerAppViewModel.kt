@@ -24,10 +24,10 @@ class HomeworkManagerAppViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 authenticateService.authenticate()
-                _loggedIn.emit(true)
+                _loggedIn.value = true
             } catch (exception: Exception) {
                 exception.printStackTrace()
-                _loggedIn.emit(false)
+                _loggedIn.value = false
             }
         }
     }

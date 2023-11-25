@@ -9,6 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import hu.bme.aut.android.homeworkmanagerapp.network.AuthInterceptor
 import hu.bme.aut.android.homeworkmanagerapp.network.auth.AuthApi
 import hu.bme.aut.android.homeworkmanagerapp.network.course.CourseApi
+import hu.bme.aut.android.homeworkmanagerapp.network.group.GroupApi
 import hu.bme.aut.android.homeworkmanagerapp.network.user.UserApi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -56,6 +57,11 @@ class NetworkModule {
     @Provides
     fun provideCourseApi(retrofit: Retrofit): CourseApi {
         return retrofit.create(CourseApi::class.java)
+    }
+
+    @Provides
+    fun provideGroupApi(retrofit: Retrofit): GroupApi {
+        return retrofit.create(GroupApi::class.java)
     }
 
     @Provides
