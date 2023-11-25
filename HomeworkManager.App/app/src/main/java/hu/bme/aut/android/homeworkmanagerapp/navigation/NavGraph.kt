@@ -7,6 +7,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import hu.bme.aut.android.homeworkmanagerapp.feature.assignment.list.AssignmentListScreen
 import hu.bme.aut.android.homeworkmanagerapp.feature.auth.login.LoginScreen
 import hu.bme.aut.android.homeworkmanagerapp.feature.auth.register.RegisterScreen
 import hu.bme.aut.android.homeworkmanagerapp.feature.course.list.CourseListScreen
@@ -24,6 +25,7 @@ fun NavGraph(
         authNavGraph(navController = navController)
         courseNavGraph(navController = navController)
         groupNavGraph(navController = navController)
+        assignmentNavGraph(navController = navController)
     }
 }
 
@@ -90,6 +92,7 @@ fun NavGraphBuilder.courseNavGraph(
             onListItemClick = { courseId ->
                 navController.navigate("${Screen.CourseList.navigationRoute}/$courseId/${Screen.GroupList.navigationRoute}")
             },
+            navController = navController
         )
     }
 }
@@ -113,6 +116,30 @@ fun NavGraphBuilder.groupNavGraph(
             onListItemClick = { groupId ->
                 // TODO
             },
+            navController = navController
+        )
+    }
+}
+
+fun NavGraphBuilder.assignmentNavGraph(
+    navController: NavHostController,
+) {
+    composable(
+        route = Screen.AssignmentList.routePattern
+    ) {
+        AssignmentListScreen(
+            null,
+            onLogout = {
+                navController.navigate(Screen.Login.navigationRoute) {
+                    popUpTo(navController.graph.id) {
+                        inclusive = true
+                    }
+                }
+            },
+            onListItemClick = { assignmentId ->
+                // TODO
+            },
+            navController = navController
         )
     }
 }

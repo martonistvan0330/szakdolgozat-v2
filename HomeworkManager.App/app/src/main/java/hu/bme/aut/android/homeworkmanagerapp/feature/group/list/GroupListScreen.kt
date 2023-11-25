@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.School
+import androidx.compose.material.icons.outlined.PeopleAlt
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,7 +27,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import hu.bme.aut.android.homeworkmanagerapp.R
+import hu.bme.aut.android.homeworkmanagerapp.ui.common.bottombar.BottomBar
 import hu.bme.aut.android.homeworkmanagerapp.ui.common.topbar.TopBar
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -36,6 +38,7 @@ fun GroupListScreen(
     courseId: Int,
     onLogout: () -> Unit,
     onListItemClick: (Int) -> Unit,
+    navController: NavHostController,
     viewModel: GroupListViewModel = hiltViewModel()
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
@@ -48,7 +51,11 @@ fun GroupListScreen(
                 onLogout = onLogout
             )
         },
-        bottomBar = {},
+        bottomBar = {
+            BottomBar(
+                navController = navController
+            )
+        },
         snackbarHost = {},
         modifier = Modifier.fillMaxSize()
     ) {
@@ -89,7 +96,7 @@ fun GroupListScreen(
                                     headlineText = {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Icon(
-                                                imageVector = Icons.Outlined.School,
+                                                imageVector = Icons.Outlined.PeopleAlt,
                                                 contentDescription = null,
                                                 modifier = Modifier
                                                     .size(40.dp)

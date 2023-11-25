@@ -1,4 +1,4 @@
-package hu.bme.aut.android.homeworkmanagerapp.feature.course.list
+package hu.bme.aut.android.homeworkmanagerapp.feature.assignment.list
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.School
+import androidx.compose.material.icons.outlined.Assignment
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,18 +34,20 @@ import hu.bme.aut.android.homeworkmanagerapp.ui.common.topbar.TopBar
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun CourseListScreen(
+fun AssignmentListScreen(
+    groupId: Int? = null,
     onLogout: () -> Unit,
     onListItemClick: (Int) -> Unit,
     navController: NavHostController,
-    viewModel: CourseListViewModel = hiltViewModel()
+    viewModel: AssignmentListViewModel = hiltViewModel()
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
+    viewModel.loadAssignments(groupId)
 
     Scaffold(
         topBar = {
             TopBar(
-                title = stringResource(id = R.string.text_your_course_list),
+                title = stringResource(id = R.string.text_your_assignment_list),
                 onLogout = onLogout
             )
         },
@@ -62,7 +64,7 @@ fun CourseListScreen(
                 .fillMaxSize()
                 .padding(it)
                 .background(
-                    color = if (state is CourseListState.Loading || state is CourseListState.Error) {
+                    color = if (state is AssignmentListState.Loading || state is AssignmentListState.Error) {
                         MaterialTheme.colorScheme.secondaryContainer
                     } else {
                         MaterialTheme.colorScheme.background
@@ -71,30 +73,30 @@ fun CourseListScreen(
             contentAlignment = Alignment.Center,
         ) {
             when (state) {
-                is CourseListState.Loading -> CircularProgressIndicator(
+                is AssignmentListState.Loading -> CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
 
-                is CourseListState.Error -> Text(
+                is AssignmentListState.Error -> Text(
                     text = state.error.toString()
                 )
 
-                is CourseListState.Result -> {
-                    if (state.courseList.isEmpty()) {
-                        Text(text = stringResource(id = R.string.text_empty_course_list))
+                is AssignmentListState.Result -> {
+                    if (state.assignmentList.isEmpty()) {
+                        Text(text = stringResource(id = R.string.text_empty_assignment_list))
                     } else {
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
                         ) {
                             items(
-                                state.courseList,
-                                key = { course -> course.courseId }) { course ->
+                                state.assignmentList,
+                                key = { assignment -> assignment.assignmentId }) { assignment ->
                                 ListItem(
                                     headlineText = {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Icon(
-                                                imageVector = Icons.Outlined.School,
+                                                imageVector = Icons.Outlined.Assignment,
                                                 contentDescription = null,
                                                 modifier = Modifier
                                                     .size(40.dp)
@@ -104,23 +106,23 @@ fun CourseListScreen(
                                                         bottom = 8.dp,
                                                     ),
                                             )
-                                            Text(text = course.name)
+                                            Text(text = assignment.name)
                                         }
                                     },
                                     supportingText = {
                                         Text(
-                                            text = course.name,
+                                            text = assignment.deadline.toString(),
                                         )
                                     },
                                     modifier = Modifier
                                         .clickable(onClick = {
                                             onListItemClick(
-                                                course.courseId,
+                                                assignment.assignmentId,
                                             )
                                         })
                                         .animateItemPlacement(),
                                 )
-                                if (state.courseList.last() != course) {
+                                if (state.assignmentList.last() != assignment) {
                                     Divider(
                                         thickness = 2.dp,
                                         color = MaterialTheme.colorScheme.secondaryContainer,

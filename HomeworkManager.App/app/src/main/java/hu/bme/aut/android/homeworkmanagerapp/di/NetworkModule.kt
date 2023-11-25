@@ -7,6 +7,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import hu.bme.aut.android.homeworkmanagerapp.network.AuthInterceptor
+import hu.bme.aut.android.homeworkmanagerapp.network.assignment.AssignmentApi
 import hu.bme.aut.android.homeworkmanagerapp.network.auth.AuthApi
 import hu.bme.aut.android.homeworkmanagerapp.network.course.CourseApi
 import hu.bme.aut.android.homeworkmanagerapp.network.group.GroupApi
@@ -47,6 +48,11 @@ class NetworkModule {
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+    }
+
+    @Provides
+    fun provideAssignmentApi(retrofit: Retrofit): AssignmentApi {
+        return retrofit.create(AssignmentApi::class.java)
     }
 
     @Provides
