@@ -8,6 +8,7 @@ namespace HomeworkManager.Model.Contexts;
 public class HomeworkManagerContext : IdentityDbContext<User, Role, Guid>
 {
     public DbSet<AccessToken> AccessTokens => Set<AccessToken>();
+    public DbSet<Appointment> Appointments => Set<Appointment>();
     public DbSet<Assignment> Assignments => Set<Assignment>();
     public DbSet<AssignmentType> AssignmentTypes => Set<AssignmentType>();
     public DbSet<Course> Courses => Set<Course>();
@@ -27,6 +28,27 @@ public class HomeworkManagerContext : IdentityDbContext<User, Role, Guid>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.Entity<Appointment>(entity =>
+        {
+            entity
+                .HasOne(a => a.Assignment)
+                .WithMany(a => a.Appointments)
+                .HasForeignKey(a => a.AssignmentId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            entity
+                .HasOne(a => a.Teacher)
+                .WithMany(u => u.ManagedAppointments)
+                .HasForeignKey(a => a.TeacherId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            entity
+                .HasOne(a => a.Student)
+                .WithMany(u => u.Appointments)
+                .HasForeignKey(a => a.StudentId)
+                .OnDelete(DeleteBehavior.NoAction);
+        });
 
         builder.Entity<Assignment>(entity =>
         {
@@ -51,11 +73,11 @@ public class HomeworkManagerContext : IdentityDbContext<User, Role, Guid>
                 .Property(at => at.AssignmentTypeId)
                 .HasConversion<int>();
 
-            entity.HasData(new()
+            entity.HasData(new AssignmentType
             {
                 AssignmentTypeId = AssignmentTypeId.TextAnswerAssignment,
                 Name = "Text answer"
-            }, new()
+            }, new AssignmentType
             {
                 AssignmentTypeId = AssignmentTypeId.FileUploadAssignment,
                 Name = "File upload"

@@ -8,6 +8,7 @@ export enum Errors {
   MinLength = 5,
   MaxLength = 6,
   Email = 7,
+  Pattern = 8,
 
   ContainsLowerCase = 101,
   ContainsUpperCase = 102,

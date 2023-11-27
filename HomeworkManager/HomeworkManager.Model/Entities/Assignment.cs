@@ -21,4 +21,5 @@ public class Assignment
     public User Creator { get; set; } = null!;
 
     public ICollection<Submission> Submissions { get; set; } = new HashSet<Submission>();
+    public ICollection<Appointment> Appointments { get; set; } = new HashSet<Appointment>();
 }

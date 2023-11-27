@@ -75,7 +75,6 @@ export class AssignmentDetailsComponent implements OnInit {
     if (typeof this.deadline.value == 'string') {
       updatedAssignment.deadline = this.deadline.value;
     } else {
-      const asd = this.deadline.value.getDate();
       const deadline = new Date(this.deadline.value)
       deadline.setDate(this.deadline.value.getDate() + 1);
       updatedAssignment.deadline = deadline.toISOString();

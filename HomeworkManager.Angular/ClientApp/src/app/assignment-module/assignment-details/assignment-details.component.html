@@ -91,8 +91,11 @@
                     </div>
                 </div>
             </mat-tab>
-            <mat-tab *ngIf="isTeacher" class="assignment-details-tab" label="Submission">
+            <mat-tab *ngIf="isTeacher" class="assignment-details-tab" label="Submissions">
                 <hwm-submission-list [assignmentId]="assignment.assignmentId"/>
+            </mat-tab>
+            <mat-tab *ngIf="isTeacher" class="assignment-details-tab" label="Presentations">
+                <hwm-presentation [assignmentId]="assignment.assignmentId" [isTeacher]="isTeacher"/>
             </mat-tab>
         </mat-tab-group>
     </div>

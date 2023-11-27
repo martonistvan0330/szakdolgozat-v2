@@ -1,0 +1,12 @@
+<div class="presentation-container">
+    <ng-container *ngIf="isTeacher">
+        <div *ngIf="!isEditing" class="presentation-edit-button-container">
+            <button (click)="onEditClick()" color="accent" mat-raised-button>Add new</button>
+        </div>
+        <div *ngIf="isEditing" class="presentation-back-button-container">
+            <button (click)="onBack()" color="accent" mat-raised-button>Back</button>
+        </div>
+    </ng-container>
+    <hwm-appointment-grid *ngIf="!isTeacher || !isEditing"/>
+    <hwm-appointment-edit (created)="onBack()" *ngIf="isTeacher && isEditing" [assignmentId]="assignmentId"/>
+</div>

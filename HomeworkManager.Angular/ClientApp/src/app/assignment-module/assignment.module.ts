@@ -26,6 +26,10 @@ import {
 import { MatDividerModule } from "@angular/material/divider";
 import { ControlModule } from "../control-module/control.module";
 import { AssignmentListComponent } from './assignment-list/assignment-list.component';
+import { PresentationComponent } from './presentation/presentation.component';
+import { AppointmentGridComponent } from './presentation/appointment-grid/appointment-grid.component';
+import { AppointmentEditComponent } from './presentation/appointment-edit/appointment-edit.component';
+import { NgxMaterialTimepickerModule } from "ngx-material-timepicker";
 
 
 @NgModule({
@@ -37,6 +41,9 @@ import { AssignmentListComponent } from './assignment-list/assignment-list.compo
     TextSubmissionDetailsComponent,
     FileSubmissionDetailsComponent,
     AssignmentListComponent,
+    PresentationComponent,
+    AppointmentGridComponent,
+    AppointmentEditComponent,
   ],
   imports: [
     CommonModule,
@@ -53,7 +60,8 @@ import { AssignmentListComponent } from './assignment-list/assignment-list.compo
     MatCheckboxModule,
     MatSelectModule,
     MatDividerModule,
-    ControlModule
+    ControlModule,
+    NgxMaterialTimepickerModule
   ],
   exports: [
     AssignmentDetailsComponent,

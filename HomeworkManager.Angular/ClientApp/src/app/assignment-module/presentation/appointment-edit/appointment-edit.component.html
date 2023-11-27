@@ -1,0 +1,68 @@
+<form [formGroup]="appointmentForm" class="appointment-form">
+    <div class="row">
+        <mat-form-field class="appointment-form-input">
+            <mat-label>Date</mat-label>
+            <input [matDatepicker]="datepicker" [min]="minDate"
+                   formControlName="date"
+                   matInput
+                   required>
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle [for]="datepicker"
+                                   matIconSuffix></mat-datepicker-toggle>
+            <mat-datepicker #datepicker [disabled]="false"></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field class="appointment-form-input">
+            <mat-label>Presentation length</mat-label>
+            <input formControlName="presentationLength" matInput type="number">
+            <mat-error *ngIf="presentationLength.invalid && (presentationLength.dirty || presentationLength.touched)"
+                       [ngSwitch]="presentationLengthError">
+                        <span *ngSwitchCase="Errors.Required">
+                            Presentation length is required
+                        </span>
+                <span *ngSwitchCase="Errors.Min">
+                            Must be at least 5
+                        </span>
+                <span *ngSwitchCase="Errors.Pattern">
+                            Must not be a decimal value
+                        </span>
+                <span *ngSwitchDefault>
+                            Presentation length is required
+                        </span>
+            </mat-error>
+        </mat-form-field>
+    </div>
+    <div class="row">
+        <mat-form-field class="appointment-form-input">
+            <mat-label>Start time</mat-label>
+            <input [format]="24"
+                   [ngxTimepicker]="startTimepicker"
+                   formControlName="startTime"
+                   matInput
+                   readonly>
+            <ngx-material-timepicker-toggle [for]="startTimepicker"
+                                            matIconSuffix>
+                <mat-icon ngxMaterialTimepickerToggleIcon style="color: white;">schedule</mat-icon>
+            </ngx-material-timepicker-toggle>
+            <ngx-material-timepicker #startTimepicker [minutesGap]="presentationLength.value"></ngx-material-timepicker>
+            <mat-error>Start time is required</mat-error>
+        </mat-form-field>
+        <mat-form-field class="appointment-form-input">
+            <mat-label>End time</mat-label>
+            <input [format]="24"
+                   [min]="startTime.value"
+                   [ngxTimepicker]="endTimepicker"
+                   formControlName="endTime"
+                   matInput
+                   readonly>
+            <ngx-material-timepicker-toggle [for]="endTimepicker"
+                                            matIconSuffix>
+                <mat-icon ngxMaterialTimepickerToggleIcon style="color: white;">schedule</mat-icon>
+            </ngx-material-timepicker-toggle>
+            <ngx-material-timepicker #endTimepicker [minutesGap]="presentationLength.value"></ngx-material-timepicker>
+            <mat-error>End time is required</mat-error>
+        </mat-form-field>
+    </div>
+    <div class="row">
+        <button (click)="onAddAppointmentClick()" color="primary" mat-raised-button>Add appointment</button>
+    </div>
+</form>

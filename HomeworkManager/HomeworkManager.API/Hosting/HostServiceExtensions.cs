@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using HomeworkManager.API.Validation;
+using HomeworkManager.API.Validation.Appointment;
 using HomeworkManager.API.Validation.Assignment;
 using HomeworkManager.API.Validation.Authentication;
 using HomeworkManager.API.Validation.Course;
@@ -18,6 +19,7 @@ using HomeworkManager.BusinessLogic.Services.Seed.Interfaces;
 using HomeworkManager.DataAccess.Repositories;
 using HomeworkManager.DataAccess.Repositories.Interfaces;
 using HomeworkManager.Model.Configurations;
+using HomeworkManager.Model.CustomEntities.Appointment;
 using HomeworkManager.Model.CustomEntities.Assignment;
 using HomeworkManager.Model.CustomEntities.Authentication;
 using HomeworkManager.Model.CustomEntities.Course;
@@ -41,6 +43,7 @@ public static class HostServiceExtensions
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IAccessTokenRepository, AccessTokenRepository>();
+        services.AddScoped<IAppointmentRepository, AppointmentRepository>();
         services.AddScoped<IAssignmentRepository, AssignmentRepository>();
         services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddScoped<IGroupRepository, GroupRepository>();
@@ -56,6 +59,7 @@ public static class HostServiceExtensions
 
     public static IServiceCollection AddManagers(this IServiceCollection services)
     {
+        services.AddScoped<IAppointmentManager, AppointmentManager>();
         services.AddScoped<IAssignmentManager, AssignmentManager>();
         services.AddScoped<IAuthenticationManager, AuthenticationManager>();
         services.AddScoped<ICourseManager, CourseManager>();
@@ -83,6 +87,7 @@ public static class HostServiceExtensions
     {
         services.AddScoped<IValidator<EmailConfirmationRequest>, EmailConfirmationRequestValidator>();
         services.AddScoped<IValidator<GroupInfo>, GroupNameValidator>();
+        services.AddScoped<IValidator<NewAppointment>, NewAppointmentValidator>();
         services.AddScoped<IValidator<NewAssignment>, NewAssignmentValidator>();
         services.AddScoped<IValidator<NewCourse>, NewCourseValidator>();
         services.AddScoped<IValidator<NewGroup>, NewGroupValidator>();
