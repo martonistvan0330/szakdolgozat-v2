@@ -1,7 +1,12 @@
-﻿namespace HomeworkManager.DataAccess.Repositories.Interfaces;
+﻿using FluentResults;
+using HomeworkManager.Model.CustomEntities.Appointment;
+
+namespace HomeworkManager.DataAccess.Repositories.Interfaces;
 
 public interface IAppointmentRepository
 {
+    Task<IEnumerable<AppointmentRow>> GetAllByAssignmentIdAsync(int assignmentId, Guid currentUserId, CancellationToken cancellationToken = default);
+
     Task CreateAsync(
         int assignmentId,
         DateTime date,
@@ -9,7 +14,9 @@ public interface IAppointmentRepository
         Guid teacherId,
         CancellationToken cancellationToken = default
     );
-    
+
+    Task<Result<int>> SignUpStudentAsync(int appointmentId, Guid studentId, CancellationToken cancellationToken = default);
+
     Task<bool> ExistsBetweenAsync(
         int assignmentId,
         DateTime date,

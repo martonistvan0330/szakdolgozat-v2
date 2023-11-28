@@ -8,6 +8,14 @@ namespace HomeworkManager.API.Attributes;
 
 public class HomeworkManagerAuthorizeAttribute : AuthorizeAttribute, IAsyncAuthorizationFilter
 {
+    public HomeworkManagerAuthorizeAttribute(params string[] roles)
+    {
+        if (roles.Length > 0)
+        {
+            Roles = string.Join(',', roles);
+        }
+    }
+
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
         var identity = context.HttpContext.User.Identity;
@@ -19,10 +27,10 @@ public class HomeworkManagerAuthorizeAttribute : AuthorizeAttribute, IAsyncAutho
         var userRepository = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
         var accessTokenRepository = context.HttpContext.RequestServices.GetRequiredService<IAccessTokenRepository>();
 
-        var bearerToken = context.HttpContext.Request.Headers["Authorization"].First()!;
-        var accessToken = bearerToken.Split(" ")[1];
+        string bearerToken = context.HttpContext.Request.Headers["Authorization"].First()!;
+        string accessToken = bearerToken.Split(" ")[1];
 
-        var username = context.HttpContext.User.Identity?.Name;
+        string? username = context.HttpContext.User.Identity?.Name;
 
         if (username is not null)
         {

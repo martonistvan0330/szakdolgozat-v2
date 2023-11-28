@@ -94,8 +94,11 @@
             <mat-tab *ngIf="isTeacher" class="assignment-details-tab" label="Submissions">
                 <hwm-submission-list [assignmentId]="assignment.assignmentId"/>
             </mat-tab>
-            <mat-tab *ngIf="isTeacher" class="assignment-details-tab" label="Presentations">
-                <hwm-presentation [assignmentId]="assignment.assignmentId" [isTeacher]="isTeacher"/>
+            <mat-tab *ngIf="!assignment.isDraft && assignment.presentationRequired" class="assignment-details-tab"
+                     label="Presentations">
+                <ng-template matTabContent>
+                    <hwm-presentation [assignmentId]="assignment.assignmentId" [isTeacher]="isTeacher"/>
+                </ng-template>
             </mat-tab>
         </mat-tab-group>
     </div>

@@ -1,1 +1,20 @@
-<p>appointment-grid works!</p>
+<div style="display: flex; flex-direction: column">
+    <div *ngFor="let appointmentRow of appointmentRows" style="display: flex; min-height: 100px;">
+        <p style="transform: rotate(-90deg); min-width: 85px">
+            {{ appointmentRow.date }}
+        </p>
+        <ng-container *ngFor="let appointment of appointmentRow.appointmentModels">
+            <div *ngIf="!appointment.isAvailable"
+                 [ngClass]="appointment.isMine ? 'my-appointment' : ''"
+                 class="mat-elevation-z2"
+                 style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 8px; min-width: 175px; padding: 16px">
+                <h3>{{ appointment.time }}</h3>
+            </div>
+            <div (click)="onAppointmentClick(appointment)"
+                 *ngIf="appointment.isAvailable" class="mat-elevation-z8" matRipple
+                 style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 8px; min-width: 100px; padding: 16px">
+                <h3>{{ appointment.time }}</h3>
+            </div>
+        </ng-container>
+    </div>
+</div>

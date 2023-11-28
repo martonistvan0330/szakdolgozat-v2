@@ -6,10 +6,10 @@ import { AppointmentService } from "../../services/appointment.service";
 
 @Component({
   selector: 'hwm-appointment-edit',
-  templateUrl: './appointment-edit.component.html',
-  styleUrls: ['./appointment-edit.component.scss']
+  templateUrl: './appointment-create.component.html',
+  styleUrls: ['./appointment-create.component.scss']
 })
-export class AppointmentEditComponent implements OnInit {
+export class AppointmentCreateComponent implements OnInit {
   private snackBarService = inject(SnackBarService);
   private appointmentService = inject(AppointmentService);
   protected minDate = new Date();

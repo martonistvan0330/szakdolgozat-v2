@@ -1,3 +1,5 @@
+export * from './models/appointment/appointment-model';
+export * from './models/appointment/appointment-row';
 export * from './models/appointment/new-appointment';
 export * from './models/assignment/assignment-list-row';
 export * from './models/assignment/assignment-model';

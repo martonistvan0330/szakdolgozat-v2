@@ -1,8 +1,10 @@
-﻿using FluentResults;
+﻿using System.Transactions;
+using FluentResults;
 using HomeworkManager.BusinessLogic.Managers.Interfaces;
 using HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
 using HomeworkManager.DataAccess.Repositories.Interfaces;
 using HomeworkManager.Model.CustomEntities.Appointment;
+using HomeworkManager.Shared.Services;
 
 namespace HomeworkManager.BusinessLogic.Managers;
 
@@ -17,6 +19,13 @@ public class AppointmentManager : IAppointmentManager
         _currentUserService = currentUserService;
     }
 
+    public async Task<Result<IEnumerable<AppointmentRow>>> GetAllByAssignmentAsync(int assignmentId, CancellationToken cancellationToken = default)
+    {
+        var currentUserId = await _currentUserService.GetIdAsync(cancellationToken);
+
+        return Result.Ok(await _appointmentRepository.GetAllByAssignmentIdAsync(assignmentId, currentUserId, cancellationToken));
+    }
+
     public async Task<Result> CreateAsync(NewAppointment newAppointment, CancellationToken cancellationToken = default)
     {
         var currentUserId = await _currentUserService.GetIdAsync(cancellationToken);
@@ -27,12 +36,28 @@ public class AppointmentManager : IAppointmentManager
 
         return Result.Ok();
     }
-    
+
+    public async Task<Result<int>> SignUpAsync(int appointmentId, CancellationToken cancellationToken = default)
+    {
+        using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+        var currentUserId = await _currentUserService.GetIdAsync(cancellationToken);
+
+        var signUpResult = await _appointmentRepository.SignUpStudentAsync(appointmentId, currentUserId, cancellationToken);
+
+        if (signUpResult.IsSuccess)
+        {
+            transactionScope.Complete();
+        }
+
+        return signUpResult;
+    }
+
     public async Task<bool> AvailableAsync(NewAppointment newAppointment, CancellationToken cancellationToken = default)
     {
-        int startMinutes = GetMinutes(newAppointment.StartTime);
-        int endMinutes = GetMinutes(newAppointment.EndTime);
-        
+        int startMinutes = TimeHelper.GetMinutes(newAppointment.StartTime);
+        int endMinutes = TimeHelper.GetMinutes(newAppointment.EndTime);
+
         var currentUserId = await _currentUserService.GetIdAsync(cancellationToken);
 
         return !await _appointmentRepository.ExistsBetweenAsync(
@@ -47,8 +72,8 @@ public class AppointmentManager : IAppointmentManager
 
     private IEnumerable<int> GetAppointments(string startTime, string endTime, int length)
     {
-        int startMinutes = GetMinutes(startTime);
-        int endMinutes = GetMinutes(endTime);
+        int startMinutes = TimeHelper.GetMinutes(startTime);
+        int endMinutes = TimeHelper.GetMinutes(endTime);
 
         List<int> appointmentTimes = new();
 
@@ -58,21 +83,5 @@ public class AppointmentManager : IAppointmentManager
         }
 
         return appointmentTimes;
-    }
-
-    private int GetMinutes(string time)
-    {
-        string[] parts = time.Split(':');
-        int hours = int.Parse(parts[0]);
-        int minutes = int.Parse(parts[1]);
-
-        return hours * 60 + minutes;
-    }
-
-    private string GetTime(int mins)
-    {
-        int hours = mins / 60;
-        int minutes = mins % 60;
-        return $"{hours}:{minutes}";
     }
 }

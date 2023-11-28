@@ -1,0 +1,10 @@
+<h1 mat-dialog-title>Choose appointment</h1>
+<mat-dialog-content>
+    <h1>{{ appointment.time }}</h1>
+    <h2>{{ appointment.teacherName }}</h2>
+    <h3>{{ appointment.teacherEmail }}</h3>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button (click)="onCancelClick()" mat-button>Cancel</button>
+    <button (click)="onOkClick()" mat-button>Choose</button>
+</mat-dialog-actions>
