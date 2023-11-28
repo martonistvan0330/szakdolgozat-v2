@@ -14,7 +14,7 @@
     <div class="course-cards-container">
         <mat-card *ngFor="let course of courses" class="course-card">
             <a [routerLink]="[NavigationItems.courseDetails.navigationUrl, course.courseId]">
-                <img alt="{{ course.name }}" class="course-card-image" height="250" src="https://placehold.co/250x250"
+                <img alt="{{ course.name }}" class="course-card-image" height="250" src="assets/images/school.png"
                      width="250">
                 <mat-card-header class="course-card-header">
                     <mat-card-title class="course-card-title">{{ course.name }}</mat-card-title>

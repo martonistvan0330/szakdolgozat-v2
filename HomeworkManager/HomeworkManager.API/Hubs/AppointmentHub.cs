@@ -1,5 +1,4 @@
-﻿using HomeworkManager.API.Attributes;
-using HomeworkManager.API.Hubs.ClientInterfaces;
+﻿using HomeworkManager.API.Hubs.ClientInterfaces;
 using Microsoft.AspNetCore.SignalR;
 
 namespace HomeworkManager.API.Hubs;

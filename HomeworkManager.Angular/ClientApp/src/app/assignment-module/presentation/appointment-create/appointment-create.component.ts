@@ -5,7 +5,7 @@ import { SnackBarService } from "../../../core-module";
 import { AppointmentService } from "../../services/appointment.service";
 
 @Component({
-  selector: 'hwm-appointment-edit',
+  selector: 'hwm-appointment-create',
   templateUrl: './appointment-create.component.html',
   styleUrls: ['./appointment-create.component.scss']
 })

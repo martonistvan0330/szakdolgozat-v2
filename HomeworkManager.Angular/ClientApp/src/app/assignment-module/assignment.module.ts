@@ -28,7 +28,7 @@ import { ControlModule } from "../control-module/control.module";
 import { AssignmentListComponent } from './assignment-list/assignment-list.component';
 import { PresentationComponent } from './presentation/presentation.component';
 import { AppointmentGridComponent } from './presentation/appointment-grid/appointment-grid.component';
-import { AppointmentCreateComponent } from './presentation/appointment-edit/appointment-create.component';
+import { AppointmentCreateComponent } from './presentation/appointment-create/appointment-create.component';
 import { NgxMaterialTimepickerModule } from "ngx-material-timepicker";
 import {
   AppointmentDetailDialogComponent

@@ -8,5 +8,5 @@
         </div>
     </ng-container>
     <hwm-appointment-grid *ngIf="!isTeacher || !isEditing" [assignmentId]="assignmentId"/>
-    <hwm-appointment-edit (created)="onBack()" *ngIf="isTeacher && isEditing" [assignmentId]="assignmentId"/>
+    <hwm-appointment-create (created)="onBack()" *ngIf="isTeacher && isEditing" [assignmentId]="assignmentId"/>
 </div>
