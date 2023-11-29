@@ -53,6 +53,11 @@ public class AppointmentController : ControllerBase
 
         var createResult = await _appointmentManager.CreateAsync(newAppointment, cancellationToken);
 
+        if (createResult.IsSuccess)
+        {
+            await _hubContext.Clients.Group($"Assignment_{newAppointment.AssignmentId}").Refresh();
+        }
+
         return createResult.ToActionResult();
     }
 

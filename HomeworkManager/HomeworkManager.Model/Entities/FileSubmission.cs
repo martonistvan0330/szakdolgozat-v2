@@ -1,6 +1,6 @@
 ﻿namespace HomeworkManager.Model.Entities;
 
-public class FileSubmission
+public class FileSubmission : Submission
 {
-    
+    public string FileName { get; set; } = null!;
 }

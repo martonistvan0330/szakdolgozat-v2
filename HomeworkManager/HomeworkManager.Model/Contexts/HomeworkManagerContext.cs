@@ -14,6 +14,7 @@ public class HomeworkManagerContext : IdentityDbContext<User, Role, Guid>
     public DbSet<Course> Courses => Set<Course>();
     public DbSet<EmailConfirmationToken> EmailConfirmationTokens => Set<EmailConfirmationToken>();
     public DbSet<Entity> Entities => Set<Entity>();
+    public DbSet<FileSubmission> FileSubmissions => Set<FileSubmission>();
     public DbSet<Group> Groups => Set<Group>();
     public DbSet<PasswordRecoveryToken> PasswordRecoveryTokens => Set<PasswordRecoveryToken>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();

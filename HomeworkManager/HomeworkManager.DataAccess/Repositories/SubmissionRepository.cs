@@ -20,7 +20,7 @@ public class SubmissionRepository : ISubmissionRepository
     {
         _context = context;
     }
-    
+
     public async Task<int> GetCountByAssignmentIdAsync(int assignmentId, string? searchText = null,
         CancellationToken cancellationToken = default)
     {
@@ -29,7 +29,7 @@ public class SubmissionRepository : ISubmissionRepository
             .Search(searchText)
             .CountAsync(cancellationToken);
     }
-    
+
     public async Task<IEnumerable<SubmissionListRow>> GetAllByAssignmentIdAsync<TKey>
     (
         int assignmentId,
@@ -64,6 +64,21 @@ public class SubmissionRepository : ISubmissionRepository
             .SingleOrDefaultAsync(cancellationToken);
     }
 
+    public async Task<FileSubmissionModel?> GetFileSubmissionAsync(int assignmentId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.FileSubmissions
+            .Where(s => s.AssignmentId == assignmentId && s.StudentId == userId)
+            .Select(s => new FileSubmissionModel
+            {
+                SubmissionId = s.SubmissionId,
+                StudentName = s.Student.FullName,
+                FileName = s.FileName,
+                SubmittedAt = s.SubmittedAt.HasValue ? s.SubmittedAt.Value.ToString("MM/dd/yyyy HH:mm:ss") : null,
+                IsDraft = s.IsDraft
+            })
+            .SingleOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<int> UpsertTextSubmissionAsync(UpdatedTextSubmission updatedTextSubmission, Guid userId,
         CancellationToken cancellationToken = default)
     {
@@ -87,6 +102,29 @@ public class SubmissionRepository : ISubmissionRepository
         await _context.SaveChangesAsync(cancellationToken);
 
         return textSubmission.SubmissionId;
+    }
+
+    public async Task<int> UpsertFileSubmissionAsync(int assignmentId, Guid studentId, string fileName, CancellationToken cancellationToken = default)
+    {
+        var fileSubmission = await _context.FileSubmissions
+            .Where(s => s.AssignmentId == assignmentId && s.StudentId == studentId)
+            .SingleOrDefaultAsync(cancellationToken);
+
+        if (fileSubmission == null)
+        {
+            fileSubmission = new FileSubmission
+            {
+                AssignmentId = assignmentId,
+                StudentId = studentId
+            };
+
+            _context.FileSubmissions.Add(fileSubmission);
+        }
+
+        fileSubmission.FileName = fileName;
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return fileSubmission.SubmissionId;
     }
 
     public async Task<Result> SubmitAsync(int assignmentId, Guid userId, CancellationToken cancellationToken = default)

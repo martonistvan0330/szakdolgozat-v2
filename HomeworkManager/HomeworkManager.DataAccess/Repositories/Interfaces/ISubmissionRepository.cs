@@ -9,7 +9,7 @@ public interface ISubmissionRepository
 {
     Task<int> GetCountByAssignmentIdAsync(int assignmentId, string? searchText = null,
         CancellationToken cancellationToken = default);
-    
+
     Task<IEnumerable<SubmissionListRow>> GetAllByAssignmentIdAsync(
         int assignmentId,
         PageData? pageData = null,
@@ -28,9 +28,11 @@ public interface ISubmissionRepository
         string? searchText = null,
         CancellationToken cancellationToken = default
     );
-    
+
     Task<TextSubmissionModel?> GetTextSubmissionAsync(int assignmentId, Guid userId, CancellationToken cancellationToken = default);
+    Task<FileSubmissionModel?> GetFileSubmissionAsync(int assignmentId, Guid userId, CancellationToken cancellationToken = default);
     Task<int> UpsertTextSubmissionAsync(UpdatedTextSubmission updatedTextSubmission, Guid userId, CancellationToken cancellationToken = default);
+    Task<int> UpsertFileSubmissionAsync(int assignment, Guid userId, string fileName, CancellationToken cancellationToken = default);
     Task<Result> SubmitAsync(int assignmentId, Guid userId, CancellationToken cancellationToken = default);
     Task<int?> GetAssignmentIdAsync(int submissionId, CancellationToken cancellationToken = default);
 }

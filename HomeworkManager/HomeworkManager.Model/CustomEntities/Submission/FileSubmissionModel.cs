@@ -2,4 +2,5 @@
 
 public class FileSubmissionModel : SubmissionModel
 {
+    public required string FileName { get; set; }
 }

@@ -14,6 +14,8 @@ using HomeworkManager.BusinessLogic.Services.Authentication;
 using HomeworkManager.BusinessLogic.Services.Authentication.Interfaces;
 using HomeworkManager.BusinessLogic.Services.Email;
 using HomeworkManager.BusinessLogic.Services.Email.Interfaces;
+using HomeworkManager.BusinessLogic.Services.File;
+using HomeworkManager.BusinessLogic.Services.File.Interfaces;
 using HomeworkManager.BusinessLogic.Services.Seed;
 using HomeworkManager.BusinessLogic.Services.Seed.Interfaces;
 using HomeworkManager.DataAccess.Repositories;
@@ -35,8 +37,11 @@ public static class HostServiceExtensions
 {
     public static IServiceCollection CreateConfigurations(this WebApplicationBuilder builder)
     {
+        builder.Configuration.AddEnvironmentVariables();
+
         builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetSection("JWT"));
         builder.Services.Configure<SmtpConfiguration>(builder.Configuration.GetSection("SMTP"));
+        builder.Services.Configure<BlobStorageConfiguration>(builder.Configuration.GetSection("BlobStorage"));
         return builder.Services;
     }
 
@@ -75,6 +80,7 @@ public static class HostServiceExtensions
     {
         services.AddTransient<ICurrentUserService, CurrentUserService>();
         services.AddTransient<IEmailService, EmailService>();
+        services.AddTransient<IFileService, FileService>();
         services.AddTransient<IHashingService, HashingService>();
         services.AddTransient<IJwtService, JwtService>();
         services.AddTransient<IRoleSeedService, RoleSeedService>();

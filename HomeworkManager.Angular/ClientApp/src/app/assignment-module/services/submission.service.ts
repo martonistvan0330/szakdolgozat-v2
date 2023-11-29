@@ -26,8 +26,16 @@ export class SubmissionService {
     return this.authApiClient.get<TextSubmissionModel | null>('Submission/Text/' + assignmentId);
   }
 
-  getFileSubmission(assignmentId: number) {
-    return this.authApiClient.get<FileSubmissionModel>('Submission/File/' + assignmentId);
+  getFileSubmission(assignmentId: number, userId: string | null) {
+    if (userId) {
+      return this.authApiClient.get<FileSubmissionModel>('Submission/File/' + assignmentId + '?userId=' + userId);
+    }
+
+    return this.authApiClient.get<FileSubmissionModel | null>('Submission/File/' + assignmentId);
+  }
+
+  downloadFileSubmission(assignmentId: number) {
+    return this.authApiClient.download('Submission/File/' + assignmentId + '/Download');
   }
 
   getSubmissions(assignmentId: number, options: PageableOptions) {
@@ -62,6 +70,14 @@ export class SubmissionService {
 
   updateTextSubmission(updatedTextSubmission: UpdatedTextSubmission) {
     return this.authApiClient.post<number>('Submission/Text', updatedTextSubmission);
+  }
+
+  uploadFileSubmission(assignmentId: number, file: File) {
+    const formData = new FormData();
+
+    formData.append('submission', file);
+
+    return this.authApiClient.post<number>('Submission/File/' + assignmentId, formData);
   }
 
   submit(assignmentId: number) {

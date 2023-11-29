@@ -3,6 +3,7 @@
     <ng-container [ngSwitch]="assignmentTypeId">
         <hwm-text-submission-details *ngSwitchCase="AssignmentTypeId.TextAnswerAssignment"
                                      [assignmentId]="assignmentId!"/>
-        <hwm-file-submission-details *ngSwitchCase="AssignmentTypeId.FileUploadAssignment"/>
+        <hwm-file-submission-details *ngSwitchCase="AssignmentTypeId.FileUploadAssignment"
+                                     [assignmentId]="assignmentId!"/>
     </ng-container>
 </div>

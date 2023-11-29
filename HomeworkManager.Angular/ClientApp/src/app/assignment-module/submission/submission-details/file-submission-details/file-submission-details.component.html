@@ -1,1 +1,9 @@
-<p>file-submission-details works!</p>
+<div>
+    <button (click)="onDownload()" color="primary" mat-raised-button>Download submission</button>
+</div>
+<div>
+    <button (click)="fileInput.click()" *ngIf="submission" color="primary" mat-raised-button>Choose File</button>
+    <input #fileInput (change)="onFileSelected($event)" hidden id="file" type="file">
+    <h5 *ngIf="file">{{ file.name }}</h5>
+    <button (click)="onUpload()" [disabled]="!file" color="primary" mat-raised-button>Upload</button>
+</div>

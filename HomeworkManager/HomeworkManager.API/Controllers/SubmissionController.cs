@@ -59,6 +59,27 @@ public class SubmissionController : ControllerBase
         return getResult.ToActionResult();
     }
 
+    [HttpGet("File/{assignmentId:int}")]
+    public async Task<ActionResult<FileSubmissionModel?>> GetFileSubmissionAsync(int assignmentId, Guid? userId, CancellationToken cancellationToken)
+    {
+        var getResult = await _submissionManager.GetFileSubmissionAsync(assignmentId, userId, cancellationToken);
+
+        return getResult.ToActionResult();
+    }
+
+    [HttpGet("File/{assignmentId:int}/Download")]
+    public async Task<ActionResult> DownloadFileSubmissionAsync(int assignmentId, Guid? userId, CancellationToken cancellationToken)
+    {
+        var downloadResult = await _submissionManager.DownloadFileSubmissionAsync(assignmentId, userId, cancellationToken);
+
+        if (!downloadResult.IsSuccess)
+        {
+            return downloadResult.ToResult().ToActionResult();
+        }
+
+        return File(downloadResult.Value, "application/octet-stream", "submission.txt");
+    }
+
     [HttpPost("Text")]
     public async Task<ActionResult<int>> UpsertTextSubmissionAsync(UpdatedTextSubmission updatedTextSubmission, CancellationToken cancellationToken)
     {
@@ -74,13 +95,12 @@ public class SubmissionController : ControllerBase
         return upsertResult.ToActionResult();
     }
 
-    [HttpPost("File")]
-    public async Task<ActionResult<int>> UpsertFileSubmissionAsync(UpdatedFileSubmission updatedTextSubmission, CancellationToken cancellationToken)
+    [HttpPost("File/{assignmentId:int}")]
+    public async Task<ActionResult<int>> UpsertFileSubmissionAsync(int assignmentId, IFormFile submission, CancellationToken cancellationToken)
     {
-        return 0;
-        // var upsertResult = await _submissionManager.UpsertTextSubmissionAsync(updatedTextSubmission, cancellationToken);
-        //
-        // return upsertResult.ToActionResult();
+        var uploadResult = await _submissionManager.UploadFileSubmissionAsync(assignmentId, submission, cancellationToken);
+
+        return uploadResult.ToActionResult();
     }
 
     [HttpPatch("{assignmentId:int}")]

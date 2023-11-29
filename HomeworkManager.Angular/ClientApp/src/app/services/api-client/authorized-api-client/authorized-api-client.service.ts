@@ -34,6 +34,16 @@ export class AuthorizedApiClientService {
     return this.httpRequest(() => this.http.delete<T>(this.apiUrl + route));
   }
 
+  download(route: string) {
+    return this.httpRequest(() =>
+      this.http.get(
+        this.apiUrl + route,
+        {
+          responseType: 'blob'
+        })
+    );
+  }
+
   private httpRequest<T>(request: () => Observable<T>) {
     return request().pipe(
       catchError((error, caught) => {
