@@ -89,7 +89,7 @@ fun FileSubmissionDetails(
                         },
                         enabled = submission.isDraft && !loading
                     ) {
-                        Text(text = stringResource(R.string.button_upload))
+                        Text(text = stringResource(R.string.button_upload_submission))
                     }
                     Button(
                         modifier = modifier,
