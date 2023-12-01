@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Homework Manager</string>
     <string name="button_label_dont_have_account">I don\'t have an account yet</string>
+    <string name="button_label_submit">Submit</string>
+    <string name="button_label_save">Save</string>
     <string name="text_field_label_email">email</string>
     <string name="text_field_label_password">password</string>
     <string name="button_label_login">Log in</string>
@@ -16,5 +18,10 @@
     <string name="text_your_groups_list">Your groups</string>
     <string name="text_empty_assignment_list">You don\'t have any assignments</string>
     <string name="text_your_assignment_list">Your assignments</string>
+    <string name="text_appointments">Appointments</string>
     <string name="something_went_wrong">Something went wrong</string>
+    <string name="unauthorized">Unauthorized</string>
+    <string name="assignment_details_presentation_appointments">Presentation appointments</string>
+    <string name="button_upload_submission">Upload submission</string>
+    <string name="button_download_submission">Download submission</string>
 </resources>

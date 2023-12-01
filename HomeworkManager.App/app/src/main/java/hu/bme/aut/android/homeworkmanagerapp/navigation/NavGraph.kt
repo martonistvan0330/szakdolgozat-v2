@@ -1,5 +1,7 @@
 package hu.bme.aut.android.homeworkmanagerapp.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -7,6 +9,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import hu.bme.aut.android.homeworkmanagerapp.feature.appointment.grid.AppointmentGridScreen
+import hu.bme.aut.android.homeworkmanagerapp.feature.assignment.details.AssignmentDetailsScreen
 import hu.bme.aut.android.homeworkmanagerapp.feature.assignment.list.AssignmentListScreen
 import hu.bme.aut.android.homeworkmanagerapp.feature.auth.login.LoginScreen
 import hu.bme.aut.android.homeworkmanagerapp.feature.auth.register.RegisterScreen
@@ -14,6 +18,7 @@ import hu.bme.aut.android.homeworkmanagerapp.feature.course.list.CourseListScree
 import hu.bme.aut.android.homeworkmanagerapp.feature.group.details.GroupDetailsScreen
 import hu.bme.aut.android.homeworkmanagerapp.feature.group.list.GroupListScreen
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun NavGraph(
     navController: NavHostController,
@@ -27,6 +32,7 @@ fun NavGraph(
         courseNavGraph(navController = navController)
         groupNavGraph(navController = navController)
         assignmentNavGraph(navController = navController)
+        appointmentNavGraph(navController = navController)
     }
 }
 
@@ -117,7 +123,9 @@ fun NavGraphBuilder.groupNavGraph(
                 }
             },
             onListItemClick = { groupName ->
-                navController.navigate("${Screen.CourseList.navigationRoute}/$courseId/${Screen.GroupDetails.navigationRoute}/$groupName")
+                navController.navigate(
+                    "${Screen.CourseList.navigationRoute}/$courseId/${Screen.GroupDetails.navigationRoute}/$groupName"
+                )
             },
             navController = navController
         )
@@ -144,6 +152,7 @@ fun NavGraphBuilder.groupNavGraph(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.Q)
 fun NavGraphBuilder.assignmentNavGraph(
     navController: NavHostController,
 ) {
@@ -161,7 +170,50 @@ fun NavGraphBuilder.assignmentNavGraph(
                 }
             },
             onListItemClick = { assignmentId ->
-                // TODO
+                navController.navigate(
+                    "${Screen.AssignmentDetails.navigationRoute}/$assignmentId"
+                )
+            },
+            navController = navController
+        )
+    }
+    composable(
+        route = Screen.AssignmentDetails.routePattern,
+        arguments = listOf(
+            navArgument("assignmentId") { type = NavType.IntType }
+        )
+    ) { backStackEntry ->
+        AssignmentDetailsScreen(
+            assignmentId = backStackEntry.arguments!!.getInt("assignmentId"),
+            onLogout = {
+                navController.navigate(Screen.Login.navigationRoute) {
+                    popUpTo(navController.graph.id) {
+                        inclusive = true
+                    }
+                }
+            },
+            navController = navController
+        )
+    }
+}
+
+fun NavGraphBuilder.appointmentNavGraph(
+    navController: NavHostController
+) {
+    composable(
+        route = Screen.AppointmentGrid.routePattern,
+        arguments = listOf(
+            navArgument("assignmentId") { type = NavType.IntType }
+        )
+    ) { backStackEntry ->
+        AppointmentGridScreen(
+            assignmentId = backStackEntry.arguments!!.getInt("assignmentId"),
+            onLogout = {
+                navController.navigate(Screen.Login.navigationRoute) {
+                    popUpTo(navController.graph.id) {
+                        inclusive = true
+                    }
+                }
             },
             navController = navController
         )

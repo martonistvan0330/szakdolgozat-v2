@@ -96,7 +96,7 @@ public class SubmissionController : ControllerBase
     }
 
     [HttpPost("File/{assignmentId:int}")]
-    public async Task<ActionResult<int>> UpsertFileSubmissionAsync(int assignmentId, IFormFile submission, CancellationToken cancellationToken)
+    public async Task<ActionResult<int>> UploadFileSubmissionAsync(int assignmentId, IFormFile submission, CancellationToken cancellationToken)
     {
         var uploadResult = await _submissionManager.UploadFileSubmissionAsync(assignmentId, submission, cancellationToken);
 

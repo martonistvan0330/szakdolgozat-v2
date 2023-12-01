@@ -95,7 +95,16 @@ fun LoginScreen(
                     },
                     isVisible = loginUiState.isPasswordVisible,
                     onVisibilityChanged = { viewModel.changePasswordVisibility() },
-                    onDone = { },
+                    onDone = {
+                        viewModel.login(
+                            onLogin = onLogin,
+                            onError = {
+                                scope.launch {
+                                    snackBarHostState.showSnackbar("Login failed")
+                                }
+                            }
+                        )
+                    },
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(

@@ -21,6 +21,7 @@ import androidx.navigation.NavHostController
 import hu.bme.aut.android.homeworkmanagerapp.feature.assignment.list.AssignmentListScreen
 import hu.bme.aut.android.homeworkmanagerapp.feature.group.details.student.list.GroupStudentListScreen
 import hu.bme.aut.android.homeworkmanagerapp.feature.group.details.teacher.list.GroupTeacherListScreen
+import hu.bme.aut.android.homeworkmanagerapp.navigation.Screen
 import hu.bme.aut.android.homeworkmanagerapp.ui.common.bottombar.BottomBar
 import hu.bme.aut.android.homeworkmanagerapp.ui.common.topbar.TopBar
 
@@ -70,7 +71,9 @@ fun GroupDetailsScreen(
                             AssignmentListScreen(
                                 courseId = courseId,
                                 groupName = groupName,
-                                onListItemClick = { },
+                                onListItemClick = { assignmentId ->
+                                    navController.navigate("${Screen.AssignmentDetails.navigationRoute}/$assignmentId")
+                                },
                             )
                         }
                     }

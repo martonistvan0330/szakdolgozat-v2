@@ -116,53 +116,55 @@ fun AssignmentListScreen(
                         is AssignmentListState.Result -> {
                             val assignments = state.assignmentList.collectAsLazyPagingItems()
 
-                            LazyColumn(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                            ) {
-                                items(
-                                    count = assignments.itemCount,
-                                    key = { index ->
-                                        val assignment = assignments[index]
-                                        "${assignment?.assignmentId ?: ""}$index"
-                                    }
-                                ) { index ->
-                                    val assignment = assignments[index] ?: return@items
-                                    ListItem(
-                                        headlineText = {
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Icon(
-                                                    imageVector = Icons.Outlined.Assignment,
-                                                    contentDescription = null,
-                                                    modifier = Modifier
-                                                        .size(40.dp)
-                                                        .padding(
-                                                            end = 8.dp,
-                                                            top = 8.dp,
-                                                            bottom = 8.dp,
-                                                        ),
+                            if (assignments.itemCount <= 0) {
+                                Text(text = stringResource(id = R.string.text_empty_assignment_list))
+                            } else {
+                                LazyColumn(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                ) {
+                                    items(
+                                        count = assignments.itemCount,
+                                        key = { index ->
+                                            val assignment = assignments[index]
+                                            "${assignment?.assignmentId ?: ""}$index"
+                                        }
+                                    ) { index ->
+                                        val assignment = assignments[index] ?: return@items
+                                        ListItem(
+                                            headlineText = {
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Icon(
+                                                        imageVector = Icons.Outlined.Assignment,
+                                                        contentDescription = null,
+                                                        modifier = Modifier
+                                                            .size(40.dp)
+                                                            .padding(
+                                                                end = 8.dp,
+                                                                top = 8.dp,
+                                                                bottom = 8.dp,
+                                                            ),
+                                                    )
+                                                    Text(text = assignment.name)
+                                                }
+                                            },
+                                            supportingText = {
+                                                Text(
+                                                    text = assignment.deadline,
                                                 )
-                                                Text(text = assignment.name)
-                                            }
-                                        },
-                                        supportingText = {
-                                            Text(
-                                                text = assignment.deadline,
-                                            )
-                                        },
-                                        modifier = Modifier
-                                            .clickable(onClick = {
-                                                onListItemClick(
-                                                    assignment.assignmentId,
-                                                )
-                                            })
-                                            .animateItemPlacement(),
-                                    )
-                                    if (assignments.itemCount != index) {
-                                        Divider(
-                                            thickness = 2.dp,
-                                            color = MaterialTheme.colorScheme.secondaryContainer,
+                                            },
+                                            modifier = Modifier
+                                                .clickable(onClick = {
+                                                    onListItemClick(assignment.assignmentId)
+                                                })
+                                                .animateItemPlacement(),
                                         )
+                                        if (assignments.itemCount != index) {
+                                            Divider(
+                                                thickness = 2.dp,
+                                                color = MaterialTheme.colorScheme.secondaryContainer,
+                                            )
+                                        }
                                     }
                                 }
                             }

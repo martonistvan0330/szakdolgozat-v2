@@ -11,6 +11,7 @@ import hu.bme.aut.android.homeworkmanagerapp.network.assignment.AssignmentApi
 import hu.bme.aut.android.homeworkmanagerapp.network.auth.AuthApi
 import hu.bme.aut.android.homeworkmanagerapp.network.course.CourseApi
 import hu.bme.aut.android.homeworkmanagerapp.network.group.GroupApi
+import hu.bme.aut.android.homeworkmanagerapp.network.submission.SubmissionApi
 import hu.bme.aut.android.homeworkmanagerapp.network.user.UserApi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -68,6 +69,11 @@ class NetworkModule {
     @Provides
     fun provideGroupApi(retrofit: Retrofit): GroupApi {
         return retrofit.create(GroupApi::class.java)
+    }
+
+    @Provides
+    fun provideSubmissionApi(retrofit: Retrofit): SubmissionApi {
+        return retrofit.create(SubmissionApi::class.java)
     }
 
     @Provides

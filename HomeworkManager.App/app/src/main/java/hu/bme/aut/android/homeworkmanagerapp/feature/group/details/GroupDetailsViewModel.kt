@@ -6,5 +6,4 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GroupDetailsViewModel @Inject constructor(
-
 ) : ViewModel()
