@@ -93,6 +93,10 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 
     implementation("androidx.paging:paging-compose:3.2.1")
+
+    implementation("com.microsoft.signalr:signalr:7.0.0")
+
+    implementation("org.slf4j:slf4j-jdk14:1.7.25")
 }
 
 kapt {

@@ -1,12 +1,15 @@
 package hu.bme.aut.android.homeworkmanagerapp.di
 
 import android.content.Context
+import com.microsoft.signalr.HubConnection
+import com.microsoft.signalr.HubConnectionBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import hu.bme.aut.android.homeworkmanagerapp.network.AuthInterceptor
+import hu.bme.aut.android.homeworkmanagerapp.network.appointment.AppointmentApi
 import hu.bme.aut.android.homeworkmanagerapp.network.assignment.AssignmentApi
 import hu.bme.aut.android.homeworkmanagerapp.network.auth.AuthApi
 import hu.bme.aut.android.homeworkmanagerapp.network.course.CourseApi
@@ -22,8 +25,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
-    private val BASE_URL = "http://10.0.2.2:5020"
-
     @Singleton
     @Provides
     fun provideAuthInterceptor(@ApplicationContext context: Context): AuthInterceptor {
@@ -49,6 +50,11 @@ class NetworkModule {
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+    }
+
+    @Provides
+    fun provideAppointmentApi(retrofit: Retrofit): AppointmentApi {
+        return retrofit.create(AppointmentApi::class.java)
     }
 
     @Provides
@@ -79,5 +85,20 @@ class NetworkModule {
     @Provides
     fun provideUserApi(retrofit: Retrofit): UserApi {
         return retrofit.create(UserApi::class.java)
+    }
+
+    @Provides
+    fun provideAppointmentHubConnection(@ApplicationContext context: Context): HubConnection {
+        return HubConnectionBuilder
+            .create("$BASE_URL/appointment")
+//            .withAccessTokenProvider(Single.create {
+//                val sharedPref = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+//                sharedPref.getString("access-token", "")
+//            })
+            .build()
+    }
+
+    companion object {
+        const val BASE_URL = "http://10.0.2.2:5020"
     }
 }

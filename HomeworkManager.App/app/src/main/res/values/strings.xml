@@ -24,4 +24,6 @@
     <string name="assignment_details_presentation_appointments">Presentation appointments</string>
     <string name="button_upload_submission">Upload submission</string>
     <string name="button_download_submission">Download submission</string>
+    <string name="cancel">Cancel</string>
+    <string name="choose">Choose</string>
 </resources>

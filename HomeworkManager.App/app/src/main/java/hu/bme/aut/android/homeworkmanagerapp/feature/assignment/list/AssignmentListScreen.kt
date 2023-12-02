@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import hu.bme.aut.android.homeworkmanagerapp.R
 import hu.bme.aut.android.homeworkmanagerapp.ui.common.NormalTextField
@@ -116,7 +117,19 @@ fun AssignmentListScreen(
                         is AssignmentListState.Result -> {
                             val assignments = state.assignmentList.collectAsLazyPagingItems()
 
-                            if (assignments.itemCount <= 0) {
+                            val loadState = assignments.loadState
+                            val finishedLoading = loadState.refresh !is LoadState.Loading
+                                    && loadState.prepend !is LoadState.Loading
+                                    && loadState.append !is LoadState.Loading
+
+                            if (!finishedLoading) {
+                                CircularProgressIndicator(
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    modifier = Modifier
+                                        .align(Alignment.TopCenter)
+                                        .padding(top = 8.dp)
+                                )
+                            } else if (assignments.itemCount <= 0) {
                                 Text(text = stringResource(id = R.string.text_empty_assignment_list))
                             } else {
                                 LazyColumn(
