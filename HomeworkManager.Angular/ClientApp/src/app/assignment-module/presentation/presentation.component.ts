@@ -10,7 +10,7 @@ export class PresentationComponent {
   @Input() isTeacher: boolean = false;
   isEditing: boolean = false;
 
-  onEditClick() {
+  onAddClick() {
     this.isEditing = true;
   }
 

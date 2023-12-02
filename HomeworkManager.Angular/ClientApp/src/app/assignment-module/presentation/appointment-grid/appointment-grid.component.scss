@@ -1,0 +1,46 @@
+.appointment-grid-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.appointment-grid-actions-container {
+  width: 100%;
+  display: flex;
+  justify-content: end;
+
+  button {
+    margin: 0 8px;
+  }
+}
+
+.appointment-grid-row {
+  display: flex;
+  min-height: 100px;
+}
+
+.appointment-grid-row-date {
+  transform: rotate(-90deg);
+  min-width: 85px
+}
+
+.appointment-grid-cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 8px;
+  min-width: 100px;
+  padding: 16px
+}
+
+.appointment-grid-cell.available {
+
+}
+
+.appointment-grid-cell.unavailable {
+}
+
+.appointment-grid-cell.chosen {
+  background-color: lightgreen;
+  color: darkgreen;
+}

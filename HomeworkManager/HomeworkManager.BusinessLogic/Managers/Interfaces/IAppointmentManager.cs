@@ -9,4 +9,5 @@ public interface IAppointmentManager
     Task<Result> CreateAsync(NewAppointment newAppointment, CancellationToken cancellationToken = default);
     Task<Result<int>> SignUpAsync(int appointmentId, CancellationToken cancellationToken = default);
     Task<bool> AvailableAsync(NewAppointment newAppointment, CancellationToken cancellationToken = default);
+    Task<Result> AssignStudentsAsync(int assignmentId, bool submittedOnly, CancellationToken cancellationToken = default);
 }

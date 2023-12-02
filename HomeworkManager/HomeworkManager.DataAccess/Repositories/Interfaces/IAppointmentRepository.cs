@@ -25,4 +25,7 @@ public interface IAppointmentRepository
         Guid teacherId,
         CancellationToken cancellationToken = default
     );
+
+    Task AssignAllStudentsAsync(int assignmentId, CancellationToken cancellationToken = default);
+    Task AssignStudentsWithSubmissionAsync(int assignmentId, CancellationToken cancellationToken = default);
 }

@@ -1,18 +1,28 @@
-<div style="display: flex; flex-direction: column">
-    <div *ngFor="let appointmentRow of appointmentRows" style="display: flex; min-height: 100px;">
-        <p style="transform: rotate(-90deg); min-width: 85px">
+<div class="appointment-grid-container">
+    <div class="appointment-grid-actions-container">
+        <button (click)="onAssignAllClick()" color="accent" mat-raised-button>
+            Assign all students
+        </button>
+        <button (click)="onAssignSubmittedClick()" color="accent" mat-raised-button>
+            Assign students who submitted
+        </button>
+        <button (click)="onEditClick()" color="accent" mat-raised-button>
+            Add new
+        </button>
+    </div>
+    <div *ngFor="let appointmentRow of appointmentRows" class="appointment-grid-row">
+        <p class="appointment-grid-row-date">
             {{ appointmentRow.date }}
         </p>
         <ng-container *ngFor="let appointment of appointmentRow.appointmentModels">
-            <div *ngIf="!appointment.isAvailable"
-                 [ngClass]="appointment.isMine ? 'my-appointment' : ''"
-                 class="mat-elevation-z2"
-                 style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 8px; min-width: 175px; padding: 16px">
+            <div (click)="onAppointmentClick(appointment)"
+                 *ngIf="appointment.isAvailable" class="appointment-grid-cell available mat-elevation-z8"
+                 matRipple>
                 <h3>{{ appointment.time }}</h3>
             </div>
-            <div (click)="onAppointmentClick(appointment)"
-                 *ngIf="appointment.isAvailable" class="mat-elevation-z8" matRipple
-                 style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 8px; min-width: 100px; padding: 16px">
+            <div *ngIf="!appointment.isAvailable"
+                 [ngClass]="appointment.isMine ? 'chosen' : ''"
+                 class="appointment-grid-cell unavailable mat-elevation-z2">
                 <h3>{{ appointment.time }}</h3>
             </div>
         </ng-container>

@@ -73,4 +73,17 @@ public class AppointmentController : ControllerBase
 
         return signUpResult.ToActionResult();
     }
+
+    [HttpPost("{assignmentId}/AssignStudents")]
+    public async Task<ActionResult> AssignStudentsAsync(int assignmentId, bool submittedOnly, CancellationToken cancellationToken)
+    {
+        var assignResult = await _appointmentManager.AssignStudentsAsync(assignmentId, submittedOnly, cancellationToken);
+
+        if (assignResult.IsSuccess)
+        {
+            await _hubContext.Clients.Group($"Assignment_{assignmentId}").Refresh();
+        }
+
+        return assignResult.ToActionResult();
+    }
 }

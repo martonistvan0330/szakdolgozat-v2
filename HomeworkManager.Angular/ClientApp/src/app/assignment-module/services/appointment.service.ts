@@ -27,6 +27,13 @@ export class AppointmentService {
   }
 
   signUp(appointmentId: number) {
-    return this.authApiClient.patch<void>('Appointment/' + appointmentId, {})
+    return this.authApiClient.patch<void>('Appointment/' + appointmentId, {});
+  }
+
+  assignStudents(assignmentId: number, submittedOnly: boolean) {
+    return this.authApiClient.post<void>(
+      'Appointment/' + assignmentId + '/AssignStudents?submittedOnly=' + submittedOnly,
+      {}
+    );
   }
 }

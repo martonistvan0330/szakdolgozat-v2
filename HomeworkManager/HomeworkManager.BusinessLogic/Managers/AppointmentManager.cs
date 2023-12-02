@@ -70,7 +70,21 @@ public class AppointmentManager : IAppointmentManager
         );
     }
 
-    private IEnumerable<int> GetAppointments(string startTime, string endTime, int length)
+    public async Task<Result> AssignStudentsAsync(int assignmentId, bool submittedOnly, CancellationToken cancellationToken = default)
+    {
+        if (submittedOnly)
+        {
+            await _appointmentRepository.AssignStudentsWithSubmissionAsync(assignmentId, cancellationToken);
+        }
+        else
+        {
+            await _appointmentRepository.AssignAllStudentsAsync(assignmentId, cancellationToken);
+        }
+
+        return Result.Ok();
+    }
+
+    private static IEnumerable<int> GetAppointments(string startTime, string endTime, int length)
     {
         int startMinutes = TimeHelper.GetMinutes(startTime);
         int endMinutes = TimeHelper.GetMinutes(endTime);

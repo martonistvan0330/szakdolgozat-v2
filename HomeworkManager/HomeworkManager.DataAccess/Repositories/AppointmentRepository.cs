@@ -120,6 +120,30 @@ public class AppointmentRepository : IAppointmentRepository
         return appointment.AssignmentId;
     }
 
+    public async Task AssignAllStudentsAsync(int assignmentId, CancellationToken cancellationToken = default)
+    {
+        var students = await _context.Assignments
+            .Where(a => a.AssignmentId == assignmentId)
+            .SelectMany(a => a.Group.Students)
+            .Where(u => u.Appointments.All(a => a.AssignmentId != assignmentId))
+            .Select(u => u.Id)
+            .ToListAsync(cancellationToken);
+
+        await AssignStudents(assignmentId, students, cancellationToken);
+    }
+
+    public async Task AssignStudentsWithSubmissionAsync(int assignmentId, CancellationToken cancellationToken = default)
+    {
+        var students = await _context.Assignments
+            .Where(a => a.AssignmentId == assignmentId)
+            .SelectMany(a => a.Submissions.Where(s => !s.IsDraft).Select(s => s.Student))
+            .Where(u => u.Appointments.All(a => a.AssignmentId != assignmentId))
+            .Select(u => u.Id)
+            .ToListAsync(cancellationToken);
+
+        await AssignStudents(assignmentId, students, cancellationToken);
+    }
+
     public async Task<bool> ExistsBetweenAsync(
         int assignmentId, DateTime date, int startTime, int endTime,
         Guid teacherId, CancellationToken cancellationToken = default
@@ -130,5 +154,20 @@ public class AppointmentRepository : IAppointmentRepository
                         && a.Date.Date == date.Date && a.TeacherId == teacherId)
             .Where(a => startTime <= a.TimeInMinutes && a.TimeInMinutes <= endTime)
             .AnyAsync(cancellationToken);
+    }
+
+    private async Task AssignStudents(int assignmentId, IEnumerable<Guid> students, CancellationToken cancellationToken = default)
+    {
+        var appointments = _context.Appointments
+            .Where(a => a.AssignmentId == assignmentId)
+            .Where(a => a.StudentId == null);
+
+
+        foreach (var (studentId, appointment) in students.Zip(appointments))
+        {
+            appointment.StudentId = studentId;
+        }
+
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

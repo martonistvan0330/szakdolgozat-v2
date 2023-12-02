@@ -2,10 +2,14 @@
   padding: 50px;
 }
 
-.presentation-edit-button-container {
+.presentation-actions-container {
   width: 100%;
   display: flex;
   justify-content: end;
+
+  button {
+    margin: 0 8px;
+  }
 }
 
 .presentation-back-button-container {

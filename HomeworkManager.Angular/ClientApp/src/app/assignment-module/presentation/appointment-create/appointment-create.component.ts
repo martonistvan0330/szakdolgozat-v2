@@ -18,6 +18,7 @@ export class AppointmentCreateComponent implements OnInit {
   protected readonly Errors = Errors;
   @Input() assignmentId!: number;
   @Output() created = new EventEmitter<void>;
+  @Output() backClick = new EventEmitter<void>;
 
   protected get date() {
     return this.appointmentForm.get('date')!!;
@@ -68,6 +69,10 @@ export class AppointmentCreateComponent implements OnInit {
           this.snackBarService.error("Appointment creation failed", error.error);
         }
       })
+  }
+
+  onBack() {
+    this.backClick.emit()
   }
 
   private formSetup() {

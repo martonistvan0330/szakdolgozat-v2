@@ -1,4 +1,4 @@
-import { Component, Inject, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Inject, inject, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { AppointmentService } from "../../services/appointment.service";
 import { SnackBarService } from "../../../core-module";
 import { AppointmentModel, AppointmentRow } from "../../../shared-module";
@@ -20,6 +20,7 @@ export class AppointmentGridComponent implements OnInit, OnDestroy {
   private readonly connection: HubConnection;
   appointmentRows: AppointmentRow[] = [];
   @Input() assignmentId!: number;
+  @Output() addClick = new EventEmitter<void>()
 
   constructor(@Inject('BASE_URL') private readonly baseUrl: string) {
     this.connection = new HubConnectionBuilder()
@@ -48,7 +49,7 @@ export class AppointmentGridComponent implements OnInit, OnDestroy {
           .catch(() => {
             this.authService.authenticate();
 
-            this.connection.invoke('JoinRoom', this.assignmentId);
+            this.connection.invoke('JoinRoom', this.assignmentId).then();
           });
       })
       .catch(error => {
@@ -74,6 +75,28 @@ export class AppointmentGridComponent implements OnInit, OnDestroy {
                 this.snackBarService.error('Appointment sign up failed!', error.error);
               }
             });
+        }
+      });
+  }
+
+  onEditClick() {
+    this.addClick.emit();
+  }
+
+  onAssignAllClick() {
+    this.appointmentService.assignStudents(this.assignmentId, false)
+      .subscribe({
+        next: () => {
+          this.snackBarService.success('Successful assignments');
+        }
+      });
+  }
+
+  onAssignSubmittedClick() {
+    this.appointmentService.assignStudents(this.assignmentId, true)
+      .subscribe({
+        next: () => {
+          this.snackBarService.success('Successful assignments');
         }
       });
   }
